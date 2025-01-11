@@ -1,0 +1,44 @@
+# Copyright (c) 2024, Egor Romanov.
+# All rights reserved.
+
+import sys
+from importlib.metadata import version
+from typing import Annotated
+
+from cyclopts import App, Parameter
+from faststream.cli.main import cli as run_faststream
+
+
+def main() -> None:
+    app = create_cli_app()
+    app()
+
+
+def create_cli_app() -> App:
+    app = App(
+        name="Four In A Row",
+        version=version("four_in_a_row"),
+        help_format="rich",
+    )
+
+    app.command(run_message_consumer)
+
+    return app
+
+
+def run_message_consumer(
+    workers: Annotated[
+        str,
+        Parameter("--workers", show_default=True),
+    ] = "1",
+) -> None:
+    """Run message consumer."""
+    sys.argv = [
+        "faststream",
+        "run",
+        "four_in_a_row.main.message_consumer:create_message_consumer_app",
+        "--workers",
+        workers,
+        "--factory",
+    ]
+    run_faststream()
