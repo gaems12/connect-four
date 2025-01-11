@@ -17,7 +17,7 @@ def lock_manager_config_from_env() -> "LockManagerConfig":
         lock_expires_in=get_env_var(
             key="LOCK_EXPIRES_IN",
             value_factory=str_to_timedelta,
-        )
+        ),
     )
 
 
@@ -35,7 +35,7 @@ class LockManager:
 
     def __init__(self, redis: Redis, config: LockManagerConfig):
         self._redis = redis
-        self._acquired_lock_names = []
+        self._acquired_lock_names: list[str] = []
         self._config = config
 
     async def acquire(self, lock_id: str) -> None:

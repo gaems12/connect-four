@@ -33,7 +33,7 @@ class GameGateway(Protocol):
         player_ids: tuple[UserId, UserId],
         *,
         sort_by: SortGamesBy | None = None,
-        limit: int = 0
+        limit: int = 0,
     ) -> list[Game]:
         raise NotImplementedError
 

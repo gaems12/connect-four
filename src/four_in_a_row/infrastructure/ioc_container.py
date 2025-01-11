@@ -3,7 +3,7 @@
 
 __all__ = ("ioc_container_factory",)
 
-from typing import Callable, Iterable
+from typing import Any, Callable, Coroutine, Iterable
 
 from dishka import Provider, Scope, AsyncContainer, make_async_container
 from adaptix import Retort
@@ -44,11 +44,13 @@ from .message_borker import (
 from .event_publisher import RealEventPublisher
 
 
-type Command = CreateGameCommand
+type _Command = CreateGameCommand
+
+type _CommandFactory = Callable[..., Coroutine[Any, Any, _Command]]
 
 
 def ioc_container_factory(
-    command_factories: Iterable[Callable[..., Command]],
+    command_factories: Iterable[_CommandFactory],
     *extra_providers: Provider,
 ) -> AsyncContainer:
     provider = Provider()

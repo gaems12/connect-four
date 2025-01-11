@@ -27,7 +27,7 @@ def create_message_consumer_app() -> FastStream:
     )
     ioc_container = ioc_container_factory(
         [create_game_command_factory],
-        FastStreamProvider,
+        FastStreamProvider(),
     )
     setup_dishka(ioc_container, app)
 

@@ -54,8 +54,8 @@ class HTTPXCentrifugoClient:
         self,
         event: GameCreatedEvent,
     ) -> None:
-        event_as_dict = {
-            "players": map(lambda user_id: user_id.hex, event.players),
+        event_as_dict: dict[str, _Serializable] = {
+            "players": list(map(lambda user_id: user_id.hex, event.players)),
             "current_turn": event.current_turn.hex,
         }
         await self._publish(
@@ -63,7 +63,7 @@ class HTTPXCentrifugoClient:
             data=event_as_dict,
         )
 
-    def _game_channel_factory(self, game_id: GameId) -> None:
+    def _game_channel_factory(self, game_id: GameId) -> str:
         return f"game:{game_id}"
 
     async def _publish(

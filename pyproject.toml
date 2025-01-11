@@ -21,7 +21,6 @@ dependencies = [
     "faststream[nats]==0.5.*",
 ]
 
-
 [project.optional-dependencies]
 dev = [
     "mypy==1.14.*",

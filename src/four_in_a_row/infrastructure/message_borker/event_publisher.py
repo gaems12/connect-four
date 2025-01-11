@@ -27,7 +27,7 @@ class NATSEventPublisher:
     ) -> None:
         event_as_dict = {
             "id": event.id.hex,
-            "players": map(lambda user_id: user_id.hex, event.players),
+            "players": list(map(lambda user_id: user_id.hex, event.players)),
             "current_turn": event.current_turn.hex,
         }
         await self._jetstream.publish(

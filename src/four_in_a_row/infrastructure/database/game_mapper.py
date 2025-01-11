@@ -22,7 +22,7 @@ def game_mapper_config_from_env() -> "GameMapperConfig":
         game_expires_in=get_env_var(
             key="GAME_MAPPER_GAME_EXPIRES_IN",
             value_factory=str_to_timedelta,
-        )
+        ),
     )
 
 
@@ -69,7 +69,7 @@ class GameMapper(GameGateway):
         if not keys:
             return None
 
-        game_as_dict = await self._redis.hgetall(keys[0])
+        game_as_dict = await self._redis.hgetall(keys[0])  # type: ignore
         if game_as_dict:
             return self._plain_retort.load(game_as_dict, Game)
 
@@ -94,7 +94,7 @@ class GameMapper(GameGateway):
             if game_count == limit:
                 break
 
-            game_as_dict = await self._redis.hgetall(key)
+            game_as_dict = await self._redis.hgetall(key)  # type: ignore
             if not game_as_dict:
                 continue
 
@@ -106,7 +106,7 @@ class GameMapper(GameGateway):
         if not sort_by:
             return games
 
-        return sorted(games, lambda game: game.created_at, reverse=True)
+        return sorted(games, key=lambda game: game.created_at, reverse=True)
 
     async def save(self, game: Game) -> None:
         hashmap_key = self._key_for_game_hashmap(
@@ -123,7 +123,10 @@ class GameMapper(GameGateway):
         )
 
     async def update(self, game: Game) -> None:
-        hashmap_key = self._key_for_game_hashmap(game.id)
+        hashmap_key = self._key_for_game_hashmap(
+            game_id=game.id,
+            player_ids=game.players.keys(),
+        )
 
         game_as_dict = self._plain_retort.dump(game, dict)
         self._redis_pipeline.hset(hashmap_key, game_as_dict)
