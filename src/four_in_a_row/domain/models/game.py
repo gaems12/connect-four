@@ -8,7 +8,7 @@ from four_in_a_row.domain.identitifiers import GameId, UserId
 from four_in_a_row.domain.constants import ChipType, GameStatus
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(slots=True, kw_only=True)
 class Game:
     id: GameId
     status: GameStatus

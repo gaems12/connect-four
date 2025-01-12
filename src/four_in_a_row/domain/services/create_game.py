@@ -4,7 +4,12 @@
 from datetime import datetime
 
 from four_in_a_row.domain.identitifiers import GameId, UserId
-from four_in_a_row.domain.constants import ChipType, GameStatus
+from four_in_a_row.domain.constants import (
+    ChipType,
+    GameStatus,
+    BOARD_COLUMNS,
+    BOARD_ROWS,
+)
 from four_in_a_row.domain.models import Game
 
 
@@ -34,6 +39,6 @@ class CreateGame:
             status=GameStatus.NOT_STARTED,
             players=players,
             current_turn=first_player_id,
-            board=[[None] * 7 for _ in range(6)],
+            board=[[None] * BOARD_COLUMNS for _ in range(BOARD_ROWS)],
             created_at=created_at,
         )
