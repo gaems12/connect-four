@@ -7,9 +7,11 @@ __all__ = (
     "EventPublisher",
     "SortGamesBy",
     "GameGateway",
+    "TaskScheduler",
     "TransactionManager",
 )
 
 from .event_publisher import GameCreatedEvent, Event, EventPublisher
 from .game_gateway import SortGamesBy, GameGateway
+from .task_scheduler import TaskScheduler
 from .transaction_manager import TransactionManager

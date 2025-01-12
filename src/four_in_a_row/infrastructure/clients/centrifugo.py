@@ -54,13 +54,20 @@ class HTTPXCentrifugoClient:
         self,
         event: GameCreatedEvent,
     ) -> None:
-        event_as_dict: dict[str, _Serializable] = {
-            "players": list(map(lambda user_id: user_id.hex, event.players)),
+        players = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),
+            }
+            for player_id, player_state in event.players.items()
+        }
+        event_as_dict = {
+            "players": players,
             "current_turn": event.current_turn.hex,
         }
         await self._publish(
             channel=self._game_channel_factory(event.id),
-            data=event_as_dict,
+            data=event_as_dict,  # type: ignore
         )
 
     def _game_channel_factory(self, game_id: GameId) -> str:
@@ -70,7 +77,7 @@ class HTTPXCentrifugoClient:
         self,
         *,
         channel: str,
-        data: dict[str, _Serializable],
+        data: _Serializable,
     ) -> None:
         await self._send_request(
             method="publish",
@@ -81,7 +88,7 @@ class HTTPXCentrifugoClient:
         self,
         *,
         method: str,
-        payload: dict[str, _Serializable],
+        payload: _Serializable,
     ) -> None:
         response = await self._httpx_client.post(
             url=urljoin(self._config.url, method),

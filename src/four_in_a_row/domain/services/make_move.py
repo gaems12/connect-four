@@ -84,7 +84,7 @@ class MakeMove:
         move: Move,
         current_player_id: UserId,
     ) -> GameStarted | PlayerWon | Draw | MoveAccepted:
-        current_player_chip_type = game.players[current_player_id]
+        current_player_chip_type = game.players[current_player_id].chip_type
         game.board[move.row][move.column] = current_player_chip_type
 
         if game.status == GameStatus.NOT_STARTED:

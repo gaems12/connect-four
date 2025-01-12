@@ -1,6 +1,7 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
+import json
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import Iterable
@@ -69,8 +70,9 @@ class GameMapper(GameGateway):
         if not keys:
             return None
 
-        game_as_dict = await self._redis.hgetall(keys[0])  # type: ignore
-        if game_as_dict:
+        game_as_json = await self._redis.get(keys[0])  # type: ignore
+        if game_as_json:
+            game_as_dict = json.loads(game_as_json)
             return self._plain_retort.load(game_as_dict, Game)
 
         return None
@@ -94,10 +96,11 @@ class GameMapper(GameGateway):
             if game_count == limit:
                 break
 
-            game_as_dict = await self._redis.hgetall(key)  # type: ignore
-            if not game_as_dict:
+            game_as_json = await self._redis.get(key)  # type: ignore
+            if not game_as_json:
                 continue
 
+            game_as_dict = json.loads(game_as_json)
             game = self._plain_retort.load(game_as_dict, Game)
             games.append(game)
 
@@ -109,29 +112,32 @@ class GameMapper(GameGateway):
         return sorted(games, key=lambda game: game.created_at, reverse=True)
 
     async def save(self, game: Game) -> None:
-        hashmap_key = self._key_for_game_hashmap(
+        game_key = self._game_key_factory(
             game_id=game.id,
             player_ids=game.players.keys(),
         )
 
         game_as_dict = self._plain_retort.dump(game, dict)
-        self._redis_pipeline.hset(hashmap_key, game_as_dict)
+        game_as_json = json.dumps(game_as_dict)
 
-        self._redis_pipeline.expire(
-            name=hashmap_key,
-            time=self._config.game_expires_in,
+        self._redis_pipeline.set(
+            name=game_key,
+            value=game_as_json,
+            ex=self._config.game_expires_in,
         )
 
     async def update(self, game: Game) -> None:
-        hashmap_key = self._key_for_game_hashmap(
+        game_key = self._game_key_factory(
             game_id=game.id,
             player_ids=game.players.keys(),
         )
 
         game_as_dict = self._plain_retort.dump(game, dict)
-        self._redis_pipeline.hset(hashmap_key, game_as_dict)
+        game_as_json = json.dumps(game_as_dict)
 
-    def _key_for_game_hashmap(
+        self._redis_pipeline.set(game_key, game_as_json)
+
+    def _game_key_factory(
         self,
         *,
         game_id: GameId,

@@ -25,9 +25,16 @@ class NATSEventPublisher:
         self,
         event: GameCreatedEvent,
     ) -> None:
+        players = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type,
+                "time_left": player_state.time_left.total_seconds(),
+            }
+            for player_id, player_state in event.players.items()
+        }
         event_as_dict = {
             "id": event.id.hex,
-            "players": list(map(lambda user_id: user_id.hex, event.players)),
+            "players": players,
             "current_turn": event.current_turn.hex,
         }
         await self._jetstream.publish(

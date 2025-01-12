@@ -2,6 +2,7 @@
 # All rights reserved.
 
 __all__ = (
+    "PlayerState",
     "Game",
     "Move",
     "GameStarted",
@@ -12,6 +13,7 @@ __all__ = (
     "MoveResult",
 )
 
+from .player_state import PlayerState
 from .game import Game
 from .move import Move
 from .move_result import (

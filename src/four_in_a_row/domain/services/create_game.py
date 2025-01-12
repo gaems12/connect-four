@@ -1,7 +1,7 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from four_in_a_row.domain.identitifiers import GameId, UserId
 from four_in_a_row.domain.constants import (
@@ -10,7 +10,7 @@ from four_in_a_row.domain.constants import (
     BOARD_COLUMNS,
     BOARD_ROWS,
 )
-from four_in_a_row.domain.models import Game
+from four_in_a_row.domain.models import Game, PlayerState
 
 
 class CreateGame:
@@ -21,17 +21,30 @@ class CreateGame:
         first_player_id: UserId,
         second_player_id: UserId,
         created_at: datetime,
+        time_for_each_player: timedelta,
         last_game: Game | None = None,
     ) -> Game:
         if last_game:
             players = {
-                first_player_id: last_game.players[second_player_id],
-                second_player_id: last_game.players[first_player_id],
+                first_player_id: PlayerState(
+                    chip_type=last_game.players[second_player_id].chip_type,
+                    time_left=time_for_each_player,
+                ),
+                second_player_id: PlayerState(
+                    chip_type=last_game.players[first_player_id].chip_type,
+                    time_left=time_for_each_player,
+                ),
             }
         else:
             players = {
-                first_player_id: ChipType.FIRST,
-                second_player_id: ChipType.SECOND,
+                first_player_id: PlayerState(
+                    chip_type=ChipType.FIRST,
+                    time_left=time_for_each_player,
+                ),
+                second_player_id: PlayerState(
+                    chip_type=ChipType.SECOND,
+                    time_left=time_for_each_player,
+                ),
             }
 
         return Game(

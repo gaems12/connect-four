@@ -4,13 +4,13 @@
 from dataclasses import dataclass
 from typing import Protocol
 
-from four_in_a_row.domain import ChipType, GameId, UserId
+from four_in_a_row.domain import GameId, UserId, PlayerState
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GameCreatedEvent:
     id: GameId
-    players: dict[UserId, ChipType]
+    players: dict[UserId, PlayerState]
     current_turn: UserId
 
 

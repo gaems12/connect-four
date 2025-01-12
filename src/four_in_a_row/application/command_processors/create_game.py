@@ -2,7 +2,7 @@
 # All rights reserved.
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from four_in_a_row.domain import UserId, GameId, CreateGame
 from four_in_a_row.application.common import (
@@ -19,6 +19,7 @@ class CreateGameCommand:
     id: GameId
     first_player_id: UserId
     second_player_id: UserId
+    time_for_each_player: timedelta
     created_at: datetime
 
 
@@ -58,6 +59,7 @@ class CreateGameProcessor:
             first_player_id=command.first_player_id,
             second_player_id=command.second_player_id,
             created_at=command.created_at,
+            time_for_each_player=command.time_for_each_player,
             last_game=last_game,
         )
         await self._game_gateway.save(new_game)
