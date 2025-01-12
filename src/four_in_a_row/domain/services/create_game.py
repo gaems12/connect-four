@@ -53,5 +53,6 @@ class CreateGame:
             players=players,
             current_turn=first_player_id,
             board=[[None] * BOARD_COLUMNS for _ in range(BOARD_ROWS)],
+            last_move_made_at=None,
             created_at=created_at,
         )

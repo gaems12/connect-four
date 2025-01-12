@@ -16,4 +16,5 @@ class Game:
     players: dict[UserId, PlayerState]
     current_turn: UserId
     board: list[list[ChipType | None]]
+    last_move_made_at: datetime | None
     created_at: datetime

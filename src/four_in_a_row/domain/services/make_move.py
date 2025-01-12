@@ -2,6 +2,7 @@
 # All rights reserved.
 
 from typing import Final
+from datetime import datetime, timezone, timedelta
 
 from four_in_a_row.domain.identitifiers import UserId
 from four_in_a_row.domain.constants import (
@@ -58,6 +59,20 @@ class MakeMove:
                 reason=MoveRejectionReason.OTHER_PLAYER_TURN,
             )
 
+        no_time_left_for_current_player = self._apply_turn_time(
+            game=game,
+            current_player_id=current_player_id,
+        )
+        if no_time_left_for_current_player:
+            game.status = GameStatus.FINISHED
+
+            return MoveRejected(
+                column=move.column,
+                row=move.row,
+                player_id=current_player_id,
+                reason=MoveRejectionReason.TIME_IS_UP,
+            )
+
         if (
             move.column > BOARD_COLUMNS - 1
             or move.row > BOARD_ROWS - 1
@@ -76,6 +91,35 @@ class MakeMove:
             current_player_id=current_player_id,
         )
         return move_result
+
+    def _apply_turn_time(
+        self,
+        *,
+        game: Game,
+        current_player_id: UserId,
+    ) -> bool:
+        """
+        Updates the game's state based on the time taken by the
+        current player to make their move and returns whether
+        the current player's time has expired.
+        """
+        current_datetime = datetime.now(timezone.utc)
+
+        if game.status == GameStatus.NOT_STARTED:
+            game.last_move_made_at = current_datetime
+            return False
+
+        time_for_move = current_datetime - game.last_move_made_at  # type: ignore
+
+        if time_for_move > game.players[current_player_id].time_left:
+            game.players[current_player_id].time_left = timedelta(seconds=0)
+            game.last_move_made_at = current_datetime
+            return True
+
+        game.players[current_player_id].time_left -= time_for_move
+        game.last_move_made_at = current_datetime
+
+        return False
 
     def _make_move(
         self,
