@@ -7,4 +7,4 @@ from enum import StrEnum
 class GameStatus(StrEnum):
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"
-    FINISHED = "finished"
+    ENDED = "ended"

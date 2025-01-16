@@ -44,11 +44,11 @@ class MakeMove:
         if current_player_id not in game.players.keys():
             raise Exception("There is no current player in the game")
 
-        if game.status == GameStatus.FINISHED:
+        if game.status == GameStatus.ENDED:
             return MoveRejected(
                 move=move,
                 player_id=current_player_id,
-                reason=MoveRejectionReason.GAME_IS_FINISHED,
+                reason=MoveRejectionReason.GAME_IS_ENDED,
             )
 
         if game.current_turn != current_player_id:
@@ -63,7 +63,7 @@ class MakeMove:
             current_player_id=current_player_id,
         )
         if no_time_left_for_current_player:
-            game.status = GameStatus.FINISHED
+            game.status = GameStatus.ENDED
 
             return MoveRejected(
                 move=move,
@@ -150,7 +150,7 @@ class MakeMove:
             current_player_chip_type=current_player_chip_type,
         )
         if player_won:
-            game.status = GameStatus.FINISHED
+            game.status = GameStatus.ENDED
 
             return PlayerWon(
                 move=move,
@@ -159,7 +159,7 @@ class MakeMove:
 
         board_is_full = self._check_if_board_is_full(game.board)
         if board_is_full:
-            game.status = GameStatus.FINISHED
+            game.status = GameStatus.ENDED
 
             return Draw(
                 move=move,

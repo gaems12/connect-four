@@ -25,7 +25,7 @@ class TryToLoseOnTime:
         if game.state_id != game_state_id:
             return False
 
-        game.status = GameStatus.FINISHED
+        game.status = GameStatus.ENDED
         game.players[game.current_turn].time_left = timedelta(seconds=0)
 
         return True
