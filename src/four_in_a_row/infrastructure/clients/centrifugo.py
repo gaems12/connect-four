@@ -7,7 +7,14 @@ from dataclasses import dataclass
 from httpx import AsyncClient
 
 from four_in_a_row.domain import GameId
-from four_in_a_row.application import GameCreatedEvent, Event
+from four_in_a_row.application import (
+    GameCreatedEvent,
+    GameStartedEvent,
+    GameEndedEvent,
+    MoveAcceptedEvent,
+    MoveRejectedEvent,
+    Event,
+)
 from four_in_a_row.infrastructure.utils import get_env_var
 
 
@@ -50,6 +57,18 @@ class HTTPXCentrifugoClient:
         if isinstance(event, GameCreatedEvent):
             await self._publish_game_created(event)
 
+        elif isinstance(event, GameStartedEvent):
+            await self._publish_game_started(event)
+
+        elif isinstance(event, GameEndedEvent):
+            await self._publish_game_ended(event)
+
+        elif isinstance(event, MoveAcceptedEvent):
+            await self._publish_move_accepted(event)
+
+        elif isinstance(event, MoveRejectedEvent):
+            await self._publish_move_rejected(event)
+
     async def _publish_game_created(
         self,
         event: GameCreatedEvent,
@@ -62,11 +81,101 @@ class HTTPXCentrifugoClient:
             for player_id, player_state in event.players.items()
         }
         event_as_dict = {
+            "event_type": "game_created",
             "players": players,
             "current_turn": event.current_turn.hex,
         }
         await self._publish(
-            channel=self._game_channel_factory(event.id),
+            channel=self._game_channel_factory(event.game_id),
+            data=event_as_dict,  # type: ignore
+        )
+
+    async def _publish_game_started(
+        self,
+        event: GameStartedEvent,
+    ) -> None:
+        await self._publish(
+            channel=self._game_channel_factory(event.game_id),
+            data={"event_type": "game_started"},
+        )
+
+    async def _publish_game_ended(
+        self,
+        event: GameEndedEvent,
+    ) -> None:
+        move = {
+            "row": event.move.row,
+            "column": event.move.column,
+        }
+        players = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),
+            }
+            for player_id, player_state in event.players.items()
+        }
+        event_as_dict = {
+            "type": "game_ended",
+            "move": move,
+            "players": players,
+            "reason": event.reason,
+            "last_turn": event.last_turn.hex,
+        }
+        await self._publish(
+            channel=self._game_channel_factory(event.game_id),
+            data=event_as_dict,  # type: ignore
+        )
+
+    async def _publish_move_accepted(
+        self,
+        event: MoveAcceptedEvent,
+    ) -> None:
+        move = {
+            "row": event.move.row,
+            "column": event.move.column,
+        }
+        players = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),
+            }
+            for player_id, player_state in event.players.items()
+        }
+        event_as_dict = {
+            "type": "move_accepted",
+            "move": move,
+            "players": players,
+            "current_turn": event.current_turn.hex,
+        }
+        await self._publish(
+            channel=self._game_channel_factory(event.game_id),
+            data=event_as_dict,  # type: ignore
+        )
+
+    async def _publish_move_rejected(
+        self,
+        event: MoveRejectedEvent,
+    ) -> None:
+        move = {
+            "row": event.move.row,
+            "column": event.move.column,
+        }
+        players = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),
+            }
+            for player_id, player_state in event.players.items()
+        }
+        event_as_dict = {
+            "type": "move_rejected",
+            "move": move,
+            "players": players,
+            "reason": event.reason,
+            "current_turn": event.current_turn.hex,
+        }
+        await self._publish(
+            channel=self._game_channel_factory(event.game_id),
             data=event_as_dict,  # type: ignore
         )
 

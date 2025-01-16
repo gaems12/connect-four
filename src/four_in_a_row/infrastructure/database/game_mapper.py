@@ -7,10 +7,10 @@ from datetime import timedelta
 from typing import Iterable
 
 from redis.asyncio.client import Redis, Pipeline
-from adaptix import Retort
 
 from four_in_a_row.domain import GameId, UserId, Game
 from four_in_a_row.application import SortGamesBy, GameGateway
+from four_in_a_row.infrastructure.common_retort import CommonRetort
 from four_in_a_row.infrastructure.utils import (
     get_env_var,
     str_to_timedelta,
@@ -36,7 +36,7 @@ class GameMapper(GameGateway):
     __slots__ = (
         "_redis",
         "_redis_pipeline",
-        "_plain_retort",
+        "_common_retort",
         "_lock_manager",
         "_config",
     )
@@ -45,13 +45,13 @@ class GameMapper(GameGateway):
         self,
         redis: Redis,
         redis_pipeline: Pipeline,
-        plain_retort: Retort,
+        common_retort: CommonRetort,
         lock_manager: LockManager,
         config: GameMapperConfig,
     ):
         self._redis = redis
         self._redis_pipeline = redis_pipeline
-        self._plain_retort = plain_retort
+        self._common_retort = common_retort
         self._lock_manager = lock_manager
         self._config = config
 
@@ -73,7 +73,7 @@ class GameMapper(GameGateway):
         game_as_json = await self._redis.get(keys[0])  # type: ignore
         if game_as_json:
             game_as_dict = json.loads(game_as_json)
-            return self._plain_retort.load(game_as_dict, Game)
+            return self._common_retort.load(game_as_dict, Game)
 
         return None
 
@@ -101,7 +101,7 @@ class GameMapper(GameGateway):
                 continue
 
             game_as_dict = json.loads(game_as_json)
-            game = self._plain_retort.load(game_as_dict, Game)
+            game = self._common_retort.load(game_as_dict, Game)
             games.append(game)
 
             game_count += 1
@@ -117,7 +117,7 @@ class GameMapper(GameGateway):
             player_ids=game.players.keys(),
         )
 
-        game_as_dict = self._plain_retort.dump(game, dict)
+        game_as_dict = self._common_retort.dump(game, dict)
         game_as_json = json.dumps(game_as_dict)
 
         self._redis_pipeline.set(
@@ -132,7 +132,7 @@ class GameMapper(GameGateway):
             player_ids=game.players.keys(),
         )
 
-        game_as_dict = self._plain_retort.dump(game, dict)
+        game_as_dict = self._common_retort.dump(game, dict)
         game_as_json = json.dumps(game_as_dict)
 
         self._redis_pipeline.set(game_key, game_as_json)

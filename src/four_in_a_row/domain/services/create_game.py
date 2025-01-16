@@ -2,8 +2,9 @@
 # All rights reserved.
 
 from datetime import datetime, timedelta
+from uuid import uuid4
 
-from four_in_a_row.domain.identitifiers import GameId, UserId
+from four_in_a_row.domain.identitifiers import GameId, GameStateId, UserId
 from four_in_a_row.domain.constants import (
     ChipType,
     GameStatus,
@@ -49,6 +50,7 @@ class CreateGame:
 
         return Game(
             id=id,
+            state_id=GameStateId(uuid4()),
             status=GameStatus.NOT_STARTED,
             players=players,
             current_turn=first_player_id,

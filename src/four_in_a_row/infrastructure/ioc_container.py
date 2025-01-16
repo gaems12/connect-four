@@ -6,11 +6,11 @@ __all__ = ("ioc_container_factory",)
 from typing import Any, Callable, Coroutine, Iterable
 
 from dishka import Provider, Scope, AsyncContainer, make_async_container
-from adaptix import Retort
 
 from four_in_a_row.application import (
     GameGateway,
     EventPublisher,
+    TaskScheduler,
     TransactionManager,
     CreateGameCommand,
     CreateGameProcessor,
@@ -22,8 +22,6 @@ from .clients import (
     HTTPXCentrifugoClient,
 )
 from .database import (
-    RedisConfig,
-    redis_config_from_env,
     redis_factory,
     redis_pipeline_factory,
     GameMapperConfig,
@@ -41,6 +39,12 @@ from .message_borker import (
     nats_jetstream_factory,
     NATSEventPublisher,
 )
+from .scheduling import (
+    taskiq_redis_schedule_source_factory,
+    TaskiqTaskScheduler,
+)
+from .redis_config import RedisConfig, redis_config_from_env
+from .common_retort import common_retort_factory
 from .event_publisher import RealEventPublisher
 
 
@@ -74,8 +78,9 @@ def ioc_container_factory(
     provider.provide(redis_pipeline_factory, scope=Scope.REQUEST)
     provider.provide(nats_client_factory, scope=Scope.APP)
     provider.provide(nats_jetstream_factory, scope=Scope.APP)
+    provider.provide(taskiq_redis_schedule_source_factory, scope=Scope.APP)
 
-    provider.provide(Retort, scope=Scope.APP)
+    provider.provide(common_retort_factory, scope=Scope.APP)
 
     provider.provide(LockManager, scope=Scope.REQUEST)
     provider.provide(GameMapper, provides=GameGateway, scope=Scope.REQUEST)
@@ -91,6 +96,12 @@ def ioc_container_factory(
         RealEventPublisher,
         provides=EventPublisher,
         scope=Scope.REQUEST,
+    )
+
+    provider.provide(
+        TaskiqTaskScheduler,
+        scope=Scope.REQUEST,
+        provides=TaskScheduler,
     )
 
     for command_factory in command_factories:

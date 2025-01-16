@@ -5,12 +5,12 @@ from dataclasses import dataclass
 
 from four_in_a_row.domain.identitifiers import UserId
 from four_in_a_row.domain.constants import MoveRejectionReason
+from .move import Move
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BaseMoveResult:
-    column: int
-    row: int
+    move: Move
     player_id: UserId
 
 

@@ -2,8 +2,6 @@
 # All rights reserved.
 
 __all__ = (
-    "RedisConfig",
-    "redis_config_from_env",
     "redis_factory",
     "redis_pipeline_factory",
     "LockManagerConfig",
@@ -15,7 +13,6 @@ __all__ = (
     "RedisTransactionManager",
 )
 
-from .config import RedisConfig, redis_config_from_env
 from .redis_ import redis_factory, redis_pipeline_factory
 from .lock_manager import (
     LockManagerConfig,

@@ -1,9 +1,11 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
+__all__ = ("RedisConfig", "redis_config_from_env")
+
 from dataclasses import dataclass
 
-from four_in_a_row.infrastructure.utils import get_env_var
+from .utils import get_env_var
 
 
 def redis_config_from_env() -> "RedisConfig":

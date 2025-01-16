@@ -65,7 +65,8 @@ class CreateGameProcessor:
         await self._game_gateway.save(new_game)
 
         event = GameCreatedEvent(
-            id=new_game.id,
+            game_id=new_game.id,
+            board=new_game.board,
             players=new_game.players,
             current_turn=new_game.current_turn,
         )

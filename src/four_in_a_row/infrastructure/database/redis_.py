@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 
 from redis.asyncio.client import Redis, Pipeline
 
-from .config import RedisConfig
+from four_in_a_row.infrastructure.redis_config import RedisConfig
 
 
 async def redis_factory(

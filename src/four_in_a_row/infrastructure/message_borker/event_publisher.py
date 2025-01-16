@@ -2,42 +2,45 @@
 # All rights reserved.
 
 import json
+from typing import Final
 
 from nats.js.client import JetStreamContext
 
-from four_in_a_row.application import GameCreatedEvent, Event
+from four_in_a_row.application import (
+    GameCreatedEvent,
+    GameStartedEvent,
+    GameEndedEvent,
+    MoveAcceptedEvent,
+    MoveRejectedEvent,
+    Event,
+)
+from four_in_a_row.infrastructure.common_retort import CommonRetort
 
 
-_GAME_CREATED_SUBJECT = "game.created"
+_EVENT_TO_SUBJECT_MAP: Final = {
+    GameCreatedEvent: "game.created",
+    GameStartedEvent: "game.started",
+    GameEndedEvent: "game.ended",
+    MoveAcceptedEvent: "game.move.accepted",
+    MoveRejectedEvent: "game.move.rejected",
+}
 
 
 class NATSEventPublisher:
-    __all__ = ("_jetstream",)
+    __all__ = ("_jetstream", "_common_retort")
 
-    def __init__(self, jetstream: JetStreamContext):
+    def __init__(
+        self,
+        jetstream: JetStreamContext,
+        common_retort: CommonRetort,
+    ):
         self._jetstream = jetstream
+        self._common_retort = common_retort
 
     async def publish(self, event: Event) -> None:
-        if isinstance(event, GameCreatedEvent):
-            await self._publish_game_created(event)
+        subject = _EVENT_TO_SUBJECT_MAP[type(event)]
 
-    async def _publish_game_created(
-        self,
-        event: GameCreatedEvent,
-    ) -> None:
-        players = {
-            player_id.hex: {
-                "chip_type": player_state.chip_type,
-                "time_left": player_state.time_left.total_seconds(),
-            }
-            for player_id, player_state in event.players.items()
-        }
-        event_as_dict = {
-            "id": event.id.hex,
-            "players": players,
-            "current_turn": event.current_turn.hex,
-        }
-        await self._jetstream.publish(
-            _GAME_CREATED_SUBJECT,
-            payload=json.dumps(event_as_dict).encode(),
-        )
+        event_as_dict = self._common_retort.dump(event, dict)
+        payload = json.dumps(event_as_dict).encode()
+
+        await self._jetstream.publish(subject, payload)

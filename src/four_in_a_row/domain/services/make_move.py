@@ -3,8 +3,9 @@
 
 from typing import Final
 from datetime import datetime, timezone, timedelta
+from uuid import uuid4
 
-from four_in_a_row.domain.identitifiers import UserId
+from four_in_a_row.domain.identitifiers import UserId, GameStateId
 from four_in_a_row.domain.constants import (
     ChipType,
     GameStatus,
@@ -45,16 +46,14 @@ class MakeMove:
 
         if game.status == GameStatus.FINISHED:
             return MoveRejected(
-                column=move.column,
-                row=move.row,
+                move=move,
                 player_id=current_player_id,
                 reason=MoveRejectionReason.GAME_IS_FINISHED,
             )
 
         if game.current_turn != current_player_id:
             return MoveRejected(
-                column=move.column,
-                row=move.row,
+                move=move,
                 player_id=current_player_id,
                 reason=MoveRejectionReason.OTHER_PLAYER_TURN,
             )
@@ -67,8 +66,7 @@ class MakeMove:
             game.status = GameStatus.FINISHED
 
             return MoveRejected(
-                column=move.column,
-                row=move.row,
+                move=move,
                 player_id=current_player_id,
                 reason=MoveRejectionReason.TIME_IS_UP,
             )
@@ -79,8 +77,7 @@ class MakeMove:
             or game.board[move.row][move.column]
         ):
             return MoveRejected(
-                column=move.column,
-                row=move.row,
+                move=move,
                 player_id=current_player_id,
                 reason=MoveRejectionReason.ILLEGAL_MOVE,
             )
@@ -128,6 +125,8 @@ class MakeMove:
         move: Move,
         current_player_id: UserId,
     ) -> GameStarted | PlayerWon | Draw | MoveAccepted:
+        game.state_id = GameStateId(uuid4())
+
         current_player_chip_type = game.players[current_player_id].chip_type
         game.board[move.row][move.column] = current_player_chip_type
 
@@ -140,8 +139,7 @@ class MakeMove:
             )
 
             return GameStarted(
-                column=move.column,
-                row=move.row,
+                move=move,
                 player_id=current_player_id,
                 next_turn=game.current_turn,
             )
@@ -155,8 +153,7 @@ class MakeMove:
             game.status = GameStatus.FINISHED
 
             return PlayerWon(
-                column=move.column,
-                row=move.row,
+                move=move,
                 player_id=current_player_id,
             )
 
@@ -165,8 +162,7 @@ class MakeMove:
             game.status = GameStatus.FINISHED
 
             return Draw(
-                column=move.column,
-                row=move.row,
+                move=move,
                 player_id=current_player_id,
             )
 
@@ -176,8 +172,7 @@ class MakeMove:
         )
 
         return MoveAccepted(
-            column=move.column,
-            row=move.row,
+            move=move,
             player_id=current_player_id,
             next_turn=game.current_turn,
         )

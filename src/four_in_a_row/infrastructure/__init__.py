@@ -3,6 +3,7 @@
 
 from .utils import *
 from .operation_id import *
+from .redis_config import *
 from .clients import *
 from .database import *
 from .message_borker import *
