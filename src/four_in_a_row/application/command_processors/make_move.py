@@ -2,6 +2,7 @@
 # All rights reserved.
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Final
 
 from four_in_a_row.domain import (
@@ -96,9 +97,12 @@ class MakeMoveProcessor:
         time_left_for_current_player = current_player_state.time_left
 
         if isinstance(move_result, (GameStarted, MoveAccepted)):
+            execute_task_at = (
+                datetime.now(timezone.utc) + time_left_for_current_player
+            )
             task = LoseOnTimeTask(
                 id=game.state_id,
-                execute_in=time_left_for_current_player,
+                execute_at=execute_task_at,
                 game_id=game.id,
                 game_state_id=game.state_id,
             )

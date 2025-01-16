@@ -2,7 +2,7 @@
 # All rights reserved.
 
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime
 from typing import Protocol
 from uuid import UUID
 
@@ -12,7 +12,7 @@ from four_in_a_row.domain import GameId, GameStateId
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BaseTask:
     id: UUID
-    execute_in: timedelta
+    execute_at: datetime
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

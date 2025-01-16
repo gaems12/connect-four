@@ -30,12 +30,13 @@ class TaskiqTaskScheduler(TaskScheduler):
         schedule = ScheduledTask(
             task_name="lose_on_time",
             labels={},
+            args=[],
             kwargs={
                 "game_id": task.game_id,
                 "game_state_id": task.game_state_id,
             },
             schedule_id=task.id.hex,
-            time=task.execute_in,
+            time=task.execute_at,
         )
         await self._schedule_source.add_schedule(schedule)
 
