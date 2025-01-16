@@ -25,7 +25,7 @@ from four_in_a_row.application import (
     GameEndedEvent,
     Event,
     EventPublisher,
-    NotifyOnTimeIsUpTask,
+    LoseOnTimeTask,
     TaskScheduler,
     TransactionManager,
     IdentityProvider,
@@ -96,7 +96,7 @@ class MakeMoveProcessor:
         time_left_for_current_player = current_player_state.time_left
 
         if isinstance(move_result, (GameStarted, MoveAccepted)):
-            task = NotifyOnTimeIsUpTask(
+            task = LoseOnTimeTask(
                 id=game.state_id,
                 execute_in=time_left_for_current_player,
                 game_id=game.id,

@@ -103,10 +103,14 @@ class HTTPXCentrifugoClient:
         self,
         event: GameEndedEvent,
     ) -> None:
-        move = {
-            "row": event.move.row,
-            "column": event.move.column,
-        }
+        if event.move:
+            move = {
+                "row": event.move.row,
+                "column": event.move.column,
+            }
+        else:
+            move = None
+
         players = {
             player_id.hex: {
                 "chip_type": player_state.chip_type.value,

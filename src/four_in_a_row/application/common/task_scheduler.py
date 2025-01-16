@@ -16,12 +16,12 @@ class BaseTask:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class NotifyOnTimeIsUpTask(BaseTask):
+class LoseOnTimeTask(BaseTask):
     game_id: GameId
     game_state_id: GameStateId
 
 
-type Task = NotifyOnTimeIsUpTask
+type Task = LoseOnTimeTask
 
 
 class TaskScheduler(Protocol):

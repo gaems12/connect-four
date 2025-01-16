@@ -7,7 +7,7 @@ from taskiq import ScheduledTask
 from taskiq_redis import RedisScheduleSource
 
 from four_in_a_row.application import (
-    NotifyOnTimeIsUpTask,
+    LoseOnTimeTask,
     Task,
     TaskScheduler,
 )
@@ -20,15 +20,15 @@ class TaskiqTaskScheduler(TaskScheduler):
         self._schedule_source = schedule_source
 
     async def schedule(self, task: Task) -> None:
-        if isinstance(task, NotifyOnTimeIsUpTask):
-            await self._schedule_notify_on_time_is_up(task)
+        if isinstance(task, LoseOnTimeTask):
+            await self._schedule_lose_on_time(task)
 
-    async def _schedule_notify_on_time_is_up(
+    async def _schedule_lose_on_time(
         self,
-        task: NotifyOnTimeIsUpTask,
+        task: LoseOnTimeTask,
     ) -> None:
         schedule = ScheduledTask(
-            task_name="notify_on_time_is_up",
+            task_name="lose_on_time",
             labels={},
             kwargs={
                 "game_id": task.game_id,

@@ -54,7 +54,7 @@ class MoveRejectedEvent:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GameEndedEvent:
     game_id: GameId
-    move: Move
+    move: Move | None
     players: dict[UserId, PlayerState]
     reason: GameEndReason
     last_turn: UserId

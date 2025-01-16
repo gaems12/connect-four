@@ -12,7 +12,7 @@ __all__ = (
     "EventPublisher",
     "SortGamesBy",
     "GameGateway",
-    "NotifyOnTimeIsUpTask",
+    "LoseOnTimeTask",
     "Task",
     "TaskScheduler",
     "TransactionManager",
@@ -32,7 +32,7 @@ from .event_publisher import (
     EventPublisher,
 )
 from .game_gateway import SortGamesBy, GameGateway
-from .task_scheduler import NotifyOnTimeIsUpTask, Task, TaskScheduler
+from .task_scheduler import LoseOnTimeTask, Task, TaskScheduler
 from .transaction_manager import TransactionManager
 from .identity_provider import IdentityProvider
 from .exceptions import ApplicationError, GameDoesNotExistError
