@@ -39,6 +39,13 @@ class LockManager:
         self._config = config
 
     async def acquire(self, lock_id: str) -> None:
+        """
+        Acquires a lock with the specified ID.
+
+        If the lock is already held by the current instance,
+        it will return immediately. Otherwise, it waits until
+        the lock becomes available and then acquires it.
+        """
         lock_name = self._lock_name_factory(lock_id)
         if lock_name in self._acquired_lock_names:
             return
@@ -55,6 +62,9 @@ class LockManager:
         self._acquired_lock_names.append(lock_name)
 
     async def release_all(self) -> None:
+        if not self._acquired_lock_names:
+            return
+
         await self._redis.delete(*self._acquired_lock_names)
         self._acquired_lock_names.clear()
 

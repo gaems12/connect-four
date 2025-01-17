@@ -89,11 +89,11 @@ class GameMapper(GameGateway):
         if not keys:
             return []
 
-        games = []
+        games_as_dicts = []
         game_count = 0
 
         for key in keys:
-            if game_count == limit:
+            if limit and game_count == limit:
                 break
 
             game_as_json = await self._redis.get(key)  # type: ignore
@@ -101,10 +101,11 @@ class GameMapper(GameGateway):
                 continue
 
             game_as_dict = json.loads(game_as_json)
-            game = self._common_retort.load(game_as_dict, Game)
-            games.append(game)
+            games_as_dicts.append(game_as_dict)
 
             game_count += 1
+
+        games = self._common_retort.load(games_as_dicts, list[Game])
 
         if not sort_by:
             return games
@@ -117,7 +118,7 @@ class GameMapper(GameGateway):
             player_ids=game.players.keys(),
         )
 
-        game_as_dict = self._common_retort.dump(game, dict)
+        game_as_dict = self._common_retort.dump(game, Game)
         game_as_json = json.dumps(game_as_dict)
 
         self._redis_pipeline.set(
@@ -132,7 +133,7 @@ class GameMapper(GameGateway):
             player_ids=game.players.keys(),
         )
 
-        game_as_dict = self._common_retort.dump(game, dict)
+        game_as_dict = self._common_retort.dump(game, Game)
         game_as_json = json.dumps(game_as_dict)
 
         self._redis_pipeline.set(game_key, game_as_json)

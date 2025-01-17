@@ -13,7 +13,7 @@ async def redis_factory(
 ) -> AsyncGenerator[Redis, None]:
     redis = Redis.from_url(url=config.url, decode_responses=True)
     yield redis
-    await redis.close()
+    await redis.aclose()
 
 
 async def redis_pipeline_factory(
