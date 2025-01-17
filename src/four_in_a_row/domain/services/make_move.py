@@ -63,6 +63,7 @@ class MakeMove:
             current_player_id=current_player_id,
         )
         if no_time_left_for_current_player:
+            game.state_id = GameStateId(uuid4())
             game.status = GameStatus.ENDED
 
             return MoveRejected(
