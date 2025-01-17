@@ -17,3 +17,9 @@ four-in-a-row run-message-consumer
 ```sh
 four-in-a-row run-task-executor
 ```
+
+## Create game
+
+```sh
+four-in-a-row create-game --id <UUID> --first-player-id <UUID> --second-player-id <UUID> --time-for-each-player <number of seconds>
+```
