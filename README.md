@@ -1,5 +1,11 @@
 # Four In A Row Game Backend
 
+## Run web api
+
+```sh
+four-in-a-row run-web-api
+```
+
 ## Run message consumer
 
 ```sh

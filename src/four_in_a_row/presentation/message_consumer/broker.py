@@ -3,7 +3,7 @@
 
 from faststream.nats import NatsBroker
 
-from .router import router
+from .routes import router
 
 
 def create_broker(nats_url: str) -> NatsBroker:
