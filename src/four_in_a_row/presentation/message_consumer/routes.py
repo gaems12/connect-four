@@ -4,7 +4,12 @@
 from faststream.nats import NatsRouter
 from dishka.integrations.faststream import FromDishka, inject
 
-from four_in_a_row.application import CreateGameCommand, CreateGameProcessor
+from four_in_a_row.application import (
+    CreateGameCommand,
+    CreateGameProcessor,
+    EndGameCommand,
+    EndGameProcessor,
+)
 
 
 router = NatsRouter()
@@ -16,5 +21,15 @@ async def create_game(
     *,
     command: FromDishka[CreateGameCommand],
     command_processor: FromDishka[CreateGameProcessor],
+) -> None:
+    await command_processor.process(command)
+
+
+@router.subscriber("game.ended", "four_in_a_row")
+@inject
+async def end_game(
+    *,
+    command: FromDishka[EndGameCommand],
+    command_processor: FromDishka[EndGameProcessor],
 ) -> None:
     await command_processor.process(command)

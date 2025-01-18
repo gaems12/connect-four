@@ -14,6 +14,8 @@ from four_in_a_row.application import (
     TransactionManager,
     CreateGameCommand,
     CreateGameProcessor,
+    EndGameCommand,
+    EndGameProcessor,
     MakeMoveCommand,
     MakeMoveProcessor,
     LoseOnTimeCommand,
@@ -52,7 +54,9 @@ from .common_retort import common_retort_factory
 from .event_publisher import RealEventPublisher
 
 
-type _Command = CreateGameCommand | MakeMoveCommand | LoseOnTimeCommand
+type _Command = (
+    CreateGameCommand | MakeMoveCommand | LoseOnTimeCommand | EndGameCommand
+)
 
 type _CommandFactory = Callable[..., Coroutine[Any, Any, _Command]]
 
@@ -112,6 +116,7 @@ def ioc_container_factory(
         provider.provide(command_factory, scope=Scope.REQUEST)
 
     provider.provide(CreateGameProcessor, scope=Scope.REQUEST)
+    provider.provide(EndGameProcessor, scope=Scope.REQUEST)
     provider.provide(MakeMoveProcessor, scope=Scope.REQUEST)
     provider.provide(LoseOnTimeProcessor, scope=Scope.REQUEST)
 
