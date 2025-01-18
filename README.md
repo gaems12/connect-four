@@ -122,4 +122,10 @@ four-in-a-row run-task-executor
 four-in-a-row create-game --id <UUID> --first-player-id <UUID> --second-player-id <UUID> --time-for-each-player <number of seconds>
 ```
 
+### End a Game
+
+```bash
+four-in-a-row end-game --id <UUID>
+```
+
 ---

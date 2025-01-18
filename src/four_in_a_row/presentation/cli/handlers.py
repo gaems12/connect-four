@@ -9,7 +9,12 @@ from cyclopts import Parameter, Token
 import rich.prompt
 
 from four_in_a_row.domain import GameId, UserId
-from four_in_a_row.application import CreateGameCommand, CreateGameProcessor
+from four_in_a_row.application import (
+    CreateGameCommand,
+    CreateGameProcessor,
+    EndGameCommand,
+    EndGameProcessor,
+)
 from four_in_a_row.infrastructure import (
     str_to_timedelta,
     ioc_container_factory,
@@ -39,7 +44,7 @@ async def create_game(
     ],
     time_for_each_player: Annotated[
         timedelta,
-        Parameter("--time-for-each-player", converter=_str_to_uuid),
+        Parameter("--time-for-each-player", converter=_str_to_timedelta),
     ],
 ) -> None:
     """
@@ -54,7 +59,7 @@ async def create_game(
     ioc_container = ioc_container_factory([])
     async with ioc_container() as request_container:
         command = CreateGameCommand(
-            id=GameId(id),
+            game_id=GameId(id),
             first_player_id=UserId(first_player_id),
             second_player_id=UserId(second_player_id),
             time_for_each_player=time_for_each_player,
@@ -63,5 +68,30 @@ async def create_game(
 
         command_processor = await request_container.get(
             CreateGameProcessor,
+        )
+        await command_processor.process(command)
+
+
+async def end_game(
+    id: Annotated[
+        UUID,
+        Parameter("--id", converter=_str_to_uuid),
+    ],
+) -> None:
+    """
+    Ends game. Asks confirmation before exection.
+    """
+    execution_is_confirmed = rich.prompt.Confirm.ask(
+        f"You are going to end game {id.hex}. Would you like to continue?",
+    )
+    if not execution_is_confirmed:
+        return
+
+    ioc_container = ioc_container_factory([])
+    async with ioc_container() as request_container:
+        command = EndGameCommand(GameId(id))
+
+        command_processor = await request_container.get(
+            EndGameProcessor,
         )
         await command_processor.process(command)

@@ -14,7 +14,7 @@ from four_in_a_row.application.common import (
 
 @dataclass(frozen=True, slots=True)
 class EndGameCommand:
-    id: GameId
+    game_id: GameId
 
 
 class EndGameProcessor:
@@ -39,7 +39,7 @@ class EndGameProcessor:
 
     async def process(self, command: EndGameCommand) -> None:
         game = await self._game_gateway.by_id(
-            id=command.id,
+            id=command.game_id,
             acquire=True,
         )
         if not game:

@@ -10,7 +10,7 @@ from faststream.cli.main import cli as run_faststream
 from taskiq.cli.scheduler.run import run_scheduler_loop
 from gunicorn.app.wsgiapp import run as run_gunicorn
 
-from four_in_a_row.presentation.cli import create_game
+from four_in_a_row.presentation.cli import create_game, end_game
 from .task_executor import create_task_executor_app
 
 
@@ -27,6 +27,8 @@ def create_cli_app() -> App:
     )
 
     app.command(create_game)
+    app.command(end_game)
+
     app.command(run_web_api)
     app.command(run_message_consumer)
     app.command(run_task_executor)

@@ -16,7 +16,7 @@ from four_in_a_row.application.common import (
 
 @dataclass(frozen=True, slots=True)
 class CreateGameCommand:
-    id: GameId
+    game_id: GameId
     first_player_id: UserId
     second_player_id: UserId
     time_for_each_player: timedelta
@@ -55,7 +55,7 @@ class CreateGameProcessor:
             last_game = None
 
         new_game = self._create_game(
-            id=command.id,
+            id=command.game_id,
             first_player_id=command.first_player_id,
             second_player_id=command.second_player_id,
             created_at=command.created_at,
