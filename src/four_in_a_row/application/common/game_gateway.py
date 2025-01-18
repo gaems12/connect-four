@@ -19,7 +19,7 @@ class GameGateway(Protocol):
         acquire: bool = False,
     ) -> Game | None:
         """
-        Returns user by specified `id`.
+        Returns game by specified `id`.
 
         Parameters:
 
