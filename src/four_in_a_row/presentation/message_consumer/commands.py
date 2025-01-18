@@ -12,8 +12,8 @@ async def create_game_command_factory(
     common_retort: CommonRetort,
 ) -> CreateGameCommand:
     decoded_message = await message.decode()
-    if not isinstance(decoded_message, dict):
-        raise Exception()
+    if not decoded_message or not isinstance(decoded_message, dict):
+        raise Exception("NatsMessage cannot be converted to dict.")
 
     return common_retort.load(decoded_message, CreateGameCommand)
 
@@ -23,7 +23,7 @@ async def end_game_command_factory(
     common_retort: CommonRetort,
 ) -> EndGameCommand:
     decoded_message = await message.decode()
-    if not isinstance(decoded_message, dict):
-        raise Exception()
+    if not decoded_message or not isinstance(decoded_message, dict):
+        raise Exception("NatsMessage cannot be converted to dict.")
 
     return common_retort.load(decoded_message, EndGameCommand)

@@ -12,6 +12,7 @@ from four_in_a_row.application import (
     EventPublisher,
     TaskScheduler,
     TransactionManager,
+    IdentityProvider,
     CreateGameCommand,
     CreateGameProcessor,
     EndGameCommand,
@@ -52,10 +53,11 @@ from .scheduling import (
 from .redis_config import RedisConfig, redis_config_from_env
 from .common_retort import common_retort_factory
 from .event_publisher import RealEventPublisher
+from .identity_provider import HTTPIdentityProvider
 
 
 type _Command = (
-    CreateGameCommand | MakeMoveCommand | LoseOnTimeCommand | EndGameCommand
+    CreateGameCommand | EndGameCommand | MakeMoveCommand | LoseOnTimeCommand
 )
 
 type _CommandFactory = Callable[..., Coroutine[Any, Any, _Command]]
@@ -110,6 +112,12 @@ def ioc_container_factory(
         TaskiqTaskScheduler,
         scope=Scope.REQUEST,
         provides=TaskScheduler,
+    )
+
+    provider.provide(
+        HTTPIdentityProvider,
+        scope=Scope.REQUEST,
+        provides=IdentityProvider,
     )
 
     for command_factory in command_factories:

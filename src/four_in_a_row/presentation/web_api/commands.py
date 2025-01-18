@@ -12,7 +12,7 @@ async def make_move_command_factory(
     common_retort: CommonRetort,
 ) -> MakeMoveCommand:
     request_json = await request.json()
-    if not isinstance(request_json, dict):
-        raise Exception()
+    if not request_json or not isinstance(request_json, dict):
+        raise Exception("HTTP request's JSON cannot be converter to dict.")
 
     return common_retort.load(request_json, MakeMoveCommand)
