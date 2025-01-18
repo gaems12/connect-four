@@ -54,17 +54,20 @@ Ensure the following services are installed and running:
 
    **For production:**
    ```bash
-   pip install .
+   pip install build
+   python3 -m build --wheel
+   pip install ./dist/four_in_a-row*.whl
    ```
 
 ### Using uv
 
-1. Create a virtual environment with uv:
+1. Create and activate a virtual environment:
    ```bash
    uv venv --python 3.12
+   source ./.venv/bin/activate
    ```
 
-2. Sync dependencies:
+2. Install dependencies:
 
    **For development**
    ```bash
@@ -73,7 +76,8 @@ Ensure the following services are installed and running:
 
    **For production**
    ```bash
-   uv sync
+   uv build --wheel
+   uv pip install ./dist/four_in_a-row*.whl
    ```
 
 ---
