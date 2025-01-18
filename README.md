@@ -1,5 +1,18 @@
 # Four In A Row Game Backend
 
+## 📚 Table of Contents
+
+- [📦 Dependencies](#-dependencies)
+- [🚀 Installation](#-installation)
+  - [Using pip](#using-pip)
+  - [Using uv](#using-uv)
+- [⚙️ Environment Variables](#%EF%B8%8F-environment-variables)
+- [🛠️ Commands](#%EF%B8%8F-commands)
+  - [Start Web API](#start-web-api)
+  - [Run Message Consumer](#run-message-consumer)
+  - [Run Task Executor](#run-task-executor)
+  - [Create a New Game](#create-a-new-game)
+
 ---
 
 ## 📦 Dependencies
