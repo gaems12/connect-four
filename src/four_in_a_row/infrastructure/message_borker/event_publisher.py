@@ -17,6 +17,8 @@ from four_in_a_row.application import (
 from four_in_a_row.infrastructure.common_retort import CommonRetort
 
 
+_STREAM: Final = "four_in_a_row"
+
 _EVENT_TO_SUBJECT_MAP: Final = {
     GameCreatedEvent: "game.created",
     GameStartedEvent: "game.started",
@@ -43,4 +45,8 @@ class NATSEventPublisher:
         event_as_dict = self._common_retort.dump(event, dict)
         payload = json.dumps(event_as_dict).encode()
 
-        await self._jetstream.publish(subject, payload)
+        await self._jetstream.publish(
+            subject=subject,
+            payload=payload,
+            stream=_STREAM,
+        )

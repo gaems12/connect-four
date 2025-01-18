@@ -1,7 +1,9 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
-from faststream.nats import NatsRouter
+from typing import Final
+
+from faststream.nats import NatsRouter, JStream
 from dishka.integrations.faststream import FromDishka, inject
 
 from four_in_a_row.application import (
@@ -12,10 +14,17 @@ from four_in_a_row.application import (
 )
 
 
+_STREAM: Final = JStream("lobby")
+
 router = NatsRouter()
 
 
-@router.subscriber("game.created", "four_in_a_row")
+@router.subscriber(
+    subject="game.created",
+    queue="four_in_a_row.game.created",
+    durable="four_in_a_row.gane.created",
+    stream=_STREAM,
+)
 @inject
 async def create_game(
     *,
@@ -25,7 +34,12 @@ async def create_game(
     await command_processor.process(command)
 
 
-@router.subscriber("game.ended", "four_in_a_row")
+@router.subscriber(
+    subject="game.ended",
+    queue="four_in_a_row.game.ended",
+    durable="four_in_a_row.game.ended",
+    stream=_STREAM,
+)
 @inject
 async def end_game(
     *,
