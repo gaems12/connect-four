@@ -21,6 +21,7 @@
   - [Run Message Consumer](#run-message-consumer)
   - [Run Task Executor](#run-task-executor)
   - [Create a New Game](#create-a-new-game)
+  - [End A Game](#end-a-game)
 
 ---
 
