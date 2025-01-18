@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from cyclopts import Parameter, Token
+import rich
 import rich.prompt
 
 from four_in_a_row.domain import GameId, UserId
@@ -14,6 +15,8 @@ from four_in_a_row.application import (
     CreateGameProcessor,
     EndGameCommand,
     EndGameProcessor,
+    GameAlreadyExistsError,
+    GameDoesNotExistError,
 )
 from four_in_a_row.infrastructure import (
     str_to_timedelta,
@@ -69,7 +72,10 @@ async def create_game(
         command_processor = await request_container.get(
             CreateGameProcessor,
         )
-        await command_processor.process(command)
+        try:
+            await command_processor.process(command)
+        except GameAlreadyExistsError:
+            rich.print("Game already exists.")
 
 
 async def end_game(
@@ -94,4 +100,7 @@ async def end_game(
         command_processor = await request_container.get(
             EndGameProcessor,
         )
-        await command_processor.process(command)
+        try:
+            await command_processor.process(command)
+        except GameDoesNotExistError:
+            rich.print("Game doesn't exist.")

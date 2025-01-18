@@ -11,6 +11,7 @@ from four_in_a_row.application.common import (
     GameCreatedEvent,
     EventPublisher,
     TransactionManager,
+    GameAlreadyExistsError,
 )
 
 
@@ -44,6 +45,10 @@ class CreateGameProcessor:
         self._transaction_manager = transaction_manager
 
     async def process(self, command: CreateGameCommand) -> None:
+        game = await self._game_gateway.by_id(command.game_id)
+        if game:
+            raise GameAlreadyExistsError()
+
         games = await self._game_gateway.list_by_player_ids(
             player_ids=(command.first_player_id, command.second_player_id),
             sort_by=SortGamesBy.DESC_CREATED_AT,

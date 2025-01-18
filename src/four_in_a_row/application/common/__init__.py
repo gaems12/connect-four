@@ -18,6 +18,7 @@ __all__ = (
     "TransactionManager",
     "IdentityProvider",
     "ApplicationError",
+    "GameAlreadyExistsError",
     "GameDoesNotExistError",
 )
 
@@ -35,4 +36,8 @@ from .game_gateway import SortGamesBy, GameGateway
 from .task_scheduler import LoseOnTimeTask, Task, TaskScheduler
 from .transaction_manager import TransactionManager
 from .identity_provider import IdentityProvider
-from .exceptions import ApplicationError, GameDoesNotExistError
+from .exceptions import (
+    ApplicationError,
+    GameAlreadyExistsError,
+    GameDoesNotExistError,
+)
