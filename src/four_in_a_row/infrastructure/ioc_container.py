@@ -39,7 +39,7 @@ from .database import (
     lock_manager_factory,
     RedisTransactionManager,
 )
-from .message_borker import (
+from .message_broker import (
     NATSConfig,
     nats_config_from_env,
     nats_client_factory,

@@ -6,7 +6,7 @@ __all__ = ("RealEventPublisher",)
 import asyncio
 
 from four_in_a_row.application import Event, EventPublisher
-from .message_borker import NATSEventPublisher
+from .message_broker import NATSEventPublisher
 from .clients import HTTPXCentrifugoClient
 
 
