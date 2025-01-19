@@ -36,7 +36,7 @@ from .database import (
     GameMapper,
     LockManagerConfig,
     lock_manager_config_from_env,
-    LockManager,
+    lock_manager_factory,
     RedisTransactionManager,
 )
 from .message_borker import (
@@ -92,7 +92,7 @@ def ioc_container_factory(
 
     provider.provide(common_retort_factory, scope=Scope.APP)
 
-    provider.provide(LockManager, scope=Scope.REQUEST)
+    provider.provide(lock_manager_factory, scope=Scope.REQUEST)
     provider.provide(GameMapper, provides=GameGateway, scope=Scope.REQUEST)
     provider.provide(
         RedisTransactionManager,

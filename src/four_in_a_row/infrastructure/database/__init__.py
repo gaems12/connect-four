@@ -7,6 +7,7 @@ __all__ = (
     "LockManagerConfig",
     "lock_manager_config_from_env",
     "LockManager",
+    "lock_manager_factory",
     "GameMapperConfig",
     "game_mapper_config_from_env",
     "GameMapper",
@@ -18,6 +19,7 @@ from .lock_manager import (
     LockManagerConfig,
     lock_manager_config_from_env,
     LockManager,
+    lock_manager_factory,
 )
 from .game_mapper import (
     GameMapperConfig,

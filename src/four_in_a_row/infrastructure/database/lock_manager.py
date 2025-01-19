@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from datetime import timedelta
+from typing import AsyncGenerator
 
 from redis.asyncio.client import Redis
 
@@ -24,6 +25,15 @@ def lock_manager_config_from_env() -> "LockManagerConfig":
 @dataclass(frozen=True, slots=True)
 class LockManagerConfig:
     lock_expires_in: timedelta
+
+
+async def lock_manager_factory(
+    redis: Redis,
+    config: LockManagerConfig,
+) -> AsyncGenerator["LockManager", None]:
+    lock_manager = LockManager(redis=redis, config=config)
+    yield lock_manager
+    await lock_manager.release_all()
 
 
 class LockManager:
