@@ -47,7 +47,7 @@ class FakeGameGateway(GameGateway):
             games = games[:limit]
         else:
             raise Exception(
-                "FakeGameGateway. Cannot list_by_player_ids: "
+                "FakeGameGateway. Cannot list by player ids: "
                 "limit is not a positive number or zero.",
             )
 

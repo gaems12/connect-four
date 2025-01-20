@@ -84,6 +84,12 @@ class GameMapper(GameGateway):
         sort_by: SortGamesBy | None = None,
         limit: int = 0,
     ) -> list[Game]:
+        if limit < 0:
+            raise Exception(
+                "GameMapper. Cannot list by player ids: "
+                "limit is not a positive number or zero.",
+            )
+
         pattern = self._pattern_to_find_game_by_player_ids(player_ids)
         keys = await self._redis.keys(pattern)
         if not keys:
