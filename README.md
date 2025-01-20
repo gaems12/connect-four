@@ -1,4 +1,4 @@
-# Four In A Row Game
+# Four In A Row
 
 <p align="left">
    <a>
