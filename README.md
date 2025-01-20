@@ -56,7 +56,7 @@ Ensure the following services are installed and running:
    ```bash
    pip install build
    python3 -m build --wheel
-   pip install ./dist/four_in_a-row*.whl
+   pip install ./dist/four_in_a_row*.whl
    ```
 
 ### Using uv
@@ -77,7 +77,7 @@ Ensure the following services are installed and running:
    **For production**
    ```bash
    uv build --wheel
-   uv pip install ./dist/four_in_a-row*.whl
+   uv pip install ./dist/four_in_a_row*.whl
    ```
 
 ---
