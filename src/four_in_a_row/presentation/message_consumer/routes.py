@@ -14,7 +14,7 @@ from four_in_a_row.application import (
 )
 
 
-_STREAM: Final = JStream("lobby")
+_STREAM: Final = JStream("connection_hub")
 
 router = NatsRouter()
 
@@ -22,7 +22,7 @@ router = NatsRouter()
 @router.subscriber(
     subject="game.created",
     queue="four_in_a_row.game.created",
-    durable="four_in_a_row.gane.created",
+    durable="four_in_a_row.game.created",
     stream=_STREAM,
 )
 @inject
