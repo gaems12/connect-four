@@ -91,12 +91,13 @@ class MakeMoveProcessor:
         )
         await self._game_gateway.update(game)
 
-        await self._task_scheduler.unschedule(old_game_state_id)
-
-        current_player_state = game.players[current_user_id]
-        time_left_for_current_player = current_player_state.time_left
+        if not isinstance(move_result, MoveRejected):
+            await self._task_scheduler.unschedule(old_game_state_id)
 
         if isinstance(move_result, (GameStarted, MoveAccepted)):
+            current_player_state = game.players[current_user_id]
+            time_left_for_current_player = current_player_state.time_left
+
             execute_task_at = (
                 datetime.now(timezone.utc) + time_left_for_current_player
             )
