@@ -13,7 +13,7 @@ from four_in_a_row.infrastructure.utils import (
 )
 
 
-def lock_manager_config_from_env() -> "LockManagerConfig":
+def load_lock_manager_config() -> "LockManagerConfig":
     return LockManagerConfig(
         lock_expires_in=get_env_var(
             key="LOCK_EXPIRES_IN",

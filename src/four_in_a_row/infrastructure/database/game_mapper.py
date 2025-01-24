@@ -18,7 +18,7 @@ from four_in_a_row.infrastructure.utils import (
 from .lock_manager import LockManager
 
 
-def game_mapper_config_from_env() -> "GameMapperConfig":
+def load_game_mapper_config() -> "GameMapperConfig":
     return GameMapperConfig(
         game_expires_in=get_env_var(
             key="GAME_MAPPER_GAME_EXPIRES_IN",

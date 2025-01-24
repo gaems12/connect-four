@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from four_in_a_row.infrastructure.utils import get_env_var
 
 
-def nats_config_from_env() -> "NATSConfig":
+def load_nats_config() -> "NATSConfig":
     return NATSConfig(url=get_env_var("NATS_URL"))
 
 

@@ -25,23 +25,23 @@ from four_in_a_row.application import (
 from .clients import (
     httpx_client_factory,
     CentrifugoConfig,
-    centrifugo_config_from_env,
+    load_centrifugo_config,
     HTTPXCentrifugoClient,
 )
 from .database import (
     redis_factory,
     redis_pipeline_factory,
     GameMapperConfig,
-    game_mapper_config_from_env,
+    load_game_mapper_config,
     GameMapper,
     LockManagerConfig,
-    lock_manager_config_from_env,
+    load_lock_manager_config,
     lock_manager_factory,
     RedisTransactionManager,
 )
 from .message_broker import (
     NATSConfig,
-    nats_config_from_env,
+    load_nats_config,
     nats_client_factory,
     nats_jetstream_factory,
     NATSEventPublisher,
@@ -50,7 +50,7 @@ from .scheduling import (
     taskiq_redis_schedule_source_factory,
     TaskiqTaskScheduler,
 )
-from .redis_config import RedisConfig, redis_config_from_env
+from .redis_config import RedisConfig, load_redis_config
 from .common_retort import common_retort_factory
 from .event_publisher import RealEventPublisher
 from .identity_provider import HTTPIdentityProvider
@@ -70,11 +70,11 @@ def ioc_container_factory(
     provider = Provider()
 
     context = {
-        CentrifugoConfig: centrifugo_config_from_env(),
-        RedisConfig: redis_config_from_env(),
-        GameMapperConfig: game_mapper_config_from_env(),
-        LockManagerConfig: lock_manager_config_from_env(),
-        NATSConfig: nats_config_from_env(),
+        CentrifugoConfig: load_centrifugo_config(),
+        RedisConfig: load_redis_config(),
+        GameMapperConfig: load_game_mapper_config(),
+        LockManagerConfig: load_lock_manager_config(),
+        NATSConfig: load_nats_config(),
     }
 
     provider.from_context(CentrifugoConfig, scope=Scope.APP)

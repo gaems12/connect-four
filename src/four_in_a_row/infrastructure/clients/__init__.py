@@ -4,13 +4,13 @@
 __all__ = (
     "httpx_client_factory",
     "CentrifugoConfig",
-    "centrifugo_config_from_env",
+    "load_centrifugo_config",
     "HTTPXCentrifugoClient",
 )
 
 from .httpx_ import httpx_client_factory
 from .centrifugo import (
     CentrifugoConfig,
-    centrifugo_config_from_env,
+    load_centrifugo_config,
     HTTPXCentrifugoClient,
 )

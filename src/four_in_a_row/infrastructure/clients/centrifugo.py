@@ -29,7 +29,7 @@ type _Serializable = (
 )
 
 
-def centrifugo_config_from_env() -> "CentrifugoConfig":
+def load_centrifugo_config() -> "CentrifugoConfig":
     return CentrifugoConfig(
         url=get_env_var("CENTRIFUGO_URL"),
         api_key=get_env_var("CENTRIFUGO_API_KEY"),

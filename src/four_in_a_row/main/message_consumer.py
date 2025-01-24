@@ -7,7 +7,7 @@ from faststream import FastStream
 from dishka.integrations.faststream import FastStreamProvider, setup_dishka
 
 from four_in_a_row.infrastructure import (
-    nats_config_from_env,
+    load_nats_config,
     ioc_container_factory,
 )
 from four_in_a_row.presentation.message_consumer import (
@@ -18,7 +18,7 @@ from four_in_a_row.presentation.message_consumer import (
 
 
 def create_message_consumer_app() -> FastStream:
-    nats_config = nats_config_from_env()
+    nats_config = load_nats_config()
     broker = create_broker(nats_config.url)
 
     app = FastStream(

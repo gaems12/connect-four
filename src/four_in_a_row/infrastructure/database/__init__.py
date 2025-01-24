@@ -5,11 +5,11 @@ __all__ = (
     "redis_factory",
     "redis_pipeline_factory",
     "LockManagerConfig",
-    "lock_manager_config_from_env",
+    "load_lock_manager_config",
     "LockManager",
     "lock_manager_factory",
     "GameMapperConfig",
-    "game_mapper_config_from_env",
+    "load_game_mapper_config",
     "GameMapper",
     "RedisTransactionManager",
 )
@@ -17,13 +17,13 @@ __all__ = (
 from .redis_ import redis_factory, redis_pipeline_factory
 from .lock_manager import (
     LockManagerConfig,
-    lock_manager_config_from_env,
+    load_lock_manager_config,
     LockManager,
     lock_manager_factory,
 )
 from .game_mapper import (
     GameMapperConfig,
-    game_mapper_config_from_env,
+    load_game_mapper_config,
     GameMapper,
 )
 from .transaction_manager import RedisTransactionManager
