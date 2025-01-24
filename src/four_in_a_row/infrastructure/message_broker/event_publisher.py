@@ -23,8 +23,8 @@ _EVENT_TO_SUBJECT_MAP: Final = {
     GameCreatedEvent: "game.created",
     GameStartedEvent: "game.started",
     GameEndedEvent: "game.ended",
-    MoveAcceptedEvent: "game.move.accepted",
-    MoveRejectedEvent: "game.move.rejected",
+    MoveAcceptedEvent: "game.move_accepted",
+    MoveRejectedEvent: "game.move_rejected",
 }
 
 
