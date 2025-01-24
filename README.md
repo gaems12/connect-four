@@ -90,7 +90,7 @@ Ensure the following services are installed and running:
 
 2. Run one of the [commands](#️-commands)
    ```bash
-   docker run -e REDIS_URL=<your_redis_url> -e NATS_URL=<your_nats_url> -e CENTRIFUGO_URL=<your_centrifugo_url> -e CENTRIFUGO_API_KEY=<your_api_key> four_in_a_row:latest <your_command>
+   docker run -e REDIS_URL=<your_redis_url> -e NATS_URL=<your_nats_url> -e CENTRIFUGO_URL=<your_centrifugo_url> -e CENTRIFUGO_API_KEY=<your_api_key> -e GAME_MAPPER_GAME_EXPIRES_IN=<number_of_second> -e LOCK_EXPIRES_IN=<number_of_seconds> four_in_a_row:latest <your_command>
    ```
 
 ---
