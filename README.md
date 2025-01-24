@@ -15,6 +15,7 @@
 - [🚀 Installation](#-installation)
   - [Using pip](#using-pip)
   - [Using uv](#using-uv)
+  - [Using Docker](#using-docker)
 - [⚙️ Environment Variables](#%EF%B8%8F-environment-variables)
 - [🛠️ Commands](#%EF%B8%8F-commands)
   - [Start Web API](#start-web-api)
@@ -80,6 +81,18 @@ Ensure the following services are installed and running:
    uv pip install ./dist/four_in_a_row*.whl
    ```
 
+### Using Docker
+
+1. Build Docker images:
+   ```bash
+   docker build -t four_in_a_row:latest .
+   ```
+
+2. Run one of the [commands](#️-commands)
+   ```bash
+   docker run -e REDIS_URL=<your_redis_url> -e NATS_URL=<your_nats_url> -e CENTRIFUGO_URL=<your_centrifugo_url> -e CENTRIFUGO_API_KEY=<your_api_key> four_in_a_row:latest <your_command>
+   ```
+
 ---
 
 ## ⚙️ Environment Variables
@@ -124,7 +137,7 @@ four-in-a-row run-task-executor
 ### Create a New Game
 
 ```bash
-four-in-a-row create-game --id <UUID> --first-player-id <UUID> --second-player-id <UUID> --time-for-each-player <number of seconds>
+four-in-a-row create-game --id <UUID> --first-player-id <UUID> --second-player-id <UUID> --time-for-each-player <number_of_seconds>
 ```
 
 ### End a Game
