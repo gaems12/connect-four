@@ -11,6 +11,7 @@ import rich.prompt
 
 from four_in_a_row.domain import GameId, UserId
 from four_in_a_row.application import (
+    LobbyId,
     CreateGameCommand,
     CreateGameProcessor,
     EndGameCommand,
@@ -36,6 +37,10 @@ async def create_game(
     id: Annotated[
         UUID,
         Parameter("--id", converter=_str_to_uuid),
+    ],
+    lobby_id: Annotated[
+        UUID,
+        Parameter("--lobby-id", converter=_str_to_uuid),
     ],
     first_player_id: Annotated[
         UUID,
@@ -63,6 +68,7 @@ async def create_game(
     async with ioc_container() as request_container:
         command = CreateGameCommand(
             game_id=GameId(id),
+            lobby_id=LobbyId(lobby_id),
             first_player_id=UserId(first_player_id),
             second_player_id=UserId(second_player_id),
             time_for_each_player=time_for_each_player,
