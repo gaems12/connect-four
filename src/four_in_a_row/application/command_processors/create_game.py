@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from four_in_a_row.domain import UserId, GameId, CreateGame
 from four_in_a_row.application.common import (
+    LobbyId,
     SortGamesBy,
     GameGateway,
     GameCreatedEvent,
@@ -18,6 +19,7 @@ from four_in_a_row.application.common import (
 @dataclass(frozen=True, slots=True)
 class CreateGameCommand:
     game_id: GameId
+    lobby_id: LobbyId
     first_player_id: UserId
     second_player_id: UserId
     time_for_each_player: timedelta
@@ -71,6 +73,7 @@ class CreateGameProcessor:
 
         event = GameCreatedEvent(
             game_id=new_game.id,
+            lobby_id=command.lobby_id,
             board=new_game.board,
             players=new_game.players,
             current_turn=new_game.current_turn,

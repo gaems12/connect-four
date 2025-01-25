@@ -2,8 +2,9 @@
 # All rights reserved.
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Protocol, NewType
 from enum import StrEnum
+from uuid import UUID
 
 from four_in_a_row.domain import (
     ChipType,
@@ -15,6 +16,9 @@ from four_in_a_row.domain import (
 )
 
 
+LobbyId = NewType("LobbyId", UUID)
+
+
 class GameEndReason(StrEnum):
     WIN = "win"
     DRAW = "draw"
@@ -24,6 +28,7 @@ class GameEndReason(StrEnum):
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GameCreatedEvent:
     game_id: GameId
+    lobby_id: LobbyId
     board: list[list[ChipType | None]]
     players: dict[UserId, PlayerState]
     current_turn: UserId

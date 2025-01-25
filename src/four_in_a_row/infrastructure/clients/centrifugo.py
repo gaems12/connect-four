@@ -8,6 +8,7 @@ from httpx import AsyncClient
 
 from four_in_a_row.domain import GameId
 from four_in_a_row.application import (
+    LobbyId,
     GameCreatedEvent,
     GameStartedEvent,
     GameEndedEvent,
@@ -81,12 +82,13 @@ class HTTPXCentrifugoClient:
             for player_id, player_state in event.players.items()
         }
         event_as_dict = {
-            "event_type": "game_created",
+            "type": "game_created",
+            "game_id": event.game_id.hex,
             "players": players,
             "current_turn": event.current_turn.hex,
         }
         await self._publish(
-            channel=self._game_channel_factory(event.game_id),
+            channel=self._lobby_channel_factory(event.lobby_id),
             data=event_as_dict,  # type: ignore
         )
 
@@ -96,7 +98,7 @@ class HTTPXCentrifugoClient:
     ) -> None:
         await self._publish(
             channel=self._game_channel_factory(event.game_id),
-            data={"event_type": "game_started"},
+            data={"type": "game_started"},
         )
 
     async def _publish_game_ended(
@@ -184,7 +186,10 @@ class HTTPXCentrifugoClient:
         )
 
     def _game_channel_factory(self, game_id: GameId) -> str:
-        return f"game:{game_id}"
+        return f"game:{game_id.hex}"
+
+    def _lobby_channel_factory(self, lobby_id: LobbyId) -> str:
+        return f"lobby:{lobby_id.hex}"
 
     async def _publish(
         self,

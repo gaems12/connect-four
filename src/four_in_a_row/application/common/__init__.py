@@ -2,6 +2,7 @@
 # All rights reserved.
 
 __all__ = (
+    "LobbyId",
     "GameEndReason",
     "GameCreatedEvent",
     "GameStartedEvent",
@@ -23,6 +24,7 @@ __all__ = (
 )
 
 from .event_publisher import (
+    LobbyId,
     GameEndReason,
     GameCreatedEvent,
     GameStartedEvent,
