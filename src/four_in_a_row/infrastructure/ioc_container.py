@@ -7,6 +7,12 @@ from typing import Any, Callable, Coroutine, Iterable
 
 from dishka import Provider, Scope, AsyncContainer, make_async_container
 
+from four_in_a_row.domain import (
+    CreateGame,
+    EndGame,
+    MakeMove,
+    TryToLoseOnTime,
+)
 from four_in_a_row.application import (
     GameGateway,
     EventPublisher,
@@ -119,6 +125,11 @@ def ioc_container_factory(
         scope=Scope.REQUEST,
         provides=IdentityProvider,
     )
+
+    provider.provide(CreateGame, scope=Scope.APP)
+    provider.provide(EndGame, scope=Scope.APP)
+    provider.provide(MakeMove, scope=Scope.APP)
+    provider.provide(TryToLoseOnTime, scope=Scope.APP)
 
     for command_factory in command_factories:
         provider.provide(command_factory, scope=Scope.REQUEST)
