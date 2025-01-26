@@ -61,14 +61,13 @@ class GameMapper(GameGateway):
         *,
         acquire: bool = False,
     ) -> Game | None:
-        if acquire:
-            lock_id = self._lock_id_factory(id)
-            await self._lock_manager.acquire(lock_id)
-
         pattern = self._pattern_to_find_game_by_id(id)
         keys = await self._redis.keys(pattern)
         if not keys:
             return None
+
+        if acquire:
+            await self._lock_manager.acquire(keys[0])
 
         game_as_json = await self._redis.get(keys[0])  # type: ignore
         if game_as_json:

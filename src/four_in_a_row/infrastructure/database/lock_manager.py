@@ -32,8 +32,10 @@ async def lock_manager_factory(
     config: LockManagerConfig,
 ) -> AsyncGenerator["LockManager", None]:
     lock_manager = LockManager(redis=redis, config=config)
-    yield lock_manager
-    await lock_manager.release_all()
+    try:
+        yield lock_manager
+    finally:
+        await lock_manager.release_all()
 
 
 class LockManager:
