@@ -84,6 +84,7 @@ Ensure the following services are installed and running:
 ### Using Docker
 
 1. Build Docker image:
+
    ```bash
    docker build -t four_in_a_row:latest .
    ```
