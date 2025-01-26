@@ -211,6 +211,6 @@ class HTTPXCentrifugoClient:
         response = await self._httpx_client.post(
             url=urljoin(self._config.url, method),
             json=payload,
-            headers={"Authorization": f"apikey {self._config.api_key}"},
+            headers={"X-API-Key": self._config.api_key},
         )
         response.raise_for_status()
