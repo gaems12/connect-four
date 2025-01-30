@@ -29,7 +29,7 @@ _EVENT_TO_SUBJECT_MAP: Final = {
 
 
 class NATSEventPublisher:
-    __all__ = ("_jetstream", "_common_retort")
+    __slots__ = ("_jetstream", "_common_retort")
 
     def __init__(
         self,
