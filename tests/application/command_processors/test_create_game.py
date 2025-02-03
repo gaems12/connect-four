@@ -17,6 +17,7 @@ from four_in_a_row.domain import (
     CreateGame,
 )
 from four_in_a_row.application import (
+    LobbyId,
     GameCreatedEvent,
     CreateGameCommand,
     CreateGameProcessor,
@@ -25,6 +26,7 @@ from .fakes import FakeGameGateway, FakeEventPublisher
 
 
 _GAME_ID: Final = GameId(uuid7())
+_LOBBY_ID: Final = LobbyId(uuid7())
 
 _FIRST_PLAYER_ID: Final = UserId(uuid7())
 _SECOND_PLAYER_ID: Final = UserId(uuid7())
@@ -37,6 +39,7 @@ async def test_create_game_processor():
 
     command = CreateGameCommand(
         game_id=_GAME_ID,
+        lobby_id=_LOBBY_ID,
         first_player_id=_FIRST_PLAYER_ID,
         second_player_id=_SECOND_PLAYER_ID,
         time_for_each_player=_TIME_FOR_EACH_PLAYER,
@@ -62,7 +65,8 @@ async def test_create_game_processor():
         ),
     }
     expected_event = GameCreatedEvent(
-        game_id=command.game_id,
+        game_id=_GAME_ID,
+        lobby_id=_LOBBY_ID,
         board=[[None] * BOARD_COLUMNS for _ in range(BOARD_ROWS)],
         players=players,
         current_turn=_FIRST_PLAYER_ID,
