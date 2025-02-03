@@ -11,10 +11,13 @@ from four_in_a_row.application import (
     CreateGameProcessor,
     EndGameCommand,
     EndGameProcessor,
+    MakeMoveCommand,
+    MakeMoveProcessor,
 )
 
 
-_STREAM: Final = JStream("connection_hub")
+_CONNECTION_HUB_STREAM: Final = JStream("connection_hub")
+_CENTRIFUGO_PROXY_STREAM: Final = JStream("centrifugo_proxy")
 
 router = NatsRouter()
 
@@ -23,7 +26,7 @@ router = NatsRouter()
     subject="game.created",
     queue="four_in_a_row.game.created",
     durable="four_in_a_row.game.created",
-    stream=_STREAM,
+    stream=_CONNECTION_HUB_STREAM,
 )
 @inject
 async def create_game(
@@ -38,12 +41,27 @@ async def create_game(
     subject="game.ended",
     queue="four_in_a_row.game.ended",
     durable="four_in_a_row.game.ended",
-    stream=_STREAM,
+    stream=_CONNECTION_HUB_STREAM,
 )
 @inject
 async def end_game(
     *,
     command: FromDishka[EndGameCommand],
     command_processor: FromDishka[EndGameProcessor],
+) -> None:
+    await command_processor.process(command)
+
+
+@router.subscriber(
+    subject="game.move_was_made",
+    queue="four_in_a_row.game.move_was_made",
+    durable="four_in_a_row.game.move_was_made",
+    stream=_CENTRIFUGO_PROXY_STREAM,
+)
+@inject
+async def make_move(
+    *,
+    command: FromDishka[MakeMoveCommand],
+    command_processor: FromDishka[MakeMoveProcessor],
 ) -> None:
     await command_processor.process(command)
