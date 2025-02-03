@@ -17,7 +17,7 @@ from four_in_a_row.application import (
 
 
 _CONNECTION_HUB_STREAM: Final = JStream("connection_hub")
-_CENTRIFUGO_PROXY_STREAM: Final = JStream("centrifugo_proxy")
+_API_GATEWAY_STREAM: Final = JStream("api_gateway")
 
 router = NatsRouter()
 
@@ -56,7 +56,7 @@ async def end_game(
     subject="game.move_was_made",
     queue="four_in_a_row.game.move_was_made",
     durable="four_in_a_row.game.move_was_made",
-    stream=_CENTRIFUGO_PROXY_STREAM,
+    stream=_API_GATEWAY_STREAM,
 )
 @inject
 async def make_move(
