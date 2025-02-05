@@ -112,7 +112,7 @@ class MakeMove:
 
         time_for_move = current_datetime - game.last_move_made_at  # type: ignore
 
-        if time_for_move > game.players[current_player_id].time_left:
+        if time_for_move >= game.players[current_player_id].time_left:
             game.players[current_player_id].time_left = timedelta(seconds=0)
             game.last_move_made_at = current_datetime
             return True
