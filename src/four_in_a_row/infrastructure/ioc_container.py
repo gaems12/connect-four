@@ -5,7 +5,12 @@ __all__ = ("ioc_container_factory",)
 
 from typing import Any, Callable, Coroutine, Iterable
 
-from dishka import Provider, Scope, AsyncContainer, make_async_container
+from dishka import (
+    Provider,
+    Scope,
+    AsyncContainer,
+    make_async_container,
+)
 
 from four_in_a_row.domain import (
     CreateGame,
@@ -27,6 +32,13 @@ from four_in_a_row.application import (
     MakeMoveProcessor,
     LoseOnTimeCommand,
     LoseOnTimeProcessor,
+)
+from .operation_id import OperationId
+from .log import (
+    LoggingConfig,
+    load_logging_config,
+    app_logger_factory,
+    request_logger_factory,
 )
 from .clients import (
     httpx_client_factory,
@@ -67,15 +79,18 @@ type _Command = (
 )
 
 type _CommandFactory = Callable[..., Coroutine[Any, Any, _Command]]
+type _OperationIdFactory = Callable[..., Coroutine[Any, Any, OperationId]]
 
 
 def ioc_container_factory(
     command_factories: Iterable[_CommandFactory],
+    operation_id_factory: _OperationIdFactory,
     *extra_providers: Provider,
 ) -> AsyncContainer:
     provider = Provider()
 
     context = {
+        LoggingConfig: load_logging_config(),
         CentrifugoConfig: load_centrifugo_config(),
         RedisConfig: load_redis_config(),
         GameMapperConfig: load_game_mapper_config(),
@@ -83,11 +98,16 @@ def ioc_container_factory(
         NATSConfig: load_nats_config(),
     }
 
+    provider.from_context(LoggingConfig, scope=Scope.APP)
     provider.from_context(CentrifugoConfig, scope=Scope.APP)
     provider.from_context(RedisConfig, scope=Scope.APP)
     provider.from_context(GameMapperConfig, scope=Scope.APP)
     provider.from_context(LockManagerConfig, scope=Scope.APP)
     provider.from_context(NATSConfig, scope=Scope.APP)
+
+    provider.provide(app_logger_factory, scope=Scope.APP)
+    provider.provide(operation_id_factory, scope=Scope.REQUEST)
+    provider.provide(request_logger_factory, scope=Scope.REQUEST)
 
     provider.provide(httpx_client_factory, scope=Scope.APP)
     provider.provide(redis_factory, scope=Scope.APP)
