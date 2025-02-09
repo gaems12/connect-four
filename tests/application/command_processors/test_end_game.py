@@ -13,17 +13,15 @@ from four_in_a_row.domain import (
     GameId,
     GameStateId,
     UserId,
-    PlayerState,
     Game,
-    TryToLoseOnTime,
+    PlayerState,
+    EndGame,
 )
 from four_in_a_row.application import (
-    GameEndReason,
-    GameEndedEvent,
-    LoseOnTimeCommand,
-    LoseOnTimeProcessor,
+    EndGameCommand,
+    EndGameProcessor,
 )
-from .fakes import FakeGameGateway, FakeEventPublisher
+from .fakes import FakeGameGateway
 
 
 _GAME_ID: Final = GameId(uuid7())
@@ -36,7 +34,7 @@ _TIME_LEFT_FOR_FIRST_PLAYER: Final = timedelta(seconds=20)
 _TIME_LEFT_FOR_SECOND_SECOND: Final = timedelta(minutes=1)
 
 
-async def test_lose_on_time_processor():
+async def test_end_game_processor():
     players = {
         _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
@@ -75,36 +73,13 @@ async def test_lose_on_time_processor():
     )
 
     game_gateway = FakeGameGateway({_GAME_ID: game})
-    event_publisher = FakeEventPublisher([])
 
-    command = LoseOnTimeCommand(
-        game_id=_GAME_ID,
-        game_state_id=_GAME_STATE_ID,
-    )
-    command_processor = LoseOnTimeProcessor(
-        try_to_lose_on_time=TryToLoseOnTime(),
+    command = EndGameCommand(game_id=_GAME_ID)
+    command_processor = EndGameProcessor(
+        end_game=EndGame(),
         game_gateway=game_gateway,
-        event_publisher=event_publisher,
+        task_scheduler=AsyncMock(),
         transaction_manager=AsyncMock(),
     )
 
     await command_processor.process(command)
-
-    updated_players = {
-        _FIRST_PLAYER_ID: PlayerState(
-            chip_type=ChipType.FIRST,
-            time_left=timedelta(seconds=0),
-        ),
-        _SECOND_PLAYER_ID: PlayerState(
-            chip_type=ChipType.SECOND,
-            time_left=_TIME_LEFT_FOR_SECOND_SECOND,
-        ),
-    }
-    expected_event = GameEndedEvent(
-        game_id=_GAME_ID,
-        move=None,
-        players=updated_players,
-        reason=GameEndReason.TIME_IS_UP,
-        last_turn=_FIRST_PLAYER_ID,
-    )
-    assert expected_event in event_publisher.events
