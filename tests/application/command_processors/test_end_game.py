@@ -83,3 +83,6 @@ async def test_end_game_processor():
     )
 
     await command_processor.process(command)
+
+    assert game_gateway.games
+    assert game_gateway.games[0].status == GameStatus.ENDED
