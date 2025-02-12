@@ -41,10 +41,9 @@ class MakeMove:
         current_player_id: UserId,
         move: Move,
     ) -> MoveResult:
-        if current_player_id not in game.players.keys():
+        if current_player_id not in game.players:
             raise Exception(
-                "MakeMove. Cannot make move: "
-                "there is no current player in the game",
+                "Cannot make move: there is no current player in the game",
             )
 
         if game.status == GameStatus.ENDED:
@@ -263,6 +262,6 @@ class MakeMove:
                 return
 
         raise Exception(
-            "MakeMove. Cannot make move: there are no other "
-            "players in the game to assign the next turn to.",
+            "Cannot make move: there are no other players "
+            "in the game to assign the next turn to.",
         )
