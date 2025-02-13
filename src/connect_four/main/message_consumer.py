@@ -9,10 +9,10 @@ from dishka.integrations.faststream import FastStreamProvider, setup_dishka
 from connect_four.infrastructure import (
     load_nats_config,
     ioc_container_factory,
-    default_operation_id_factory,
 )
 from connect_four.presentation.message_consumer import (
     create_broker,
+    operation_id_factory,
     create_game_command_factory,
     end_game_command_factory,
     make_move_command_factory,
@@ -34,7 +34,7 @@ def create_message_consumer_app() -> FastStream:
             end_game_command_factory,
             make_move_command_factory,
         ],
-        default_operation_id_factory,
+        operation_id_factory,
         FastStreamProvider(),
     )
     setup_dishka(ioc_container, app)
