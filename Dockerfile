@@ -18,7 +18,7 @@ FROM base AS runner
 
 COPY --from=builder ./app/dist ./
 
-RUN pip install four_in_a_row*.whl
+RUN pip install connect_four*.whl
 
-ENTRYPOINT four-in-a-row
+ENTRYPOINT connect-four
 CMD ["--help"]

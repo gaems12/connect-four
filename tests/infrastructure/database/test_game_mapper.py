@@ -9,7 +9,7 @@ import pytest
 from redis.asyncio.client import Redis, Pipeline
 from uuid_extensions import uuid7
 
-from four_in_a_row.domain import (
+from connect_four.domain import (
     GameId,
     GameStateId,
     UserId,
@@ -20,8 +20,8 @@ from four_in_a_row.domain import (
     PlayerState,
     Game,
 )
-from four_in_a_row.application import SortGamesBy
-from four_in_a_row.infrastructure import (
+from connect_four.application import SortGamesBy
+from connect_four.infrastructure import (
     get_env_var,
     RedisConfig,
     redis_factory,

@@ -1,4 +1,4 @@
-# Four In A Row
+# Connect Four
 
 <p align="left">
    <a>
@@ -56,7 +56,7 @@ Ensure the following services are installed and running:
    ```bash
    pip install build
    python3 -m build --wheel
-   pip install ./dist/four_in_a_row*.whl
+   pip install ./dist/connect_four*.whl
    ```
 
 ### Using uv
@@ -77,7 +77,7 @@ Ensure the following services are installed and running:
    **For production**
    ```bash
    uv build --wheel
-   uv pip install ./dist/four_in_a_row*.whl
+   uv pip install ./dist/connect_four*.whl
    ```
 
 ### Using Docker
@@ -85,7 +85,7 @@ Ensure the following services are installed and running:
 1. Build Docker image:
 
    ```bash
-   docker build -t four_in_a_row:latest .
+   docker build -t connect_four:latest .
    ```
 
 ---
@@ -116,26 +116,26 @@ Configure the following environment variables before running the application:
 
 Run the message consumer to process game-related events from NATS:
 ```bash
-four-in-a-row run-message-consumer
+connect-four run-message-consumer
 ```
 
 ### Run Task Executor
 
 Run the executor for scheduled tasks:
 ```bash
-four-in-a-row run-task-executor
+connect-four run-task-executor
 ```
 
 ### Create a New Game
 
 ```bash
-four-in-a-row create-game --id <UUID> --first-player-id <UUID> --second-player-id <UUID> --time-for-each-player <number_of_seconds>
+connect-four create-game --id <UUID> --first-player-id <UUID> --second-player-id <UUID> --time-for-each-player <number_of_seconds>
 ```
 
 ### End a Game
 
 ```bash
-four-in-a-row end-game --id <UUID>
+connect-four end-game --id <UUID>
 ```
 
 ---

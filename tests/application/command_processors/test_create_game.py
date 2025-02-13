@@ -7,7 +7,7 @@ from typing import Final
 
 from uuid_extensions import uuid7
 
-from four_in_a_row.domain import (
+from connect_four.domain import (
     ChipType,
     BOARD_COLUMNS,
     BOARD_ROWS,
@@ -16,7 +16,7 @@ from four_in_a_row.domain import (
     PlayerState,
     CreateGame,
 )
-from four_in_a_row.application import (
+from connect_four.application import (
     LobbyId,
     GameCreatedEvent,
     CreateGameCommand,

@@ -3,8 +3,8 @@ requires = ["setuptools>=64.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "four_in_a_row"
-description = "Four in a row game."
+name = "connect_four"
+description = "Connect four game."
 version = "0.1.0"
 requires-python = ">=3.12"
 
@@ -32,4 +32,4 @@ dev = [
 ]
 
 [project.scripts]
-four-in-a-row = "four_in_a_row.main.cli:main"
+connect-four= "connect_four.main.cli:main"

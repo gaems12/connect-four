@@ -7,7 +7,7 @@ from typing import Final
 
 from uuid_extensions import uuid7
 
-from four_in_a_row.domain import (
+from connect_four.domain import (
     GameId,
     GameStateId,
     UserId,

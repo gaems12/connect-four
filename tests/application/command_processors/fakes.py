@@ -1,8 +1,8 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
-from four_in_a_row.domain import GameId, UserId, Game
-from four_in_a_row.application import (
+from connect_four.domain import GameId, UserId, Game
+from connect_four.application import (
     SortGamesBy,
     GameGateway,
     Event,

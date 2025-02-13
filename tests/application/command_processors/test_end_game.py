@@ -7,7 +7,7 @@ from typing import Final
 
 from uuid_extensions import uuid7
 
-from four_in_a_row.domain import (
+from connect_four.domain import (
     GameStatus,
     ChipType,
     GameId,
@@ -17,7 +17,7 @@ from four_in_a_row.domain import (
     PlayerState,
     EndGame,
 )
-from four_in_a_row.application import (
+from connect_four.application import (
     EndGameCommand,
     EndGameProcessor,
 )
@@ -45,16 +45,14 @@ async def test_end_game_processor():
             time_left=_TIME_LEFT_FOR_SECOND_SECOND,
         ),
     }
-    board = [
-        [
-            [None] * 6,
-            [None] * 6,
-            [None] * 6,
-            [ChipType.SECOND] + [None] * 5,
-            [ChipType.SECOND] + [None] * 5,
-            [ChipType.SECOND, ChipType.FIRST] + [None] * 4,
-            [ChipType.FIRST, ChipType.FIRST, ChipType.FIRST] + [None] * 3,
-        ],
+    board: list[list[ChipType | None]] = [
+        [None] * 6,
+        [None] * 6,
+        [None] * 6,
+        [ChipType.SECOND] + [None] * 5,
+        [ChipType.SECOND] + [None] * 5,
+        [ChipType.SECOND, ChipType.FIRST] + [None] * 4,
+        [ChipType.FIRST, ChipType.FIRST, ChipType.FIRST] + [None] * 3,
     ]
 
     game = Game(

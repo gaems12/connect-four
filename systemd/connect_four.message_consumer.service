@@ -1,0 +1,14 @@
+[Unit]
+Description=Connect Four Message Consumer
+After=network.target
+
+[Service]
+User=connect_four
+Group=connect_four
+Type=simple
+WorkingDirectory=/opt/connect_four
+ExecStart=/opt/connect_four/venv/bin/connect-four run-message-consumer
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
