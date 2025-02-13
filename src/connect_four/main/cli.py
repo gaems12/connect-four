@@ -20,7 +20,7 @@ def main() -> None:
 
 def create_cli_app() -> App:
     app = App(
-        name="Four In A Row",
+        name="Connect Four Game",
         version=version("connect_four"),
         help_format="rich",
     )

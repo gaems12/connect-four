@@ -25,7 +25,7 @@ def create_message_consumer_app() -> FastStream:
 
     app = FastStream(
         broker=broker,
-        title="Four In A Row Game",
+        title="Connect Four Game",
         version=version("connect_four"),
     )
     ioc_container = ioc_container_factory(
