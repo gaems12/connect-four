@@ -11,13 +11,19 @@ from connect_four.application import (
     Task,
     TaskScheduler,
 )
+from connect_four.infrastructure.operation_id import OperationId
 
 
 class TaskiqTaskScheduler(TaskScheduler):
-    __slots__ = ("schedule_source",)
+    __slots__ = ("_schedule_source", "_operation_id")
 
-    def __init__(self, schedule_source: RedisScheduleSource):
+    def __init__(
+        self,
+        schedule_source: RedisScheduleSource,
+        operation_id: OperationId,
+    ):
         self._schedule_source = schedule_source
+        self._operation_id = operation_id
 
     async def schedule(self, task: Task) -> None:
         if isinstance(task, LoseOnTimeTask):
