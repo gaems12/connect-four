@@ -70,6 +70,53 @@ wheels = [
 ]
 
 [[package]]
+name = "connect-four"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "adaptix" },
+    { name = "cyclopts" },
+    { name = "dishka" },
+    { name = "faststream", extra = ["nats"] },
+    { name = "httpx" },
+    { name = "nats-py" },
+    { name = "redis" },
+    { name = "taskiq" },
+    { name = "taskiq-nats" },
+    { name = "taskiq-redis" },
+    { name = "uuid7" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "adaptix", specifier = "==3.0b9" },
+    { name = "cyclopts", specifier = "==3.0.*" },
+    { name = "dishka", specifier = "==1.4.*" },
+    { name = "faststream", extras = ["nats"], specifier = "==0.5.*" },
+    { name = "httpx", specifier = "==0.28.*" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = "==1.14.*" },
+    { name = "nats-py", specifier = "==2.9.*" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = "==4.0.*" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = "==8.3.*" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = "==0.25.*" },
+    { name = "redis", specifier = "==5.2.*" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.8.*" },
+    { name = "taskiq", specifier = "==0.11.*" },
+    { name = "taskiq-nats", specifier = "==0.5.*" },
+    { name = "taskiq-redis", specifier = "==1.0.*" },
+    { name = "uuid7", specifier = "==0.1.*" },
+]
+
+[[package]]
 name = "cyclopts"
 version = "3.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -159,53 +206,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9d/db/3ef5bb276dae18d6ec2124224403d1d67bccdbefc17af4cc8f553e341ab1/filelock-3.16.1.tar.gz", hash = "sha256:c249fbfcd5db47e5e2d6d62198e565475ee65e4831e2561c8e313fa7eb961435", size = 18037 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b9/f8/feced7779d755758a52d1f6635d990b8d98dc0a29fa568bbe0625f18fdf3/filelock-3.16.1-py3-none-any.whl", hash = "sha256:2082e5703d51fbf98ea75855d9d5527e33d8ff23099bec374a134febee6946b0", size = 16163 },
-]
-
-[[package]]
-name = "four-in-a-row"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "adaptix" },
-    { name = "cyclopts" },
-    { name = "dishka" },
-    { name = "faststream", extra = ["nats"] },
-    { name = "httpx" },
-    { name = "nats-py" },
-    { name = "redis" },
-    { name = "taskiq" },
-    { name = "taskiq-nats" },
-    { name = "taskiq-redis" },
-    { name = "uuid7" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "mypy" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "adaptix", specifier = "==3.0b9" },
-    { name = "cyclopts", specifier = "==3.0.*" },
-    { name = "dishka", specifier = "==1.4.*" },
-    { name = "faststream", extras = ["nats"], specifier = "==0.5.*" },
-    { name = "httpx", specifier = "==0.28.*" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = "==1.14.*" },
-    { name = "nats-py", specifier = "==2.9.*" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = "==4.0.*" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = "==8.3.*" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = "==0.25.*" },
-    { name = "redis", specifier = "==5.2.*" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.8.*" },
-    { name = "taskiq", specifier = "==0.11.*" },
-    { name = "taskiq-nats", specifier = "==0.5.*" },
-    { name = "taskiq-redis", specifier = "==1.0.*" },
-    { name = "uuid7", specifier = "==0.1.*" },
 ]
 
 [[package]]
