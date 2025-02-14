@@ -19,11 +19,8 @@ from connect_four.application import (
     GameAlreadyExistsError,
     GameDoesNotExistError,
 )
-from connect_four.infrastructure import (
-    str_to_timedelta,
-    ioc_container_factory,
-    default_operation_id_factory,
-)
+from connect_four.infrastructure import str_to_timedelta
+from .ioc_container import ioc_container_factory
 
 
 def _str_to_uuid(_, tokens: list[Token]) -> UUID:
@@ -65,10 +62,8 @@ async def create_game(
     if not execution_is_confirmed:
         return
 
-    ioc_container = ioc_container_factory(
-        [],
-        default_operation_id_factory,
-    )
+    ioc_container = ioc_container_factory()
+
     async with ioc_container() as request_container:
         command = CreateGameCommand(
             game_id=GameId(id),
@@ -103,10 +98,8 @@ async def end_game(
     if not execution_is_confirmed:
         return
 
-    ioc_container = ioc_container_factory(
-        [],
-        default_operation_id_factory,
-    )
+    ioc_container = ioc_container_factory()
+
     async with ioc_container() as request_container:
         command = EndGameCommand(GameId(id))
 

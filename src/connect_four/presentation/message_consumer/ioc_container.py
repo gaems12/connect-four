@@ -1,22 +1,18 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
-__all__ = ("ioc_container_factory",)
-
-from typing import Any, Callable, Coroutine, Iterable
-
 from dishka import (
     Provider,
     Scope,
     AsyncContainer,
     make_async_container,
 )
+from dishka.integrations.faststream import FastStreamProvider
 
 from connect_four.domain import (
     CreateGame,
     EndGame,
     MakeMove,
-    TryToLoseOnTime,
 )
 from connect_four.application import (
     GameGateway,
@@ -24,29 +20,19 @@ from connect_four.application import (
     TaskScheduler,
     TransactionManager,
     IdentityProvider,
-    CreateGameCommand,
     CreateGameProcessor,
-    EndGameCommand,
     EndGameProcessor,
-    MakeMoveCommand,
     MakeMoveProcessor,
-    LoseOnTimeCommand,
-    LoseOnTimeProcessor,
 )
-from .operation_id import OperationId
-from .log import (
+from connect_four.infrastructure import (
     LoggingConfig,
     load_logging_config,
     app_logger_factory,
     request_logger_factory,
-)
-from .clients import (
     httpx_client_factory,
     CentrifugoConfig,
     load_centrifugo_config,
     HTTPXCentrifugoClient,
-)
-from .database import (
     redis_factory,
     redis_pipeline_factory,
     GameMapperConfig,
@@ -56,37 +42,28 @@ from .database import (
     load_lock_manager_config,
     lock_manager_factory,
     RedisTransactionManager,
-)
-from .message_broker import (
     NATSConfig,
     load_nats_config,
     nats_client_factory,
     nats_jetstream_factory,
     NATSEventPublisher,
-)
-from .scheduling import (
     taskiq_redis_schedule_source_factory,
     TaskiqTaskScheduler,
+    RedisConfig,
+    load_redis_config,
+    common_retort_factory,
+    RealEventPublisher,
 )
-from .redis_config import RedisConfig, load_redis_config
-from .common_retort import common_retort_factory
-from .event_publisher import RealEventPublisher
-from .identity_provider import NATSIdentityProvider
-
-
-type _Command = (
-    CreateGameCommand | EndGameCommand | MakeMoveCommand | LoseOnTimeCommand
+from .commands import (
+    create_game_command_factory,
+    end_game_command_factory,
+    make_move_command_factory,
 )
+from .identity_provider import MessageBrokerIdentityProvider
+from .operation_id import operation_id_factory
 
-type _CommandFactory = Callable[..., Coroutine[Any, Any, _Command]]
-type _OperationIdFactory = Callable[..., Coroutine[Any, Any, OperationId]]
 
-
-def ioc_container_factory(
-    command_factories: Iterable[_CommandFactory],
-    operation_id_factory: _OperationIdFactory,
-    *extra_providers: Provider,
-) -> AsyncContainer:
+def ioc_container_factory() -> AsyncContainer:
     provider = Provider()
 
     context = {
@@ -141,7 +118,7 @@ def ioc_container_factory(
     )
 
     provider.provide(
-        NATSIdentityProvider,
+        MessageBrokerIdentityProvider,
         scope=Scope.REQUEST,
         provides=IdentityProvider,
     )
@@ -149,14 +126,17 @@ def ioc_container_factory(
     provider.provide(CreateGame, scope=Scope.APP)
     provider.provide(EndGame, scope=Scope.APP)
     provider.provide(MakeMove, scope=Scope.APP)
-    provider.provide(TryToLoseOnTime, scope=Scope.APP)
 
-    for command_factory in command_factories:
-        provider.provide(command_factory, scope=Scope.REQUEST)
+    provider.provide(create_game_command_factory, scope=Scope.REQUEST)
+    provider.provide(end_game_command_factory, scope=Scope.REQUEST)
+    provider.provide(make_move_command_factory, scope=Scope.REQUEST)
 
     provider.provide(CreateGameProcessor, scope=Scope.REQUEST)
     provider.provide(EndGameProcessor, scope=Scope.REQUEST)
     provider.provide(MakeMoveProcessor, scope=Scope.REQUEST)
-    provider.provide(LoseOnTimeProcessor, scope=Scope.REQUEST)
 
-    return make_async_container(provider, *extra_providers, context=context)
+    return make_async_container(
+        provider,
+        FastStreamProvider(),
+        context=context,
+    )
