@@ -62,15 +62,14 @@ class LockManager:
         if lock_name in self._acquired_lock_names:
             return
 
-        lock_is_acquired = await self._redis.get(lock_name)
-        while lock_is_acquired:
-            lock_is_acquired = await self._redis.get(lock_name)
-
-        await self._redis.set(
+        while not await self._redis.set(
             name=lock_name,
             value="",
             ex=self._config.lock_expires_in,
-        )
+            nx=True,
+        ):
+            ...
+
         self._acquired_lock_names.append(lock_name)
 
     async def release_all(self) -> None:
