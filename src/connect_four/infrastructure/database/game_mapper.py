@@ -62,7 +62,7 @@ class GameMapper(GameGateway):
         acquire: bool = False,
     ) -> Game | None:
         pattern = self._pattern_to_find_game_by_id(id)
-        keys = await self._redis.keys(pattern)
+        keys = await self._keys_by_pattern(pattern=pattern, limit=1)
         if not keys:
             return None
 
@@ -90,7 +90,7 @@ class GameMapper(GameGateway):
             )
 
         pattern = self._pattern_to_find_game_by_player_ids(player_ids)
-        keys = await self._redis.keys(pattern)
+        keys = await self._keys_by_pattern(pattern=pattern, limit=1)
         if not keys:
             return []
 
@@ -167,6 +167,29 @@ class GameMapper(GameGateway):
             "games:id:*:player_ids:"
             f"{sorted_player_ids[0].hex}:{sorted_player_ids[1].hex}"
         )
+
+    async def _keys_by_pattern(
+        self,
+        *,
+        pattern: str,
+        batch_size: int = 10,
+        limit: int | None = None,
+    ) -> list[str]:
+        keys: list[str] = []
+
+        if limit == 0:
+            return keys
+
+        async for key in self._redis.scan_iter(
+            match=pattern,
+            count=batch_size,
+        ):
+            keys.append(key)
+
+            if limit and len(keys) >= limit:
+                return keys
+
+        return keys
 
     def _lock_id_factory(self, game_id: GameId) -> str:
         return f"games:id:{game_id.hex}"
