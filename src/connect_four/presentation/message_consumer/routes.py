@@ -3,7 +3,7 @@
 
 from typing import Final
 
-from faststream.nats import NatsRouter, JStream
+from faststream.nats import NatsRouter, JStream, PullSub
 from dishka.integrations.faststream import FromDishka, inject
 
 from connect_four.application import (
@@ -24,9 +24,9 @@ router = NatsRouter()
 
 @router.subscriber(
     subject="game.created",
-    queue="connect_four.game.created",
     durable="connect_four.game.created",
     stream=_CONNECTION_HUB_STREAM,
+    pull_sub=PullSub(timeout=0.2),
 )
 @inject
 async def create_game(
@@ -39,9 +39,9 @@ async def create_game(
 
 @router.subscriber(
     subject="game.ended",
-    queue="connect_four.game.ended",
     durable="connect_four.game.ended",
     stream=_CONNECTION_HUB_STREAM,
+    pull_sub=PullSub(timeout=0.2),
 )
 @inject
 async def end_game(
@@ -54,9 +54,9 @@ async def end_game(
 
 @router.subscriber(
     subject="game.move_was_made",
-    queue="connect_four.game.move_was_made",
     durable="connect_four.game.move_was_made",
     stream=_API_GATEWAY_STREAM,
+    pull_sub=PullSub(timeout=0.2),
 )
 @inject
 async def make_move(
