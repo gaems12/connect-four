@@ -1,6 +1,7 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
+import asyncio
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import AsyncGenerator
@@ -68,7 +69,7 @@ class LockManager:
             ex=self._config.lock_expires_in,
             nx=True,
         ):
-            ...
+            await asyncio.sleep(0.1)
 
         self._acquired_lock_names.append(lock_name)
 
