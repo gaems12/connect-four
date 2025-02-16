@@ -190,6 +190,3 @@ class GameMapper(GameGateway):
                 return keys
 
         return keys
-
-    def _lock_id_factory(self, game_id: GameId) -> str:
-        return f"games:id:{game_id.hex}"
