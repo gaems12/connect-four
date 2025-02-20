@@ -10,10 +10,7 @@ from connect_four.infrastructure.utils import get_env_var
 
 def load_logging_config() -> "LoggingConfig":
     return LoggingConfig(
-        level=get_env_var(
-            "LOGGING_LEVEL",
-            lambda v: GLoggerLevel(int(v)),
-        ),
+        level=get_env_var("LOGGING_LEVEL", GLoggerLevel),
     )
 
 
