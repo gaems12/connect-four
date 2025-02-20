@@ -19,7 +19,7 @@
 - [⚙️ Environment Variables](#%EF%B8%8F-environment-variables)
 - [🛠️ Commands](#%EF%B8%8F-commands)
   - [Run Message Consumer](#run-message-consumer)
-  - [Run Task Executor](#run-task-executor)
+  - [Run Task Scheduler](#run-task-scheduler)
   - [Create a New Game](#create-a-new-game)
   - [End a Game](#end-a-game)
 
@@ -119,11 +119,11 @@ Run the message consumer to process game-related events from NATS:
 connect-four run-message-consumer
 ```
 
-### Run Task Executor
+### Run Task Scheduler
 
-Run the executor for scheduled tasks:
+Run the task scheduler:
 ```bash
-connect-four run-task-executor
+connect-four run-task-scheduler
 ```
 
 ### Create a New Game

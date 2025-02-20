@@ -10,7 +10,7 @@ from faststream.cli.main import cli as run_faststream
 from taskiq.cli.scheduler.run import run_scheduler_loop
 
 from connect_four.presentation.cli import create_game, end_game
-from .task_executor import create_task_executor_app
+from .task_scheduler import create_task_scheduler_app
 
 
 def main() -> None:
@@ -29,7 +29,7 @@ def create_cli_app() -> App:
     app.command(end_game)
 
     app.command(run_message_consumer)
-    app.command(run_task_executor)
+    app.command(run_task_scheduler)
 
     return app
 
@@ -52,7 +52,7 @@ def run_message_consumer(
     run_faststream()
 
 
-async def run_task_executor():
-    """Run task executor."""
-    task_executor = create_task_executor_app()
-    await run_scheduler_loop(task_executor)
+async def run_task_scheduler():
+    """Run task scheduler."""
+    task_scheduler = create_task_scheduler_app()
+    await run_scheduler_loop(task_scheduler)

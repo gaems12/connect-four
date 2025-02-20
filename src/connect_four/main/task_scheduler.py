@@ -13,7 +13,7 @@ from connect_four.infrastructure import (
 from connect_four.presentation.task_executor import ioc_container_factory
 
 
-def create_task_executor_app() -> TaskiqScheduler:
+def create_task_scheduler_app() -> TaskiqScheduler:
     nats_config = load_nats_config()
     redis_config = load_redis_config()
 

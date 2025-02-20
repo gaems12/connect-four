@@ -1,5 +1,5 @@
 [Unit]
-Description=Connect Four Task Executor
+Description=Connect Four Task Scheduler
 After=network.target
 
 [Service]
@@ -7,7 +7,7 @@ User=connect_four
 Group=connect_four
 Type=simple
 WorkingDirectory=/opt/connect_four
-ExecStart=/opt/connect_four/venv/bin/connect-four run-task-executor
+ExecStart=/opt/connect_four/venv/bin/connect-four run-task-scheduler
 Restart=always
 
 [Install]
