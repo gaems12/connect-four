@@ -20,6 +20,7 @@
 - [🛠️ Commands](#%EF%B8%8F-commands)
   - [Run Message Consumer](#run-message-consumer)
   - [Run Task Scheduler](#run-task-scheduler)
+  - [Run Task Executor](#run-task-executor)
   - [Create a New Game](#create-a-new-game)
   - [End a Game](#end-a-game)
 
@@ -98,7 +99,7 @@ Configure the following environment variables before running the application:
 
 | Variable                     | Required            | Description                              |
 |------------------------------|---------------------|------------------------------------------|
-| `LOGGING_LEVEL`              | Yes                 | Level for [GLogger](https://github.com/gaems12/g-logger)                        |
+| `LOGGING_LEVEL`              | Yes                 | Level for [GLogger](https://github.com/gaems12/g-logger)                      |
 | `REDIS_URL`                  | Yes                 | URL for the Redis instance.              |
 | `NATS_URL`                   | Yes                 | URL for the NATS server.                 |
 | `CENTRIFUGO_URL`             | Yes                 | URL for the Centrifugo server.           |
