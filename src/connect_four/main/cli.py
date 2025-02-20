@@ -58,7 +58,9 @@ def run_message_consumer(
 async def run_task_scheduler() -> None:
     """Run task scheduler."""
     task_scheduler = create_task_scheduler_app()
+    await task_scheduler.startup()
     await run_scheduler_loop(task_scheduler)
+    await task_scheduler.shutdown()
 
 
 def run_task_executor(

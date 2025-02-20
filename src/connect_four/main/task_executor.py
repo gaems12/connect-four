@@ -1,7 +1,7 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
-from taskiq_nats import PushBasedJetStreamBroker, NatsBroker
+from taskiq_nats import PullBasedJetStreamBroker, NatsBroker
 from dishka.integrations.taskiq import setup_dishka
 
 from connect_four.infrastructure import load_nats_config
@@ -14,7 +14,10 @@ from connect_four.presentation.task_executor import (
 def create_task_executor_app() -> NatsBroker:
     nats_config = load_nats_config()
 
-    broker = PushBasedJetStreamBroker([nats_config.url])
+    broker = PullBasedJetStreamBroker(
+        [nats_config.url],
+        pull_consume_timeout=0.2,
+    )
     broker.register_task(lose_on_time)
 
     ioc_container = ioc_container_factory()
