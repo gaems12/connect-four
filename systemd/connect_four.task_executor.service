@@ -1,0 +1,14 @@
+[Unit]
+Description=Connect Four Task Executor
+After=network.target
+
+[Service]
+User=connect_four
+Group=connect_four
+Type=simple
+WorkingDirectory=/opt/connect_four
+ExecStart=/opt/connect_four/venv/bin/connect-four run-task-executor
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

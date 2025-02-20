@@ -8,6 +8,8 @@ from typing import Annotated
 from cyclopts import App, Parameter
 from faststream.cli.main import cli as run_faststream
 from taskiq.cli.scheduler.run import run_scheduler_loop
+from taskiq.cli.worker.args import WorkerArgs
+from taskiq.cli.worker.run import run_worker
 
 from connect_four.presentation.cli import create_game, end_game
 from .task_scheduler import create_task_scheduler_app
@@ -30,6 +32,7 @@ def create_cli_app() -> App:
 
     app.command(run_message_consumer)
     app.command(run_task_scheduler)
+    app.command(run_task_executor)
 
     return app
 
@@ -52,7 +55,23 @@ def run_message_consumer(
     run_faststream()
 
 
-async def run_task_scheduler():
+async def run_task_scheduler() -> None:
     """Run task scheduler."""
     task_scheduler = create_task_scheduler_app()
     await run_scheduler_loop(task_scheduler)
+
+
+def run_task_executor(
+    workers: Annotated[
+        str,
+        Parameter("--workers", show_default=True),
+    ] = 2,
+) -> None:
+    """Run task executor."""
+    worker_args = WorkerArgs(
+        broker="connect_four.main.task_executor:task_executor",
+        modules=["connect_four.presentation.task_executor"],
+        tasks_pattern=("executors.py",),
+        workers=workers,
+    )
+    run_worker(worker_args)

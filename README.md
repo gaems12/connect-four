@@ -126,6 +126,13 @@ Run the task scheduler:
 connect-four run-task-scheduler
 ```
 
+### Run Task Executor
+
+Run the task executor for scheduled tasks:
+```bash
+connect-four run-task-executor
+```
+
 ### Create a New Game
 
 ```bash
