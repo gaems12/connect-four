@@ -4,17 +4,20 @@
 from dishka.integrations.taskiq import FromDishka, inject
 
 from connect_four.domain import GameId, GameStateId
-from connect_four.application import LoseOnTimeCommand, LoseOnTimeProcessor
+from connect_four.application import (
+    TryToLoseOnTimeCommand,
+    TryToLoseOnTimeProcessor,
+)
 
 
 @inject
-async def lose_on_time(
+async def try_to_lose_on_time(
     *,
     game_id: GameId,
     game_state_id: GameStateId,
-    command_processor: FromDishka[LoseOnTimeProcessor],
+    command_processor: FromDishka[TryToLoseOnTimeProcessor],
 ) -> None:
-    command = LoseOnTimeCommand(
+    command = TryToLoseOnTimeCommand(
         game_id=game_id,
         game_state_id=game_state_id,
     )

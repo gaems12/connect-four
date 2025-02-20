@@ -20,8 +20,8 @@ from connect_four.domain import (
 from connect_four.application import (
     GameEndReason,
     GameEndedEvent,
-    LoseOnTimeCommand,
-    LoseOnTimeProcessor,
+    TryToLoseOnTimeCommand,
+    TryToLoseOnTimeProcessor,
 )
 from .fakes import FakeGameGateway, FakeEventPublisher
 
@@ -75,11 +75,11 @@ async def test_lose_on_time_processor():
     game_gateway = FakeGameGateway({_GAME_ID: game})
     event_publisher = FakeEventPublisher([])
 
-    command = LoseOnTimeCommand(
+    command = TryToLoseOnTimeCommand(
         game_id=_GAME_ID,
         game_state_id=_GAME_STATE_ID,
     )
-    command_processor = LoseOnTimeProcessor(
+    command_processor = TryToLoseOnTimeProcessor(
         try_to_lose_on_time=TryToLoseOnTime(),
         game_gateway=game_gateway,
         event_publisher=event_publisher,

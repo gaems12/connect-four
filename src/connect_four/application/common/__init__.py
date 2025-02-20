@@ -13,7 +13,7 @@ __all__ = (
     "EventPublisher",
     "SortGamesBy",
     "GameGateway",
-    "LoseOnTimeTask",
+    "TryToLoseOnTimeTask",
     "Task",
     "TaskScheduler",
     "TransactionManager",
@@ -35,7 +35,7 @@ from .event_publisher import (
     EventPublisher,
 )
 from .game_gateway import SortGamesBy, GameGateway
-from .task_scheduler import LoseOnTimeTask, Task, TaskScheduler
+from .task_scheduler import TryToLoseOnTimeTask, Task, TaskScheduler
 from .transaction_manager import TransactionManager
 from .identity_provider import IdentityProvider
 from .exceptions import (

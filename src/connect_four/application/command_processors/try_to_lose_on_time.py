@@ -15,12 +15,12 @@ from connect_four.application.common import (
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class LoseOnTimeCommand:
+class TryToLoseOnTimeCommand:
     game_id: GameId
     game_state_id: GameStateId
 
 
-class LoseOnTimeProcessor:
+class TryToLoseOnTimeProcessor:
     __slots__ = (
         "_try_to_lose_on_time",
         "_game_gateway",
@@ -40,7 +40,7 @@ class LoseOnTimeProcessor:
         self._event_publisher = event_publisher
         self._transaction_manager = transaction_manager
 
-    async def process(self, command: LoseOnTimeCommand) -> None:
+    async def process(self, command: TryToLoseOnTimeCommand) -> None:
         game = await self._game_gateway.by_id(
             id=command.game_id,
             acquire=True,

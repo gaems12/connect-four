@@ -13,7 +13,7 @@ from connect_four.application import (
     GameGateway,
     EventPublisher,
     TransactionManager,
-    LoseOnTimeProcessor,
+    TryToLoseOnTimeProcessor,
 )
 from connect_four.infrastructure import (
     LoggingConfig,
@@ -94,6 +94,6 @@ def ioc_container_factory() -> AsyncContainer:
     )
 
     provider.provide(TryToLoseOnTime, scope=Scope.APP)
-    provider.provide(LoseOnTimeProcessor, scope=Scope.REQUEST)
+    provider.provide(TryToLoseOnTimeProcessor, scope=Scope.REQUEST)
 
     return make_async_container(provider, context=context)

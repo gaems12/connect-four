@@ -26,7 +26,7 @@ from connect_four.application import (
     GameEndedEvent,
     Event,
     EventPublisher,
-    LoseOnTimeTask,
+    TryToLoseOnTimeTask,
     TaskScheduler,
     TransactionManager,
     IdentityProvider,
@@ -101,7 +101,7 @@ class MakeMoveProcessor:
             execute_task_at = (
                 datetime.now(timezone.utc) + time_left_for_current_player
             )
-            task = LoseOnTimeTask(
+            task = TryToLoseOnTimeTask(
                 id=game.state_id,
                 execute_at=execute_task_at,
                 game_id=game.id,

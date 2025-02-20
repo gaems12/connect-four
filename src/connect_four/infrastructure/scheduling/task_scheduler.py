@@ -7,7 +7,7 @@ from taskiq import ScheduledTask
 from taskiq_redis import RedisScheduleSource
 
 from connect_four.application import (
-    LoseOnTimeTask,
+    TryToLoseOnTimeTask,
     Task,
     TaskScheduler,
 )
@@ -26,15 +26,15 @@ class TaskiqTaskScheduler(TaskScheduler):
         self._operation_id = operation_id
 
     async def schedule(self, task: Task) -> None:
-        if isinstance(task, LoseOnTimeTask):
-            await self._schedule_lose_on_time(task)
+        if isinstance(task, TryToLoseOnTimeTask):
+            await self._schedule_try_to_lose_on_time(task)
 
-    async def _schedule_lose_on_time(
+    async def _schedule_try_to_lose_on_time(
         self,
-        task: LoseOnTimeTask,
+        task: TryToLoseOnTimeTask,
     ) -> None:
         schedule = ScheduledTask(
-            task_name="lose_on_time",
+            task_name="try_to_lose_on_time",
             labels={},
             args=[],
             kwargs={
