@@ -18,10 +18,11 @@ from connect_four.domain import (
     EndGame,
 )
 from connect_four.application import (
+    TryToLoseOnTimeTask,
     EndGameCommand,
     EndGameProcessor,
 )
-from .fakes import FakeGameGateway
+from .fakes import FakeGameGateway, FakeTaskScheduler
 
 
 _GAME_ID: Final = GameId(uuid7())
@@ -72,11 +73,19 @@ async def test_end_game_processor():
 
     game_gateway = FakeGameGateway({_GAME_ID: game})
 
+    task = TryToLoseOnTimeTask(
+        id=_GAME_STATE_ID,
+        execute_at=_TIME_LEFT_FOR_FIRST_PLAYER,
+        game_id=_GAME_ID,
+        game_state_id=_GAME_STATE_ID,
+    )
+    task_scheduler = FakeTaskScheduler({_GAME_STATE_ID: task})
+
     command = EndGameCommand(game_id=_GAME_ID)
     command_processor = EndGameProcessor(
         end_game=EndGame(),
         game_gateway=game_gateway,
-        task_scheduler=AsyncMock(),
+        task_scheduler=task_scheduler,
         transaction_manager=AsyncMock(),
     )
 
@@ -84,3 +93,5 @@ async def test_end_game_processor():
 
     assert game_gateway.games
     assert game_gateway.games[0].status == GameStatus.ENDED
+
+    assert not task_scheduler.tasks

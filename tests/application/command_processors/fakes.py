@@ -1,12 +1,16 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
+from uuid import UUID
+
 from connect_four.domain import GameId, UserId, Game
 from connect_four.application import (
     SortGamesBy,
     GameGateway,
     Event,
     EventPublisher,
+    Task,
+    TaskScheduler,
 )
 
 
@@ -72,3 +76,20 @@ class FakeEventPublisher(EventPublisher):
 
     async def publish(self, event: Event) -> None:
         self._events.append(event)
+
+
+class FakeTaskScheduler(TaskScheduler):
+    __slots__ = ("_tasks",)
+
+    def __init__(self, tasks: dict[UUID, Task]):
+        self._tasks = tasks
+
+    @property
+    def tasks(self) -> list[Task]:
+        return list(self._tasks.values())
+
+    async def schedule(self, task: Task) -> None:
+        self._tasks[task.id] = task
+
+    async def unschedule(self, task_id: UUID) -> None:
+        self._tasks.pop(task_id, None)
