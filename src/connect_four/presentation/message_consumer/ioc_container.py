@@ -27,8 +27,6 @@ from connect_four.application import (
 from connect_four.infrastructure import (
     LoggingConfig,
     load_logging_config,
-    app_logger_factory,
-    request_logger_factory,
     httpx_client_factory,
     CentrifugoConfig,
     load_centrifugo_config,
@@ -60,6 +58,7 @@ from .commands import (
     make_move_command_factory,
 )
 from .identity_provider import MessageBrokerIdentityProvider
+from .context_var_setter import ContextVarSetter
 from .operation_id import operation_id_factory
 
 
@@ -82,9 +81,8 @@ def ioc_container_factory() -> AsyncContainer:
     provider.from_context(LockManagerConfig, scope=Scope.APP)
     provider.from_context(NATSConfig, scope=Scope.APP)
 
-    provider.provide(app_logger_factory, scope=Scope.APP)
     provider.provide(operation_id_factory, scope=Scope.REQUEST)
-    provider.provide(request_logger_factory, scope=Scope.REQUEST)
+    provider.provide(ContextVarSetter, scope=Scope.REQUEST)
 
     provider.provide(httpx_client_factory, scope=Scope.APP)
     provider.provide(redis_factory, scope=Scope.APP)

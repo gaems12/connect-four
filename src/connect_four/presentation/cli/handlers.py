@@ -20,6 +20,7 @@ from connect_four.application import (
     GameDoesNotExistError,
 )
 from connect_four.infrastructure import str_to_timedelta
+from .context_var_setter import ContextVarSetter
 from .ioc_container import ioc_container_factory
 
 
@@ -65,6 +66,9 @@ async def create_game(
     ioc_container = ioc_container_factory()
 
     async with ioc_container() as request_container:
+        context_var_setter = await request_container.get(ContextVarSetter)
+        context_var_setter.set()
+
         command = CreateGameCommand(
             game_id=GameId(id),
             lobby_id=LobbyId(lobby_id),

@@ -1,6 +1,8 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
 
+import logging
+
 from faststream.broker.message import StreamMessage
 
 from connect_four.application import (
@@ -8,24 +10,28 @@ from connect_four.application import (
     EndGameCommand,
     MakeMoveCommand,
 )
-from connect_four.infrastructure import RequestLogger, CommonRetort
+from connect_four.infrastructure import CommonRetort
+
+
+_logger = logging.getLogger(__name__)
 
 
 async def create_game_command_factory(
     message: StreamMessage,
-    logger: RequestLogger,
     common_retort: CommonRetort,
 ) -> CreateGameCommand:
     decoded_message = await message.decode()
 
-    logger.debug(
-        message="Got message from message broker.",
-        decoded_message=repr(message),
+    _logger.debug(
+        {
+            "message": "Got message from message broker.",
+            "decoded_message": message,
+        },
     )
 
     if not decoded_message or not isinstance(decoded_message, dict):
         error_message = "StreamMessage cannot be converted to dict."
-        logger.error(error_message)
+        _logger.error(error_message)
 
         raise Exception(error_message)
 
@@ -34,19 +40,20 @@ async def create_game_command_factory(
 
 async def end_game_command_factory(
     message: StreamMessage,
-    logger: RequestLogger,
     common_retort: CommonRetort,
 ) -> EndGameCommand:
     decoded_message = await message.decode()
 
-    logger.debug(
-        message="Got message from message broker.",
-        decoded_message=repr(message),
+    _logger.debug(
+        {
+            "message": "Got message from message broker.",
+            "decoded_message": message,
+        },
     )
 
     if not decoded_message or not isinstance(decoded_message, dict):
         error_message = "StreamMessage cannot be converted to dict."
-        logger.error(error_message)
+        _logger.error(error_message)
 
         raise Exception(error_message)
 
@@ -55,19 +62,20 @@ async def end_game_command_factory(
 
 async def make_move_command_factory(
     message: StreamMessage,
-    logger: RequestLogger,
     common_retort: CommonRetort,
 ) -> MakeMoveCommand:
     decoded_message = await message.decode()
 
-    logger.debug(
-        message="Got message from message broker.",
-        decoded_message=repr(message),
+    _logger.debug(
+        {
+            "message": "Got message from message broker.",
+            "decoded_message": message,
+        },
     )
 
     if not decoded_message or not isinstance(decoded_message, dict):
         error_message = "StreamMessage cannot be converted to dict."
-        logger.error(error_message)
+        _logger.error(error_message)
 
         raise Exception(error_message)
 

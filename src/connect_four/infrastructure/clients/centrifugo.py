@@ -3,7 +3,7 @@
 
 import asyncio
 import random
-import traceback
+import logging
 from urllib.parse import urljoin
 from dataclasses import dataclass
 from typing import Final
@@ -20,8 +20,14 @@ from connect_four.application import (
     MoveRejectedEvent,
     Event,
 )
-from connect_four.infrastructure.log import RequestLogger
 from connect_four.infrastructure.utils import get_env_var
+
+
+_logger = logging.getLogger(__name__)
+
+_MAX_RETRIES: Final = 20
+_BASE_BACKOFF_DELAY: Final = 0.5
+_MAX_BACKOFF_DELAY: Final = 10
 
 
 type _Serializable = (
@@ -33,10 +39,6 @@ type _Serializable = (
     | list[_Serializable]
     | dict[str, _Serializable]
 )
-
-_MAX_RETRIES: Final = 20
-_BASE_BACKOFF_DELAY: Final = 0.5
-_MAX_BACKOFF_DELAY: Final = 10
 
 
 class CentrifuoClientError(Exception): ...
@@ -56,17 +58,15 @@ class CentrifugoConfig:
 
 
 class HTTPXCentrifugoClient:
-    __slots__ = ("_httpx_client", "_config", "_logger")
+    __slots__ = ("_httpx_client", "_config")
 
     def __init__(
         self,
         httpx_client: AsyncClient,
         config: CentrifugoConfig,
-        logger: RequestLogger,
     ):
         self._httpx_client = httpx_client
         self._config = config
-        self._logger = logger
 
     async def publish_event(self, event: Event) -> None:
         if isinstance(event, GameCreatedEvent):
@@ -225,10 +225,12 @@ class HTTPXCentrifugoClient:
         retry_on_failure: bool,
     ) -> None:
         try:
-            self._logger.debug(
-                message="Going to make request to centrifugo.",
-                url=url,
-                json=json_,
+            _logger.debug(
+                {
+                    "message": "Going to make request to centrifugo.",
+                    "url": url,
+                    "json": json_,
+                },
             )
             response = await self._httpx_client.post(
                 url=url,
@@ -239,10 +241,7 @@ class HTTPXCentrifugoClient:
             error_message = (
                 "Unexpected error occurred during request to centrifugo."
             )
-            self._logger.error(
-                message=error_message,
-                traceback=traceback.format_exception(e),
-            )
+            _logger.exception(error_message)
 
             if retry_on_failure:
                 retries_were_successful = await self._retry_request(
@@ -255,18 +254,23 @@ class HTTPXCentrifugoClient:
             raise CentrifuoClientError(error_message)
 
         if response.status_code == 200:
-            self._logger.debug(
-                message="Centrifuo responded.",
-                status_code=response.status_code,
-                content=response.content.decode(),
+            _logger.debug(
+                {
+                    "message": "Centrifuo responded.",
+                    "status_code": response.status_code,
+                    "Centrifuo responded."
+                    "content": response.content.decode(),
+                },
             )
             return
 
         error_message = "Centrifugo responded with bad status code."
-        self._logger.error(
-            message=error_message,
-            status_code=response.status_code,
-            content=response.content.decode(),
+        _logger.error(
+            {
+                "message": error_message,
+                "status_code": response.status_code,
+                "content": response.content.decode(),
+            },
         )
 
         if retry_on_failure:
@@ -287,10 +291,12 @@ class HTTPXCentrifugoClient:
     ) -> bool:
         for retry_number in range(1, _MAX_RETRIES + 1):
             try:
-                self._logger.debug(
-                    message="Going to retry request to centrifugo.",
-                    retry_number=retry_number,
-                    retries_left=_MAX_RETRIES - retry_number,
+                _logger.debug(
+                    {
+                        "message": "Going to retry request to centrifugo.",
+                        "retry_number": retry_number,
+                        "retries_left": _MAX_RETRIES - retry_number,
+                    },
                 )
                 await self._send_request(
                     url=url,

@@ -20,8 +20,6 @@ from connect_four.application import (
 from connect_four.infrastructure import (
     LoggingConfig,
     load_logging_config,
-    app_logger_factory,
-    request_logger_factory,
     httpx_client_factory,
     CentrifugoConfig,
     load_centrifugo_config,
@@ -48,6 +46,7 @@ from connect_four.infrastructure import (
     RealEventPublisher,
     default_operation_id_factory,
 )
+from .context_var_setter import ContextVarSetter
 
 
 def ioc_container_factory() -> AsyncContainer:
@@ -69,9 +68,8 @@ def ioc_container_factory() -> AsyncContainer:
     provider.from_context(LockManagerConfig, scope=Scope.APP)
     provider.from_context(NATSConfig, scope=Scope.APP)
 
-    provider.provide(app_logger_factory, scope=Scope.APP)
     provider.provide(default_operation_id_factory, scope=Scope.REQUEST)
-    provider.provide(request_logger_factory, scope=Scope.REQUEST)
+    provider.provide(ContextVarSetter, scope=Scope.REQUEST)
 
     provider.provide(httpx_client_factory, scope=Scope.APP)
     provider.provide(redis_factory, scope=Scope.APP)
