@@ -2,7 +2,7 @@
 
 <p align="left">
    <a>
-      <img src="https://img.shields.io/badge/python-3.12-blue" alt="Python version">
+      <img src="https://img.shields.io/badge/python-3.13-blue" alt="Python version">
    </a>
    <a href="https://github.com/astral-sh/ruff">
       <img src="https://img.shields.io/badge/code_style-ruff-%236b00ff" alt="Code style">
