@@ -12,6 +12,7 @@ from connect_four.domain import CreateGame, EndGame
 from connect_four.application import (
     GameGateway,
     EventPublisher,
+    TaskScheduler,
     TransactionManager,
     CreateGameProcessor,
     EndGameProcessor,
@@ -39,6 +40,8 @@ from connect_four.infrastructure import (
     nats_client_factory,
     nats_jetstream_factory,
     NATSEventPublisher,
+    taskiq_redis_schedule_source_factory,
+    TaskiqTaskScheduler,
     RedisConfig,
     load_redis_config,
     common_retort_factory,
@@ -75,6 +78,7 @@ def ioc_container_factory() -> AsyncContainer:
     provider.provide(redis_pipeline_factory, scope=Scope.REQUEST)
     provider.provide(nats_client_factory, scope=Scope.APP)
     provider.provide(nats_jetstream_factory, scope=Scope.APP)
+    provider.provide(taskiq_redis_schedule_source_factory, scope=Scope.APP)
 
     provider.provide(common_retort_factory, scope=Scope.APP)
 
@@ -92,6 +96,12 @@ def ioc_container_factory() -> AsyncContainer:
         RealEventPublisher,
         provides=EventPublisher,
         scope=Scope.REQUEST,
+    )
+
+    provider.provide(
+        TaskiqTaskScheduler,
+        scope=Scope.REQUEST,
+        provides=TaskScheduler,
     )
 
     provider.provide(CreateGame, scope=Scope.APP)

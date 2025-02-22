@@ -15,7 +15,7 @@ RequestLogger = NewType("RequestLogger", GLogger)  # type: ignore
 
 def app_logger_factory(config: LoggingConfig) -> AppLogger:
     logger = GLogger.create(
-        "api_gateway",
+        "connect_four",
         level=config.level,
         log_dump_errors=True,
     )
@@ -27,7 +27,7 @@ def request_logger_factory(
     operation_id: OperationId,
 ) -> RequestLogger:
     logger = app_logger.create_child(
-        "request",
+        "operation",
         data={"operation_id": operation_id},
     )
     return RequestLogger(logger)
