@@ -13,7 +13,7 @@ async def nats_client_factory(
     config: NATSConfig,
 ) -> AsyncGenerator[Client, None]:
     client = Client()
-    await client.connect([config.url])
+    await client.connect(config.url)
     yield client
     await client.close()
 

@@ -24,7 +24,7 @@ router = NatsRouter()
 
 @router.subscriber(
     subject="game.created",
-    durable="connect_four.game.created",
+    durable="connect_four_game_created",
     stream=_CONNECTION_HUB_STREAM,
     pull_sub=PullSub(timeout=0.2),
 )
@@ -39,7 +39,7 @@ async def create_game(
 
 @router.subscriber(
     subject="game.ended",
-    durable="connect_four.game.ended",
+    durable="connect_four_game_ended",
     stream=_CONNECTION_HUB_STREAM,
     pull_sub=PullSub(timeout=0.2),
 )
@@ -54,7 +54,7 @@ async def end_game(
 
 @router.subscriber(
     subject="game.move_was_made",
-    durable="connect_four.game.move_was_made",
+    durable="connect_four_game_move_was_made",
     stream=_API_GATEWAY_STREAM,
     pull_sub=PullSub(timeout=0.2),
 )

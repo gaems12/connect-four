@@ -7,7 +7,7 @@ from .routes import router
 
 
 def create_broker(nats_url: str) -> NatsBroker:
-    broker = NatsBroker((nats_url,))
+    broker = NatsBroker(nats_url)
 
     broker.include_router(router)
 
