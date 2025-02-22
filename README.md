@@ -2,7 +2,7 @@
 
 <p align="left">
    <a href="./LICENSE">
-      <img src="https://img.shields.io/badge/license-the_Personal_Use-green" alt="License">
+      <img src="https://img.shields.io/badge/license-the_Personal_Use-3eb52b" alt="License">
    </a>
    <a>
       <img src="https://img.shields.io/badge/python-3.13-blue" alt="Python version">
