@@ -34,7 +34,11 @@ def setup_logging() -> None:
     context_var_log_extra_filter = _ContextVarLogExtraSetterFilter()
     stream_handler.addFilter(context_var_log_extra_filter)
 
-    json_formatter = JsonFormatter(json_ensure_ascii=False)
+    json_formatter = JsonFormatter(
+        fmt="%(timestamp)s %(levelname)s %(message)s",
+        timestamp=True,
+        json_ensure_ascii=False,
+    )
     stream_handler.setFormatter(json_formatter)
 
     logging.basicConfig(level=config.level, handlers=[stream_handler])
