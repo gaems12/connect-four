@@ -11,11 +11,13 @@ from taskiq.cli.scheduler.run import run_scheduler_loop
 from taskiq.cli.worker.args import WorkerArgs
 from taskiq.cli.worker.run import run_worker
 
+from connect_four.infrastructure import setup_logging
 from connect_four.presentation.cli import create_game, end_game
 from .task_scheduler import create_task_scheduler_app
 
 
 def main() -> None:
+    setup_logging()
     app = create_cli_app()
     app()
 
@@ -65,7 +67,7 @@ async def run_task_scheduler() -> None:
 
 def run_task_executor(
     workers: Annotated[
-        str,
+        int,
         Parameter("--workers", show_default=True),
     ] = 2,
 ) -> None:

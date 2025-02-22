@@ -16,7 +16,7 @@ from connect_four.application.common import (
 )
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class CreateGameCommand:
     game_id: GameId
     lobby_id: LobbyId
