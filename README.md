@@ -138,7 +138,7 @@ connect-four run-task-executor
 ### Create a New Game
 
 ```bash
-connect-four create-game --id <UUID> --first-player-id <UUID> --second-player-id <UUID> --time-for-each-player <number_of_seconds>
+connect-four create-game --id <UUID> --lobby-id <UUID> --first-player-id <UUID> --second-player-id <UUID> --time-for-each-player <number_of_seconds>
 ```
 
 ### End a Game
