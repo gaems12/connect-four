@@ -1,5 +1,6 @@
 # Copyright (c) 2024, Egor Romanov.
 # All rights reserved.
+# Licensed under the Personal Use License (see LICENSE).
 
 from unittest.mock import AsyncMock
 from datetime import datetime, timedelta, timezone
@@ -75,7 +76,7 @@ async def test_end_game_processor():
 
     task = TryToLoseOnTimeTask(
         id=_GAME_STATE_ID,
-        execute_at=_TIME_LEFT_FOR_FIRST_PLAYER,
+        execute_at=datetime.now(timezone.utc) + _TIME_LEFT_FOR_FIRST_PLAYER,
         game_id=_GAME_ID,
         game_state_id=_GAME_STATE_ID,
     )
