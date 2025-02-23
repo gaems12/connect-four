@@ -10,8 +10,11 @@
    <a href="https://github.com/astral-sh/ruff">
       <img src="https://img.shields.io/badge/code_style-ruff-%236b00ff" alt="Code style">
    </a>
-   <a href="https://github.com/gaems12/connect-four/actions/workflows/test.yaml">
-      <img src="https://img.shields.io/github/actions/workflow/status/gaems12/connect-four/test.yaml?label=test" alt="Status of passing tests">
+   <a href="https://github.com/gaems12/connect-four/actions/workflows/lint-and-test.yaml">
+      <img src="https://img.shields.io/github/actions/workflow/status/gaems12/connect-four/lint-and-test.yaml?label=lint" alt="Status of passing 'lint' job">
+   </a>
+   <a href="https://github.com/gaems12/connect-four/actions/workflows/lint-and-test.yaml">
+      <img src="https://img.shields.io/github/actions/workflow/status/gaems12/connect-four/lint-and-test.yaml?label=test" alt="Status of passing 'test' job">
    </a>
 </p>
 
