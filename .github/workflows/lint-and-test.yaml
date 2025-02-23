@@ -1,5 +1,5 @@
-name: test
-run-name: testing
+name: Lint and Test
+run-name: Linting and Testing by ${{ github.actor }}
 
 on:
   push:

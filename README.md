@@ -16,6 +16,9 @@
    <a href="https://github.com/gaems12/connect-four/actions/workflows/lint-and-test.yaml">
       <img src="https://img.shields.io/github/actions/workflow/status/gaems12/connect-four/lint-and-test.yaml?label=test" alt="Status of passing 'test' job">
    </a>
+   <a href="https://codecov.io/gh/gaems12/connect-four" >
+      <img src="https://codecov.io/gh/gaems12/connect-four/graph/badge.svg?token=TMXVV6QQQ7"/>
+   </a>
 </p>
 
 ## 📜 License
