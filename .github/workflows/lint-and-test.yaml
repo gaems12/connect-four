@@ -85,6 +85,7 @@ jobs:
       - name: Run tests
         env:
           TEST_REDIS_URL: redis://localhost:6379/0
-          GAME_MAPPER_GAME_EXPIRES_IN: 3600
-          LOCK_EXPIRES_IN: 5
-        run: pytest --tb=short --disable-warnings
+        run: pytest --tb=short --disable-warnings --cov=./ --cov-report=xml
+
+      - name: Upload converage report
+        uses: codecov/codecov-action@v5
