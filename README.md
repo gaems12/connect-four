@@ -2,7 +2,7 @@
 
 <p align="left">
    <a href="./LICENSE">
-      <img src="https://img.shields.io/badge/license-the_Personal_Use-ffff00" alt="License">
+      <img src="https://img.shields.io/badge/license-the_Personal_Use-yellow" alt="License">
    </a>
    <a>
       <img src="https://img.shields.io/badge/python-3.13-blue" alt="Python version">
@@ -43,6 +43,7 @@ Ensure the following services are installed and running:
 ### Using pip
 
 1. Create and activate a virtual environment:
+
    ```bash
    python3 -m venv .venv
    source ./.venv/bin/activate
@@ -57,9 +58,7 @@ Ensure the following services are installed and running:
 
    **For production:**
    ```bash
-   pip install build
-   python3 -m build --wheel
-   pip install ./dist/connect_four*.whl
+   pip install -e .
    ```
 
 ### Using uv
@@ -79,8 +78,7 @@ Ensure the following services are installed and running:
 
    **For production**
    ```bash
-   uv build --wheel
-   uv pip install ./dist/connect_four*.whl
+   uv sync --frozen
    ```
 
 ### Using Docker
