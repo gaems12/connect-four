@@ -3,6 +3,7 @@
 # Licensed under the Personal Use License (see LICENSE).
 
 import logging
+from uuid import UUID
 from typing import cast
 
 from faststream.broker.message import StreamMessage
@@ -35,8 +36,8 @@ async def operation_id_factory(message: StreamMessage) -> OperationId:
         return default_operation_id
 
     decoded_message_body = cast(dict, decoded_message_body)
-    operation_id_as_str = decoded_message_body.get("operation_id")
-    if not operation_id_as_str:
+    raw_operation_id = decoded_message_body.get("operation_id")
+    if not raw_operation_id:
         default_operation_id = await default_operation_id_factory()
         _logger.warning(
             {
@@ -51,4 +52,22 @@ async def operation_id_factory(message: StreamMessage) -> OperationId:
         )
         return default_operation_id
 
-    return OperationId(operation_id_as_str)
+    try:
+        operation_id = OperationId(UUID(raw_operation_id))
+    except:
+        default_operation_id = await default_operation_id_factory()
+        _logger.warning(
+            {
+                "message": (
+                    "Operation id from message received from "
+                    "message broker cannot be converter to UUID."
+                    "Default operation id will be used instead."
+                ),
+                "received_message": decoded_message_body,
+                "operation_id": default_operation_id,
+            },
+            exc_info=True,
+        )
+        return default_operation_id
+
+    return operation_id
