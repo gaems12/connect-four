@@ -2,7 +2,7 @@
 
 <p align="left">
    <a href="./LICENSE">
-      <img src="https://img.shields.io/badge/license-the_Personal_Use-3eb52b" alt="License">
+      <img src="https://img.shields.io/badge/license-the_Personal_Use-ffff00" alt="License">
    </a>
    <a>
       <img src="https://img.shields.io/badge/python-3.13-blue" alt="Python version">
@@ -14,8 +14,6 @@
 
 ## 📜 License
 This project is licensed under the Personal Use License. See the [LICENSE](LICENSE) file for details.
-
----
 
 ## 📚 Table of Contents
 
@@ -32,8 +30,6 @@ This project is licensed under the Personal Use License. See the [LICENSE](LICEN
   - [Create a New Game](#create-a-new-game)
   - [End a Game](#end-a-game)
 
----
-
 ## 📦 Dependencies
 
 Ensure the following services are installed and running:
@@ -41,8 +37,6 @@ Ensure the following services are installed and running:
 - **Redis**
 - **NATS**
 - **Centrifugo**
-
----
 
 ## 🚀 Installation
 
@@ -97,8 +91,6 @@ Ensure the following services are installed and running:
    docker build -t connect_four:latest .
    ```
 
----
-
 ## ⚙️ Environment Variables
 
 Configure the following environment variables before running the application:
@@ -117,8 +109,6 @@ Configure the following environment variables before running the application:
 | `TEST_REDIS_URL`             | Yes(for tests)      | URL for the test Redis instance.         |
 
 </div>
-
----
 
 ## 🛠️ Commands
 
@@ -154,5 +144,3 @@ connect-four create-game --id <UUID> --lobby-id <UUID> --first-player-id <UUID> 
 ```bash
 connect-four end-game --id <UUID>
 ```
-
----
