@@ -108,9 +108,9 @@ Configure the following environment variables before running the application:
 | `NATS_URL`                   | Yes                 | URL for the NATS server.                 |
 | `CENTRIFUGO_URL`             | Yes                 | URL for the Centrifugo server.           |
 | `CENTRIFUGO_API_KEY`         | Yes                 | API key for Centrifugo.                  |
-| `GAME_MAPPER_GAME_EXPIRES_IN`| Yes                 | Game expiration time in seconds.         |
-| `LOCK_EXPIRES_IN`            | Yes                 | Lock expiration time in seconds.         |
-| `TEST_REDIS_URL`             | Yes(for tests)      | URL for the test Redis instance.         |
+| `GAME_MAPPER_GAME_EXPIRES_IN`| No (default: 3600)  | Game expiration time in seconds.         |
+| `LOCK_EXPIRES_IN`            | No (default: 5)     | Lock expiration time in seconds.         |
+| `TEST_REDIS_URL`             | Yes (for tests)     | URL for the test Redis instance.         |
 
 </div>
 

@@ -20,6 +20,7 @@ def load_lock_manager_config() -> "LockManagerConfig":
         lock_expires_in=get_env_var(
             key="LOCK_EXPIRES_IN",
             value_factory=str_to_timedelta,
+            default=timedelta(seconds=5),
         ),
     )
 
