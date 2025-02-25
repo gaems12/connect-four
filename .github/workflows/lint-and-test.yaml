@@ -42,6 +42,11 @@ jobs:
         ports: ["6379:6379"]
 
     steps:
+      - name: Run nats
+        run: |
+          docker rm -f nats || echo "nats container doesn't exist"
+          docker run -d --name nats -p 4222:4222 nats:2.10-alpine -js
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -58,6 +63,7 @@ jobs:
       - name: Run tests
         env:
           TEST_REDIS_URL: redis://localhost:6379/0
+          TEST_NATS_URL: nats://localhost:4222
         run: uv run pytest --tb=short --disable-warnings --cov=./src --cov-report=xml
 
       - name: Upload coverage report

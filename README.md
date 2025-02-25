@@ -111,6 +111,7 @@ Configure the following environment variables before running the application:
 | `GAME_MAPPER_GAME_EXPIRES_IN`| No (default: 3600)  | Game expiration time in seconds.         |
 | `LOCK_EXPIRES_IN`            | No (default: 5)     | Lock expiration time in seconds.         |
 | `TEST_REDIS_URL`             | Yes (for tests)     | URL for the test Redis instance.         |
+| `TEST_NATS_URL`              | Yes (for tests)     | URL for the test NTAS server.            |
 
 </div>
 
