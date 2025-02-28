@@ -18,16 +18,15 @@ from connect_four.application import (
 from .context_var_setter import ContextVarSetter
 
 
-_CONNECTION_HUB_STREAM: Final = JStream("connection_hub")
-_API_GATEWAY_STREAM: Final = JStream("api_gateway")
+_STREAM: Final = JStream(name="games", declare=False)
 
 router = NatsRouter()
 
 
 @router.subscriber(
-    subject="game.created",
+    subject="connection_hub.game.created",
     durable="connect_four_game_created",
-    stream=_CONNECTION_HUB_STREAM,
+    stream=_STREAM,
     pull_sub=PullSub(timeout=0.2),
 )
 @inject
@@ -42,9 +41,9 @@ async def create_game(
 
 
 @router.subscriber(
-    subject="game.ended",
+    subject="connection_hub.game.ended",
     durable="connect_four_game_ended",
-    stream=_CONNECTION_HUB_STREAM,
+    stream=_STREAM,
     pull_sub=PullSub(timeout=0.2),
 )
 @inject
@@ -59,9 +58,9 @@ async def end_game(
 
 
 @router.subscriber(
-    subject="game.move_was_made",
+    subject="api_gateway.game.move_was_made",
     durable="connect_four_game_move_was_made",
-    stream=_API_GATEWAY_STREAM,
+    stream=_STREAM,
     pull_sub=PullSub(timeout=0.2),
 )
 @inject

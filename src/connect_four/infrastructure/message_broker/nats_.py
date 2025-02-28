@@ -19,5 +19,5 @@ async def nats_client_factory(
     await client.close()
 
 
-async def nats_jetstream_factory(nats_client: Client) -> JetStreamContext:
+def nats_jetstream_factory(nats_client: Client) -> JetStreamContext:
     return nats_client.jetstream()

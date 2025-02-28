@@ -18,14 +18,14 @@ from connect_four.application import (
 from connect_four.infrastructure.common_retort import CommonRetort
 
 
-_STREAM: Final = "connect_four"
+_STREAM: Final = "games"
 
 _EVENT_TO_SUBJECT_MAP: Final = {
-    GameCreatedEvent: "game.created",
-    GameStartedEvent: "game.started",
-    GameEndedEvent: "game.ended",
-    MoveAcceptedEvent: "game.move_accepted",
-    MoveRejectedEvent: "game.move_rejected",
+    GameCreatedEvent: "connect_four.game.created",
+    GameStartedEvent: "connect_four.game.started",
+    GameEndedEvent: "connect_four.game.ended",
+    MoveAcceptedEvent: "connect_four.game.move_accepted",
+    MoveRejectedEvent: "connect_four.game.move_rejected",
 }
 
 
@@ -43,7 +43,7 @@ class NATSEventPublisher:
     async def publish(self, event: Event) -> None:
         subject = _EVENT_TO_SUBJECT_MAP[type(event)]
 
-        event_as_dict = self._common_retort.dump(event, dict)
+        event_as_dict = self._common_retort.dump(event)
         payload = json.dumps(event_as_dict).encode()
 
         await self._jetstream.publish(

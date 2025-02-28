@@ -44,11 +44,25 @@ jobs:
     steps:
       - name: Run nats
         run: |
+          ls
           docker rm -f nats || echo "nats container doesn't exist"
           docker run -d --name nats -p 4222:4222 nats:2.10-alpine -js
 
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Delete nats games stream
+        uses: nats-io/jetstream-gh-action/delete/stream@main
+        with:
+          missing_ok: 1
+          stream: games
+          server: nats://localhost:4222
+
+      - name: Create nats games stream
+        uses: nats-io/jetstream-gh-action/create/stream@main
+        with:
+          config: ./config/nats/games-stream.json
+          server: nats://localhost:4222
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v5
@@ -70,3 +84,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml
+
+      - name: Remove nats
+        run: docker rm -f nats || echo "nats container doesn't exist"

@@ -17,7 +17,10 @@ from connect_four.application import (
     EndGameProcessor,
     MakeMoveProcessor,
 )
-from connect_four.infrastructure import get_env_var, common_retort_factory
+from connect_four.infrastructure import (
+    NATSConfig,
+    common_retort_factory,
+)
 from connect_four.presentation.message_consumer import (
     create_broker,
     create_game_command_factory,
@@ -30,9 +33,8 @@ from connect_four.main.message_consumer import create_message_consumer_app
 
 
 @pytest.fixture(scope="function")
-def broker() -> NatsBroker:
-    nats_url = get_env_var("TEST_NATS_URL")
-    return create_broker(nats_url)
+def broker(nats_config: NATSConfig) -> NatsBroker:
+    return create_broker(nats_config.url)
 
 
 @pytest.fixture(scope="function")
@@ -90,8 +92,8 @@ async def test_create_game(app: FastStream, broker: NatsBroker):
         }
         await test_broker.publish(
             message=message,
-            subject="game.created",
-            stream="connection_hub",
+            subject="connection_hub.game.created",
+            stream="games",
         )
 
 
@@ -103,8 +105,8 @@ async def test_end_game(app: FastStream, broker: NatsBroker):
         message = {"game_id": uuid7().hex}
         await test_broker.publish(
             message=message,
-            subject="game.ended",
-            stream="connection_hub",
+            subject="connection_hub.game.ended",
+            stream="games",
         )
 
 
@@ -122,6 +124,6 @@ async def test_make_move(app: FastStream, broker: NatsBroker):
         }
         await test_broker.publish(
             message=message,
-            subject="game.move_was_made",
-            stream="api_gateway",
+            subject="api_gateway.game.move_was_made",
+            stream="games",
         )
