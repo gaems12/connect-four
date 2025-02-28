@@ -45,19 +45,11 @@ jobs:
     steps:
       - name: Run nats
         run: |
-          ls
           docker rm -f nats || echo "nats container doesn't exist"
           docker run -d --name nats -p 4222:4222 nats:2.10-alpine -js
 
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Delete nats games stream
-        uses: madnoberson/jetstream-gh-action/delete/stream@main
-        with:
-          stream: games
-          server: nats://localhost:4222
-          missing_ok: 1
 
       - name: Create nats games stream
         uses: madnoberson/jetstream-gh-action/create/stream@main
