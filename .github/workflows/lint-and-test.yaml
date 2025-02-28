@@ -55,7 +55,7 @@ jobs:
         uses: madnoberson/jetstream-gh-action/create/stream@main
         with:
           config: ./config/nats/games-stream.json
-          server: nats://localhost:4222
+          server: nats://host.docker.internal:4222
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v5
