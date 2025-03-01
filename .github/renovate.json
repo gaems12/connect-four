@@ -1,0 +1,20 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended"],
+    "uv": {
+        "enabled": true,
+        "fileMatch": ["(^|/)pyproject\\.toml$", "(^|/)uv\\.lock$"]
+    },
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["before 5am on Monday"],
+        "automerge": true
+    },
+    "packageRules": [
+        {
+            "matchManagers": ["uv"],
+            "automerge": true,
+            "automergeType": "branch"
+        }
+    ]
+  }
