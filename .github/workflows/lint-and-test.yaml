@@ -51,12 +51,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create nats games stream
-        uses: madnoberson/jetstream-gh-action/create/stream@main
-        with:
-          config: ./config/nats/games-stream.json
-          server: nats://host.docker.internal:4222
-
       - name: Setup uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -66,6 +60,9 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --all-extras --frozen
+
+      - name: Create nats streams
+        run: uv run connect-four create-nats-streams nats://localhost:4222
 
       - name: Run tests
         env:

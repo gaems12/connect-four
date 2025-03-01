@@ -12,7 +12,13 @@ from taskiq.cli.scheduler.run import run_scheduler_loop
 from taskiq.cli.worker.args import WorkerArgs
 from taskiq.cli.worker.run import run_worker
 
-from connect_four.infrastructure import setup_logging
+from connect_four.infrastructure import (
+    setup_logging,
+    NATSConfig,
+    nats_client_factory,
+    nats_jetstream_factory,
+    NATSStreamCreator,
+)
 from connect_four.presentation.cli import create_game, end_game
 from .task_scheduler import create_task_scheduler_app
 
@@ -30,6 +36,8 @@ def create_cli_app() -> App:
         help_format="rich",
     )
 
+    app.command(create_nats_streams)
+
     app.command(create_game)
     app.command(end_game)
 
@@ -38,6 +46,17 @@ def create_cli_app() -> App:
     app.command(run_task_executor)
 
     return app
+
+
+async def create_nats_streams(nats_url: str) -> None:
+    """
+    Create nats stream with all subjects used by application.
+    """
+    nats_config = NATSConfig(url=nats_url)
+    async for nats_client in nats_client_factory(nats_config):
+        jetstream = nats_jetstream_factory(nats_client)
+        stream_creator = NATSStreamCreator(jetstream)
+        await stream_creator.create()
 
 
 def run_message_consumer(

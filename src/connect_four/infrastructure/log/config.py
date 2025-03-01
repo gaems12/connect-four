@@ -8,7 +8,7 @@ from connect_four.infrastructure.utils import get_env_var
 
 
 def load_logging_config() -> "LoggingConfig":
-    return LoggingConfig(level=get_env_var("LOGGING_LEVEL"))
+    return LoggingConfig(level=get_env_var("LOGGING_LEVEL", default="DEBUG"))
 
 
 @dataclass(frozen=True, slots=True)
