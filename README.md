@@ -30,6 +30,7 @@ This project is licensed under the Personal Use License. See the [LICENSE](LICEN
   - [Using Docker](#using-docker)
 - [⚙️ Environment Variables](#%EF%B8%8F-environment-variables)
 - [🛠️ Commands](#%EF%B8%8F-commands)
+  - [Create NATS Streams](#create-nats-streams)
   - [Run Message Consumer](#run-message-consumer)
   - [Run Task Scheduler](#run-task-scheduler)
   - [Run Task Executor](#run-task-executor)
@@ -103,7 +104,7 @@ Configure the following environment variables before running the application:
 
 | Variable                     | Required            | Description                              |
 |------------------------------|---------------------|------------------------------------------|
-| `LOGGING_LEVEL`              | Yes                 | Logging level                            |
+| `LOGGING_LEVEL`              | No (default: DEBUG) | Logging level                            |
 | `REDIS_URL`                  | Yes                 | URL for the Redis instance.              |
 | `NATS_URL`                   | Yes                 | URL for the NATS server.                 |
 | `CENTRIFUGO_URL`             | Yes                 | URL for the Centrifugo server.           |
@@ -116,6 +117,13 @@ Configure the following environment variables before running the application:
 </div>
 
 ## 🛠️ Commands
+
+### Create NATS Streams
+
+Create NATS streams with all subjects used by application to test it:
+```bash
+connect-four create-nats-streams <nats_url>
+```
 
 ### Run Message Consumer
 
