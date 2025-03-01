@@ -2,7 +2,6 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-from contextlib import asynccontextmanager
 from datetime import timedelta
 from typing import AsyncGenerator, Final
 
@@ -29,9 +28,7 @@ _SECOND_PLAYER_ID: Final = UserId(uuid7())
 async def nats_jetstream(
     nats_config: NATSConfig,
 ) -> AsyncGenerator[JetStreamContext, None]:
-    nats_client_factory_ctx_manager = asynccontextmanager(nats_client_factory)
-
-    async with nats_client_factory_ctx_manager(nats_config) as nats_client:
+    async for nats_client in nats_client_factory(nats_config):
         yield nats_jetstream_factory(nats_client)
 
 

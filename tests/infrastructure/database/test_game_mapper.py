@@ -3,7 +3,6 @@
 # Licensed under the Personal Use License (see LICENSE).
 
 from typing import AsyncGenerator, Final
-from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -45,15 +44,13 @@ async def redis() -> AsyncGenerator[Redis, None]:
     redis_url = get_env_var("TEST_REDIS_URL")
     redis_config = RedisConfig(url=redis_url)
 
-    ctx_manager = asynccontextmanager(redis_factory)
-    async with ctx_manager(redis_config) as redis:
+    async for redis in redis_factory(redis_config):
         yield redis
 
 
 @pytest.fixture(scope="function")
 async def redis_pipeline(redis: Redis) -> AsyncGenerator[Pipeline, None]:
-    ctx_manager = asynccontextmanager(redis_pipeline_factory)
-    async with ctx_manager(redis) as redis_pipeline:
+    async for redis_pipeline in redis_pipeline_factory(redis):
         yield redis_pipeline
 
 
@@ -79,7 +76,7 @@ async def test_game_mapper(redis: Redis, redis_pipeline: Pipeline):
     )
 
     game = await game_mapper.by_id(GameId(uuid7()))
-    assert game == None
+    assert game is None
 
     game_id = GameId(uuid7())
     players = {
