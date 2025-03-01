@@ -9,12 +9,5 @@
         "enabled": true,
         "schedule": ["before 5am on Monday"],
         "automerge": true
-    },
-    "packageRules": [
-        {
-            "matchManagers": ["uv"],
-            "automerge": true,
-            "automergeType": "branch"
-        }
-    ]
-  }
+    }
+}
