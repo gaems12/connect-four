@@ -2,16 +2,16 @@
 
 <p align="left">
    <a>
-      <img src="https://img.shields.io/badge/python-3.13-blue" alt="Python version">
+      <img src="https://img.shields.io/badge/python-3.13-blue?logo=python" alt="Python version">
    </a>
    <a href="https://github.com/astral-sh/ruff">
-      <img src="https://img.shields.io/badge/code_style-ruff-%236b00ff" alt="Code style">
+      <img src="https://img.shields.io/badge/code_style-ruff-%236b00ff?logo=python" alt="Code style">
    </a>
    <a href="https://github.com/gaems12/connect-four/actions/workflows/lint-and-test.yaml">
-      <img src="https://img.shields.io/github/actions/workflow/status/gaems12/connect-four/lint-and-test.yaml?label=lint" alt="Status of passing 'lint' job">
+      <img src="https://img.shields.io/github/actions/workflow/status/gaems12/connect-four/lint-and-test.yaml?label=lint&logo=github" alt="Status of passing 'lint' job">
    </a>
    <a href="https://github.com/gaems12/connect-four/actions/workflows/lint-and-test.yaml">
-      <img src="https://img.shields.io/github/actions/workflow/status/gaems12/connect-four/lint-and-test.yaml?label=test" alt="Status of passing 'test' job">
+      <img src="https://img.shields.io/github/actions/workflow/status/gaems12/connect-four/lint-and-test.yaml?label=test&logo=github" alt="Status of passing 'test' job">
    </a>
    <a href="https://codecov.io/gh/gaems12/connect-four" >
       <img src="https://codecov.io/gh/gaems12/connect-four/graph/badge.svg?token=TMXVV6QQQ7"/>
