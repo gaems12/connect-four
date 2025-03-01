@@ -42,21 +42,16 @@ class MakeMove:
         current_player_id: UserId,
         move: Move,
     ) -> MoveResult:
-        if current_player_id not in game.players:
-            raise Exception("There is no current player in the game")
-
-        if game.status == GameStatus.ENDED:
+        move_rejection_reason = self._vallidate_move(
+            game=game,
+            move=move,
+            current_player_id=current_player_id,
+        )
+        if move_rejection_reason:
             return MoveRejected(
                 move=move,
                 player_id=current_player_id,
-                reason=MoveRejectionReason.GAME_IS_ENDED,
-            )
-
-        if game.current_turn != current_player_id:
-            return MoveRejected(
-                move=move,
-                player_id=current_player_id,
-                reason=MoveRejectionReason.OTHER_PLAYER_TURN,
+                reason=move_rejection_reason,
             )
 
         no_time_left_for_current_player = self._apply_turn_time(
@@ -71,17 +66,6 @@ class MakeMove:
                 move=move,
                 player_id=current_player_id,
                 reason=MoveRejectionReason.TIME_IS_UP,
-            )
-
-        if (
-            move.column > BOARD_COLUMNS - 1
-            or move.row > BOARD_ROWS - 1
-            or game.board[move.row][move.column]
-        ):
-            return MoveRejected(
-                move=move,
-                player_id=current_player_id,
-                reason=MoveRejectionReason.ILLEGAL_MOVE,
             )
 
         move_result = self._make_move(
@@ -119,6 +103,37 @@ class MakeMove:
         game.last_move_made_at = current_datetime
 
         return False
+
+    def _vallidate_move(
+        self,
+        *,
+        game: Game,
+        move: Move,
+        current_player_id: UserId,
+    ) -> MoveRejectionReason | None:
+        if current_player_id not in game.players:
+            raise Exception("There is no current player in the game")
+
+        if game.status == GameStatus.ENDED:
+            return MoveRejectionReason.GAME_IS_ENDED
+
+        if game.current_turn != current_player_id:
+            return MoveRejectionReason.OTHER_PLAYER_TURN
+
+        if (
+            move.column > BOARD_COLUMNS - 1
+            or move.row > BOARD_ROWS - 1
+            or game.board[move.row][move.column]
+        ):
+            return MoveRejectionReason.ILLEGAL_MOVE
+
+        if (
+            move.row != BOARD_ROWS - 1
+            and game.board[move.row + 1][move.column] is None
+        ):
+            return MoveRejectionReason.ILLEGAL_MOVE
+
+        return None
 
     def _make_move(
         self,

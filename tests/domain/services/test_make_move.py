@@ -306,7 +306,85 @@ def test_win(
     assert game.status == GameStatus.ENDED
 
 
-def test_illegal_move():
+@pytest.mark.parametrize(
+    ["board", "illegal_move"],
+    [
+        [
+            #  x = ChipType.FIRST
+            #  y = ChipType.SECOND
+            #
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  | x | y | y |   |   |   |
+            #  +---+---+---+---+---+---+
+            [
+                [None] * 6,
+                [None] * 6,
+                [None] * 6,
+                [None] * 6,
+                [None] * 6,
+                [None] * 6,
+                [
+                    ChipType.FIRST,
+                    ChipType.SECOND,
+                    ChipType.SECOND,
+                ]
+                + [None] * 3,
+            ],
+            Move(column=0, row=6),
+        ],
+        [
+            #  x = ChipType.FIRST
+            #  y = ChipType.SECOND
+            #
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  |   |   |   |   |   |   |
+            #  +---+---+---+---+---+---+
+            #  | x | y | y |   |   |   |
+            #  +---+---+---+---+---+---+
+            [
+                [None] * 6,
+                [None] * 6,
+                [None] * 6,
+                [None] * 6,
+                [None] * 6,
+                [None] * 6,
+                [
+                    ChipType.FIRST,
+                    ChipType.SECOND,
+                    ChipType.SECOND,
+                ]
+                + [None] * 3,
+            ],
+            Move(column=0, row=0),
+        ],
+    ],
+)
+def test_illegal_move(
+    board: list[list[ChipType | None]],
+    illegal_move: Move,
+):
     players = {
         _PLAYER_1_ID: PlayerState(
             chip_type=ChipType.FIRST,
@@ -318,39 +396,6 @@ def test_illegal_move():
         ),
     }
 
-    #  x = ChipType.FIRST
-    #  y = ChipType.SECOND
-    #
-    #  +---+---+---+---+---+---+
-    #  |   |   |   |   |   |   |
-    #  +---+---+---+---+---+---+
-    #  |   |   |   |   |   |   |
-    #  +---+---+---+---+---+---+
-    #  |   |   |   |   |   |   |
-    #  +---+---+---+---+---+---+
-    #  |   |   |   |   |   |   |
-    #  +---+---+---+---+---+---+
-    #  |   |   |   |   |   |   |
-    #  +---+---+---+---+---+---+
-    #  |   |   |   |   |   |   |
-    #  +---+---+---+---+---+---+
-    #  | x | y | y |   |   |   |
-    #  +---+---+---+---+---+---+
-
-    board: list[list[ChipType | None]] = [
-        [None] * 6,
-        [None] * 6,
-        [None] * 6,
-        [None] * 6,
-        [None] * 6,
-        [None] * 6,
-        [
-            ChipType.FIRST,
-            ChipType.SECOND,
-            ChipType.SECOND,
-        ]
-        + [None] * 3,
-    ]
     game = Game(
         id=GameId(uuid7()),
         state_id=GameStateId(uuid7()),
@@ -362,15 +407,13 @@ def test_illegal_move():
         created_at=datetime.now(timezone.utc) - timedelta(minutes=1),
     )
 
-    move = Move(column=0, row=6)
-
     move_result = MakeMove()(
         game=game,
         current_player_id=_PLAYER_1_ID,
-        move=move,
+        move=illegal_move,
     )
     expected_move_result = MoveRejected(
-        move=move,
+        move=illegal_move,
         player_id=_PLAYER_1_ID,
         reason=MoveRejectionReason.ILLEGAL_MOVE,
     )
