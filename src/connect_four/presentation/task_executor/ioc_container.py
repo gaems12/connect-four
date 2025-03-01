@@ -43,6 +43,7 @@ from connect_four.infrastructure import (
     RealEventPublisher,
     default_operation_id_factory,
 )
+from .context_var_setter import ContextVarSetter
 
 
 def ioc_container_factory() -> AsyncContainer:
@@ -65,14 +66,14 @@ def ioc_container_factory() -> AsyncContainer:
     provider.from_context(NATSConfig, scope=Scope.APP)
 
     provider.provide(default_operation_id_factory, scope=Scope.REQUEST)
+    provider.provide(ContextVarSetter, scope=Scope.REQUEST)
+    provider.provide(common_retort_factory, scope=Scope.APP)
 
     provider.provide(httpx_client_factory, scope=Scope.APP)
     provider.provide(redis_factory, scope=Scope.APP)
     provider.provide(redis_pipeline_factory, scope=Scope.REQUEST)
     provider.provide(nats_client_factory, scope=Scope.APP)
     provider.provide(nats_jetstream_factory, scope=Scope.APP)
-
-    provider.provide(common_retort_factory, scope=Scope.APP)
 
     provider.provide(lock_manager_factory, scope=Scope.REQUEST)
     provider.provide(GameMapper, provides=GameGateway, scope=Scope.REQUEST)
