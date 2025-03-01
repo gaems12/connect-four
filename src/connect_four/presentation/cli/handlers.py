@@ -66,26 +66,23 @@ async def create_game(
 
     ioc_container = ioc_container_factory()
 
-    async with ioc_container() as request_container:
-        context_var_setter = await request_container.get(ContextVarSetter)
-        context_var_setter.set()
+    context_var_setter = await ioc_container.get(ContextVarSetter)
+    context_var_setter.set()
 
-        command = CreateGameCommand(
-            game_id=GameId(id),
-            lobby_id=LobbyId(lobby_id),
-            first_player_id=UserId(first_player_id),
-            second_player_id=UserId(second_player_id),
-            time_for_each_player=time_for_each_player,
-            created_at=datetime.now(timezone.utc),
-        )
+    command = CreateGameCommand(
+        game_id=GameId(id),
+        lobby_id=LobbyId(lobby_id),
+        first_player_id=UserId(first_player_id),
+        second_player_id=UserId(second_player_id),
+        time_for_each_player=time_for_each_player,
+        created_at=datetime.now(timezone.utc),
+    )
 
-        command_processor = await request_container.get(
-            CreateGameProcessor,
-        )
-        try:
-            await command_processor.process(command)
-        except GameAlreadyExistsError:
-            rich.print("Game already exists.")
+    command_processor = await ioc_container.get(CreateGameProcessor)
+    try:
+        await command_processor.process(command)
+    except GameAlreadyExistsError:
+        rich.print("Game already exists.")
 
 
 async def end_game(
@@ -105,13 +102,10 @@ async def end_game(
 
     ioc_container = ioc_container_factory()
 
-    async with ioc_container() as request_container:
-        command = EndGameCommand(GameId(id))
+    command = EndGameCommand(GameId(id))
 
-        command_processor = await request_container.get(
-            EndGameProcessor,
-        )
-        try:
-            await command_processor.process(command)
-        except GameDoesNotExistError:
-            rich.print("Game doesn't exist.")
+    command_processor = await ioc_container.get(EndGameProcessor)
+    try:
+        await command_processor.process(command)
+    except GameDoesNotExistError:
+        rich.print("Game doesn't exist.")

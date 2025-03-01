@@ -51,7 +51,7 @@ from .context_var_setter import ContextVarSetter
 
 
 def ioc_container_factory() -> AsyncContainer:
-    provider = Provider()
+    provider = Provider(scope=Scope.APP)
 
     context = {
         LoggingConfig: load_logging_config(),
@@ -62,51 +62,39 @@ def ioc_container_factory() -> AsyncContainer:
         NATSConfig: load_nats_config(),
     }
 
-    provider.from_context(LoggingConfig, scope=Scope.APP)
-    provider.from_context(CentrifugoConfig, scope=Scope.APP)
-    provider.from_context(RedisConfig, scope=Scope.APP)
-    provider.from_context(GameMapperConfig, scope=Scope.APP)
-    provider.from_context(LockManagerConfig, scope=Scope.APP)
-    provider.from_context(NATSConfig, scope=Scope.APP)
+    provider.from_context(LoggingConfig)
+    provider.from_context(CentrifugoConfig)
+    provider.from_context(RedisConfig)
+    provider.from_context(GameMapperConfig)
+    provider.from_context(LockManagerConfig)
+    provider.from_context(NATSConfig)
 
-    provider.provide(default_operation_id_factory, scope=Scope.REQUEST)
-    provider.provide(ContextVarSetter, scope=Scope.REQUEST)
+    provider.provide(default_operation_id_factory)
+    provider.provide(ContextVarSetter)
 
-    provider.provide(httpx_client_factory, scope=Scope.APP)
-    provider.provide(redis_factory, scope=Scope.APP)
-    provider.provide(redis_pipeline_factory, scope=Scope.REQUEST)
-    provider.provide(nats_client_factory, scope=Scope.APP)
-    provider.provide(nats_jetstream_factory, scope=Scope.APP)
-    provider.provide(taskiq_redis_schedule_source_factory, scope=Scope.APP)
+    provider.provide(httpx_client_factory)
+    provider.provide(redis_factory)
+    provider.provide(redis_pipeline_factory)
+    provider.provide(nats_client_factory)
+    provider.provide(nats_jetstream_factory)
+    provider.provide(taskiq_redis_schedule_source_factory)
 
-    provider.provide(common_retort_factory, scope=Scope.APP)
+    provider.provide(common_retort_factory)
 
-    provider.provide(lock_manager_factory, scope=Scope.REQUEST)
-    provider.provide(GameMapper, provides=GameGateway, scope=Scope.REQUEST)
-    provider.provide(
-        RedisTransactionManager,
-        provides=TransactionManager,
-        scope=Scope.REQUEST,
-    )
+    provider.provide(lock_manager_factory)
+    provider.provide(GameMapper, provides=GameGateway)
+    provider.provide(RedisTransactionManager, provides=TransactionManager)
 
-    provider.provide(NATSEventPublisher, scope=Scope.REQUEST)
-    provider.provide(HTTPXCentrifugoClient, scope=Scope.REQUEST)
-    provider.provide(
-        RealEventPublisher,
-        provides=EventPublisher,
-        scope=Scope.REQUEST,
-    )
+    provider.provide(NATSEventPublisher)
+    provider.provide(HTTPXCentrifugoClient)
+    provider.provide(RealEventPublisher, provides=EventPublisher)
 
-    provider.provide(
-        TaskiqTaskScheduler,
-        scope=Scope.REQUEST,
-        provides=TaskScheduler,
-    )
+    provider.provide(TaskiqTaskScheduler, provides=TaskScheduler)
 
-    provider.provide(CreateGame, scope=Scope.APP)
-    provider.provide(EndGame, scope=Scope.APP)
+    provider.provide(CreateGame)
+    provider.provide(EndGame)
 
-    provider.provide(CreateGameProcessor, scope=Scope.REQUEST)
-    provider.provide(EndGameProcessor, scope=Scope.REQUEST)
+    provider.provide(CreateGameProcessor)
+    provider.provide(EndGameProcessor)
 
     return make_async_container(provider, context=context)
