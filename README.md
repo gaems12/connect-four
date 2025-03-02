@@ -47,10 +47,29 @@ Ensure the following services are installed and running:
 
 ## 🚀 Installation
 
+### Using uv (Recommended)
+
+1. Create and activate a virtual environment:
+   ```bash
+   uv venv --python 3.13
+   source ./.venv/bin/activate
+   ```
+
+2. Install dependencies:
+
+   **For development**
+   ```bash
+   uv sync --all-extras --frozen
+   ```
+
+   **For production**
+   ```bash
+   uv sync --frozen
+   ```
+
 ### Using pip
 
 1. Create and activate a virtual environment:
-
    ```bash
    python3 -m venv .venv
    source ./.venv/bin/activate
@@ -68,27 +87,7 @@ Ensure the following services are installed and running:
    pip install -e .
    ```
 
-### Using uv
-
-1. Create and activate a virtual environment:
-   ```bash
-   uv venv --python 3.12
-   source ./.venv/bin/activate
-   ```
-
-2. Install dependencies:
-
-   **For development**
-   ```bash
-   uv sync --all-extras --frozen
-   ```
-
-   **For production**
-   ```bash
-   uv sync --frozen
-   ```
-
-### Using Docker
+### Using Docker (Recommended)
 
 1. Build Docker image:
 
