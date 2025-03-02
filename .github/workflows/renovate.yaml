@@ -10,11 +10,13 @@ jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run Renovate
+      - name: Run renovate
         uses: renovatebot/github-action@v41.0.0
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
           configurationFile: .github/renovate.json
+        env:
+          LOG_LEVEL: debug
