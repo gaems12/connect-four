@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 from dataclasses import dataclass
 from typing import Final
 
-from httpx import AsyncClient
+from httpx import AsyncClient, Timeout
 
 from connect_four.domain import GameId
 from connect_four.application import (
@@ -29,6 +29,8 @@ _logger = logging.getLogger(__name__)
 _MAX_RETRIES: Final = 20
 _BASE_BACKOFF_DELAY: Final = 0.5
 _MAX_BACKOFF_DELAY: Final = 10
+
+_REQUEST_TIMEOUT: Final = Timeout(30)
 
 
 type _Serializable = (
@@ -237,6 +239,7 @@ class HTTPXCentrifugoClient:
                 url=url,
                 json=json_,
                 headers={"X-API-Key": self._config.api_key},
+                timeout=_REQUEST_TIMEOUT,
             )
         except Exception as e:
             error_message = (
