@@ -21,9 +21,9 @@ class NATSStreamCreator:
                 "connect_four.game.ended",
                 "connect_four.game.move_accepted",
                 "connect_four.game.move_rejected",
-                "connection_hub.game.created",
-                "connection_hub.game.ended",
-                "api_gateway.game.move_was_made",
+                "connection_hub.connect_four.game.created",
+                "connection_hub.connect_four.game.player_disqualified",
+                "api_gateway.connect_four.game.move_was_made",
             ],
         )
         await self._jetstream.add_stream(games_stream_config)
