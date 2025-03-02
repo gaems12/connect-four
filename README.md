@@ -16,8 +16,8 @@
    <a href="https://codecov.io/gh/gaems12/connect-four" >
       <img src="https://codecov.io/gh/gaems12/connect-four/graph/badge.svg?token=TMXVV6QQQ7"/>
    </a>
-   <a>
-      <img src="./mutation_testing/dead_mutants_badge.svg">
+   <a href="https://github.com/gaems12/connect-four/actions/workflows/mutation-test.yaml">
+      <img src="./assets/killed_mutants_badge.svg">
    </a>
 </p>
 
