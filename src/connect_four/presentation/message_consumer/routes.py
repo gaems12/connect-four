@@ -31,7 +31,7 @@ router = NatsRouter()
 @inject
 async def create_game(
     *,
-    command: FromDishka[CreateGameCommand],
+    command: CreateGameCommand,
     command_processor: FromDishka[CreateGameProcessor],
 ) -> None:
     await command_processor.process(command)
@@ -46,7 +46,7 @@ async def create_game(
 @inject
 async def end_game(
     *,
-    command: FromDishka[EndGameCommand],
+    command: EndGameCommand,
     command_processor: FromDishka[EndGameProcessor],
 ) -> None:
     await command_processor.process(command)
@@ -61,7 +61,7 @@ async def end_game(
 @inject
 async def make_move(
     *,
-    command: FromDishka[MakeMoveCommand],
+    command: MakeMoveCommand,
     command_processor: FromDishka[MakeMoveProcessor],
 ) -> None:
     await command_processor.process(command)

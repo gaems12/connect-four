@@ -21,7 +21,7 @@ class _ContextVarLogExtraSetterFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         log_extra = log_extra_context_var.get()
 
-        for key, value in log_extra.values():
+        for key, value in log_extra.items():
             setattr(record, key, value)
 
         return True

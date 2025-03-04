@@ -262,8 +262,7 @@ class HTTPXCentrifugoClient:
                 {
                     "message": "Centrifuo responded.",
                     "status_code": response.status_code,
-                    "Centrifuo responded."
-                    "content": response.content.decode(),
+                    "Centrifuo responded.content": response.content.decode(),
                 },
             )
             return

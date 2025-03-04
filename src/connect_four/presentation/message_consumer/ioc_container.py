@@ -52,15 +52,10 @@ from connect_four.infrastructure import (
     load_redis_config,
     common_retort_factory,
     RealEventPublisher,
-)
-from .commands import (
-    create_game_command_factory,
-    end_game_command_factory,
-    make_move_command_factory,
+    OperationId,
+    log_extra_context_var,
 )
 from .identity_provider import MessageBrokerIdentityProvider
-from .context_var_setter import ContextVarSetter
-from .operation_id import operation_id_factory
 
 
 def ioc_container_factory() -> AsyncContainer:
@@ -82,9 +77,6 @@ def ioc_container_factory() -> AsyncContainer:
     provider.from_context(LockManagerConfig, scope=Scope.APP)
     provider.from_context(NATSConfig, scope=Scope.APP)
 
-    provider.provide(operation_id_factory, scope=Scope.REQUEST)
-    provider.provide(ContextVarSetter, scope=Scope.REQUEST)
-
     provider.provide(httpx_client_factory, scope=Scope.APP)
     provider.provide(redis_factory, scope=Scope.APP)
     provider.provide(redis_pipeline_factory, scope=Scope.REQUEST)
@@ -92,6 +84,11 @@ def ioc_container_factory() -> AsyncContainer:
     provider.provide(nats_jetstream_factory, scope=Scope.APP)
     provider.provide(taskiq_redis_schedule_source_factory, scope=Scope.APP)
 
+    provider.provide(
+        lambda: log_extra_context_var.get()["operation_id"],
+        scope=Scope.REQUEST,
+        provides=OperationId,
+    )
     provider.provide(common_retort_factory, scope=Scope.APP)
 
     provider.provide(lock_manager_factory, scope=Scope.REQUEST)
@@ -125,10 +122,6 @@ def ioc_container_factory() -> AsyncContainer:
     provider.provide(CreateGame, scope=Scope.APP)
     provider.provide(EndGame, scope=Scope.APP)
     provider.provide(MakeMove, scope=Scope.APP)
-
-    provider.provide(create_game_command_factory, scope=Scope.REQUEST)
-    provider.provide(end_game_command_factory, scope=Scope.REQUEST)
-    provider.provide(make_move_command_factory, scope=Scope.REQUEST)
 
     provider.provide(CreateGameProcessor, scope=Scope.REQUEST)
     provider.provide(EndGameProcessor, scope=Scope.REQUEST)
