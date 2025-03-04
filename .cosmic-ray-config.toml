@@ -8,7 +8,7 @@ test-command = "pytest"
 name = "local"
 
 [cosmic-ray.badge]
-label = "killed mutants"
+label = "🧬 killed mutants"
 format = "%.2f %%"
 
 [cosmic-ray.badge.thresholds]
