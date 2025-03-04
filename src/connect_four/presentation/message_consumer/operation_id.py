@@ -21,7 +21,7 @@ async def operation_id_factory(message: StreamMessage) -> OperationId:
     decoded_message_body = await message.decode()
 
     if not isinstance(decoded_message_body, dict):
-        default_operation_id = await default_operation_id_factory()
+        default_operation_id = default_operation_id_factory()
         _logger.warning(
             {
                 "message": (
@@ -29,7 +29,6 @@ async def operation_id_factory(message: StreamMessage) -> OperationId:
                     "converted to dict. "
                     "Default operation id will be used instead."
                 ),
-                "received_message": decoded_message_body,
                 "operation_id": default_operation_id,
             },
         )
@@ -38,7 +37,7 @@ async def operation_id_factory(message: StreamMessage) -> OperationId:
     decoded_message_body = cast(dict, decoded_message_body)
     raw_operation_id = decoded_message_body.get("operation_id")
     if not raw_operation_id:
-        default_operation_id = await default_operation_id_factory()
+        default_operation_id = default_operation_id_factory()
         _logger.warning(
             {
                 "message": (
@@ -46,16 +45,15 @@ async def operation_id_factory(message: StreamMessage) -> OperationId:
                     "operation id. "
                     "Default operation id will be used instead."
                 ),
-                "received_message": decoded_message_body,
                 "operation_id": default_operation_id,
             },
         )
         return default_operation_id
 
     try:
-        operation_id = OperationId(UUID(raw_operation_id))
+        return OperationId(UUID(raw_operation_id))
     except:
-        default_operation_id = await default_operation_id_factory()
+        default_operation_id = default_operation_id_factory()
         _logger.warning(
             {
                 "message": (
@@ -63,11 +61,8 @@ async def operation_id_factory(message: StreamMessage) -> OperationId:
                     "message broker cannot be converter to UUID."
                     "Default operation id will be used instead."
                 ),
-                "received_message": decoded_message_body,
                 "operation_id": default_operation_id,
             },
             exc_info=True,
         )
         return default_operation_id
-
-    return operation_id

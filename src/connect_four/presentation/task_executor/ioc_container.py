@@ -8,6 +8,7 @@ from dishka import (
     AsyncContainer,
     make_async_container,
 )
+from dishka.integrations.taskiq import TaskiqProvider
 
 from connect_four.domain import TryToLoseOnTime
 from connect_four.application import (
@@ -41,9 +42,10 @@ from connect_four.infrastructure import (
     load_redis_config,
     common_retort_factory,
     RealEventPublisher,
-    default_operation_id_factory,
 )
+from .commands import try_to_lose_on_time_command_factory
 from .context_var_setter import ContextVarSetter
+from .operation_id import operation_id_factory
 
 
 def ioc_container_factory() -> AsyncContainer:
@@ -65,7 +67,7 @@ def ioc_container_factory() -> AsyncContainer:
     provider.from_context(LockManagerConfig, scope=Scope.APP)
     provider.from_context(NATSConfig, scope=Scope.APP)
 
-    provider.provide(default_operation_id_factory, scope=Scope.REQUEST)
+    provider.provide(operation_id_factory, scope=Scope.REQUEST)
     provider.provide(ContextVarSetter, scope=Scope.REQUEST)
     provider.provide(common_retort_factory, scope=Scope.APP)
 
@@ -92,6 +94,7 @@ def ioc_container_factory() -> AsyncContainer:
     )
 
     provider.provide(TryToLoseOnTime, scope=Scope.APP)
+    provider.provide(try_to_lose_on_time_command_factory, scope=Scope.REQUEST)
     provider.provide(TryToLoseOnTimeProcessor, scope=Scope.REQUEST)
 
-    return make_async_container(provider, context=context)
+    return make_async_container(provider, TaskiqProvider(), context=context)

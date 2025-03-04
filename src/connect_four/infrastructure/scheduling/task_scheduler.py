@@ -41,6 +41,7 @@ class TaskiqTaskScheduler(TaskScheduler):
             kwargs={
                 "game_id": task.game_id,
                 "game_state_id": task.game_state_id,
+                "operation_id": self._operation_id,
             },
             schedule_id=task.id.hex,
             time=task.execute_at,
