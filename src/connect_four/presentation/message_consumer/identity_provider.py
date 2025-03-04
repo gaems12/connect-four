@@ -19,7 +19,10 @@ class MessageBrokerIdentityProvider(IdentityProvider):
     async def user_id(self) -> UserId:
         decoded_message = await self._message.decode()
         if not decoded_message or not isinstance(decoded_message, dict):
-            raise Exception("StreamMessage cannot be converter to dict.")
+            raise Exception(
+                "Message received from message broker cannot be "
+                "converted to dict.",
+            )
 
         user_id = decoded_message.get("user_id")
         return UserId(UUID(user_id))
