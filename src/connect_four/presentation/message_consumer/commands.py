@@ -29,7 +29,10 @@ async def _process_stream_message(message: StreamMessage) -> dict:
     )
 
     if not decoded_message or not isinstance(decoded_message, dict):
-        error_message = "StreamMessage cannot be converted to dict."
+        error_message = (
+            "Decoded message from message broker cannot be "
+            "converted to dict.",
+        )
         _logger.error(error_message)
 
         raise Exception(error_message)
