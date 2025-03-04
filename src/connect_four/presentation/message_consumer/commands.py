@@ -12,6 +12,7 @@ from connect_four.application import (
     MakeMoveCommand,
 )
 from connect_four.infrastructure import CommonRetort
+from .context_var_setter import ContextVarSetter
 
 
 _logger = logging.getLogger(__name__)
@@ -39,22 +40,52 @@ async def _process_stream_message(message: StreamMessage) -> dict:
 async def create_game_command_factory(
     message: StreamMessage,
     common_retort: CommonRetort,
+    context_var_setter: ContextVarSetter,
 ) -> CreateGameCommand:
+    context_var_setter.set()
     decoded_message = await _process_stream_message(message)
-    return common_retort.load(decoded_message, CreateGameCommand)
+
+    try:
+        return common_retort.load(decoded_message, CreateGameCommand)
+    except:
+        _logger.exception(
+            "Error occurred during converting decoded message "
+            "from message broker to CreateGameCommand.",
+        )
+        raise
 
 
 async def end_game_command_factory(
     message: StreamMessage,
     common_retort: CommonRetort,
+    context_var_setter: ContextVarSetter,
 ) -> EndGameCommand:
+    context_var_setter.set()
     decoded_message = await _process_stream_message(message)
-    return common_retort.load(decoded_message, EndGameCommand)
+
+    try:
+        return common_retort.load(decoded_message, EndGameCommand)
+    except:
+        _logger.exception(
+            "Error occurred during converting decoded message "
+            "from message broker to EndGameCommand.",
+        )
+        raise
 
 
 async def make_move_command_factory(
     message: StreamMessage,
     common_retort: CommonRetort,
+    context_var_setter: ContextVarSetter,
 ) -> MakeMoveCommand:
+    context_var_setter.set()
     decoded_message = await _process_stream_message(message)
-    return common_retort.load(decoded_message, MakeMoveCommand)
+
+    try:
+        return common_retort.load(decoded_message, MakeMoveCommand)
+    except:
+        _logger.exception(
+            "Error occurred during converting decoded message "
+            "from message broker to MakeMoveCommand.",
+        )
+        raise
