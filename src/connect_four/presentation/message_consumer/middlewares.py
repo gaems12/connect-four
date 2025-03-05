@@ -10,8 +10,8 @@ from faststream import BaseMiddleware
 from faststream.broker.message import StreamMessage
 
 from connect_four.infrastructure import (
-    log_extra_context_var,
     OperationId,
+    set_operation_id,
     default_operation_id_factory,
 )
 
@@ -25,7 +25,7 @@ class OperationIdMiddleware(BaseMiddleware):
         msg: StreamMessage[T],
     ) -> StreamMessage[T]:
         operation_id = await self._extract_operation_id(msg)
-        self._set_operation_id_to_log_extra_context_var(operation_id)
+        set_operation_id(operation_id)
 
         return await super().on_consume(msg)
 
@@ -37,6 +37,7 @@ class OperationIdMiddleware(BaseMiddleware):
 
         if not isinstance(decoded_message, dict):
             default_operation_id = default_operation_id_factory()
+
             _logger.warning(
                 {
                     "message": (
@@ -52,6 +53,7 @@ class OperationIdMiddleware(BaseMiddleware):
         raw_operation_id = decoded_message.get("operation_id")
         if not raw_operation_id:
             default_operation_id = default_operation_id_factory()
+
             _logger.warning(
                 {
                     "message": (
@@ -68,6 +70,7 @@ class OperationIdMiddleware(BaseMiddleware):
             return OperationId(UUID(raw_operation_id))
         except:
             default_operation_id = default_operation_id_factory()
+
             _logger.warning(
                 {
                     "message": (
@@ -80,14 +83,6 @@ class OperationIdMiddleware(BaseMiddleware):
                 exc_info=True,
             )
             return default_operation_id
-
-    def _set_operation_id_to_log_extra_context_var(
-        self,
-        operation_id: OperationId,
-    ) -> None:
-        current_log_extra = log_extra_context_var.get().copy()
-        current_log_extra["operation_id"] = operation_id
-        log_extra_context_var.set(current_log_extra)
 
 
 class LoggingMiddleware(BaseMiddleware):

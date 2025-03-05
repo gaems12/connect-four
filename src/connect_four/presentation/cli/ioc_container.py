@@ -19,8 +19,6 @@ from connect_four.application import (
     EndGameProcessor,
 )
 from connect_four.infrastructure import (
-    LoggingConfig,
-    load_logging_config,
     httpx_client_factory,
     CentrifugoConfig,
     load_centrifugo_config,
@@ -45,16 +43,14 @@ from connect_four.infrastructure import (
     load_redis_config,
     common_retort_factory,
     RealEventPublisher,
-    default_operation_id_factory,
+    get_operation_id,
 )
-from .context_var_setter import ContextVarSetter
 
 
 def ioc_container_factory() -> AsyncContainer:
     provider = Provider(scope=Scope.APP)
 
     context = {
-        LoggingConfig: load_logging_config(),
         CentrifugoConfig: load_centrifugo_config(),
         RedisConfig: load_redis_config(),
         GameMapperConfig: load_game_mapper_config(),
@@ -62,15 +58,14 @@ def ioc_container_factory() -> AsyncContainer:
         NATSConfig: load_nats_config(),
     }
 
-    provider.from_context(LoggingConfig)
     provider.from_context(CentrifugoConfig)
     provider.from_context(RedisConfig)
     provider.from_context(GameMapperConfig)
     provider.from_context(LockManagerConfig)
     provider.from_context(NATSConfig)
 
-    provider.provide(default_operation_id_factory)
-    provider.provide(ContextVarSetter)
+    provider.provide(get_operation_id)
+    provider.provide(common_retort_factory)
 
     provider.provide(httpx_client_factory)
     provider.provide(redis_factory)
@@ -78,8 +73,6 @@ def ioc_container_factory() -> AsyncContainer:
     provider.provide(nats_client_factory)
     provider.provide(nats_jetstream_factory)
     provider.provide(taskiq_redis_schedule_source_factory)
-
-    provider.provide(common_retort_factory)
 
     provider.provide(lock_manager_factory)
     provider.provide(GameMapper, provides=GameGateway)

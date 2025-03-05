@@ -5,9 +5,10 @@
 __all__ = (
     "LoggingConfig",
     "load_logging_config",
-    "log_extra_context_var",
+    "set_operation_id",
+    "get_operation_id",
     "setup_logging",
 )
 
 from .config import LoggingConfig, load_logging_config
-from .logging_ import log_extra_context_var, setup_logging
+from .logging_ import get_operation_id, set_operation_id, setup_logging

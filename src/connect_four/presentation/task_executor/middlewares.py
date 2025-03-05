@@ -8,8 +8,8 @@ from uuid import UUID
 from taskiq import TaskiqMiddleware, TaskiqMessage
 
 from connect_four.infrastructure import (
-    log_extra_context_var,
     OperationId,
+    set_operation_id,
     default_operation_id_factory,
 )
 
@@ -20,7 +20,7 @@ _logger = logging.getLogger(__name__)
 class OperationIdMiddleware(TaskiqMiddleware):
     def pre_execute(self, message: TaskiqMessage) -> TaskiqMessage:
         operation_id = self._extract_operation_id(message)
-        self._add_operation_id_to_log_extra(operation_id)
+        set_operation_id(operation_id)
 
         return message
 
@@ -57,14 +57,6 @@ class OperationIdMiddleware(TaskiqMiddleware):
                 exc_info=True,
             )
             return default_operation_id
-
-    def _add_operation_id_to_log_extra(
-        self,
-        operation_id: OperationId,
-    ) -> None:
-        current_log_extra = log_extra_context_var.get().copy()
-        current_log_extra["operation_id"] = operation_id
-        log_extra_context_var.set(current_log_extra)
 
 
 class LoggingMiddleware(TaskiqMiddleware):

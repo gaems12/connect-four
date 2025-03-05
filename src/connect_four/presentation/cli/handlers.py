@@ -20,8 +20,11 @@ from connect_four.application import (
     GameAlreadyExistsError,
     GameDoesNotExistError,
 )
-from connect_four.infrastructure import str_to_timedelta
-from .context_var_setter import ContextVarSetter
+from connect_four.infrastructure import (
+    str_to_timedelta,
+    default_operation_id_factory,
+    set_operation_id,
+)
 from .ioc_container import ioc_container_factory
 
 
@@ -66,8 +69,8 @@ async def create_game(
 
     ioc_container = ioc_container_factory()
 
-    context_var_setter = await ioc_container.get(ContextVarSetter)
-    context_var_setter.set()
+    operation_id = default_operation_id_factory()
+    set_operation_id(operation_id)
 
     command = CreateGameCommand(
         game_id=GameId(id),
@@ -77,7 +80,6 @@ async def create_game(
         time_for_each_player=time_for_each_player,
         created_at=datetime.now(timezone.utc),
     )
-
     command_processor = await ioc_container.get(CreateGameProcessor)
     try:
         await command_processor.process(command)
@@ -102,8 +104,10 @@ async def end_game(
 
     ioc_container = ioc_container_factory()
 
-    command = EndGameCommand(GameId(id))
+    operation_id = default_operation_id_factory()
+    set_operation_id(operation_id)
 
+    command = EndGameCommand(GameId(id))
     command_processor = await ioc_container.get(EndGameProcessor)
     try:
         await command_processor.process(command)

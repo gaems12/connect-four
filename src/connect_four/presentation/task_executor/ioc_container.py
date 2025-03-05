@@ -18,8 +18,6 @@ from connect_four.application import (
     TryToLoseOnTimeProcessor,
 )
 from connect_four.infrastructure import (
-    LoggingConfig,
-    load_logging_config,
     httpx_client_factory,
     CentrifugoConfig,
     load_centrifugo_config,
@@ -42,8 +40,7 @@ from connect_four.infrastructure import (
     load_redis_config,
     common_retort_factory,
     RealEventPublisher,
-    OperationId,
-    log_extra_context_var,
+    get_operation_id,
 )
 
 
@@ -51,7 +48,6 @@ def ioc_container_factory() -> AsyncContainer:
     provider = Provider()
 
     context = {
-        LoggingConfig: load_logging_config(),
         CentrifugoConfig: load_centrifugo_config(),
         RedisConfig: load_redis_config(),
         GameMapperConfig: load_game_mapper_config(),
@@ -59,18 +55,13 @@ def ioc_container_factory() -> AsyncContainer:
         NATSConfig: load_nats_config(),
     }
 
-    provider.from_context(LoggingConfig, scope=Scope.APP)
     provider.from_context(CentrifugoConfig, scope=Scope.APP)
     provider.from_context(RedisConfig, scope=Scope.APP)
     provider.from_context(GameMapperConfig, scope=Scope.APP)
     provider.from_context(LockManagerConfig, scope=Scope.APP)
     provider.from_context(NATSConfig, scope=Scope.APP)
 
-    provider.provide(
-        lambda: log_extra_context_var.get()["operation_id"],
-        scope=Scope.REQUEST,
-        provides=OperationId,
-    )
+    provider.provide(get_operation_id, scope=Scope.REQUEST)
     provider.provide(common_retort_factory, scope=Scope.APP)
 
     provider.provide(httpx_client_factory, scope=Scope.APP)
