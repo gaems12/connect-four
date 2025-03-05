@@ -8,6 +8,7 @@ from taskiq import ScheduledTask
 from taskiq_redis import RedisScheduleSource
 
 from connect_four.application import (
+    TryToLoseOnTimeCommand,
     TryToLoseOnTimeTask,
     Task,
     TaskScheduler,
@@ -34,15 +35,16 @@ class TaskiqTaskScheduler(TaskScheduler):
         self,
         task: TryToLoseOnTimeTask,
     ) -> None:
+        command = TryToLoseOnTimeCommand(
+            game_id=task.game_id,
+            game_state_id=task.game_state_id,
+        )
+
         schedule = ScheduledTask(
             task_name="try_to_lose_on_time",
             labels={},
-            args=[],
-            kwargs={
-                "game_id": task.game_id,
-                "game_state_id": task.game_state_id,
-                "operation_id": self._operation_id,
-            },
+            args=[self._operation_id],
+            kwargs={"command": command},
             schedule_id=task.id.hex,
             time=task.execute_at,
         )

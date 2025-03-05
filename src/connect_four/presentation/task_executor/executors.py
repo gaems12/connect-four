@@ -13,9 +13,7 @@ from connect_four.application import (
 @inject
 async def try_to_lose_on_time(
     *,
-    command: FromDishka[TryToLoseOnTimeCommand],
+    command: TryToLoseOnTimeCommand,
     command_processor: FromDishka[TryToLoseOnTimeProcessor],
-    game_id,
-    game_state_id,
 ) -> None:
     await command_processor.process(command)

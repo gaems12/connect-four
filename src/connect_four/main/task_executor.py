@@ -8,6 +8,8 @@ from dishka.integrations.taskiq import setup_dishka
 from connect_four.infrastructure import load_nats_config
 from connect_four.presentation.task_executor import (
     try_to_lose_on_time,
+    OperationIdMiddleware,
+    LoggingMiddleware,
     ioc_container_factory,
 )
 
@@ -19,6 +21,7 @@ def create_task_executor_app() -> NatsBroker:
         [nats_config.url],
         pull_consume_timeout=0.2,
     )
+    broker.add_middlewares(OperationIdMiddleware(), LoggingMiddleware())
     broker.register_task(try_to_lose_on_time)
 
     ioc_container = ioc_container_factory()
