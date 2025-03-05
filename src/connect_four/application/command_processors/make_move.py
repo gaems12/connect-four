@@ -173,7 +173,7 @@ class MakeMoveProcessor:
         move_result: MoveResult,
     ) -> None:
         if isinstance(move_result, GameStarted):
-            data_to_publish = {"type": "game_started"}
+            centrifugo_publication = {"type": "game_started"}
 
         elif isinstance(move_result, MoveAccepted):
             move = {
@@ -187,7 +187,7 @@ class MakeMoveProcessor:
                 }
                 for player_id, player_state in game.players.items()
             }
-            data_to_publish = {
+            centrifugo_publication = {
                 "type": "move_accepted",
                 "move": move,  # type: ignore[dict-item]
                 "players": players,  # type: ignore[dict-item]
@@ -206,7 +206,7 @@ class MakeMoveProcessor:
                 }
                 for player_id, player_state in game.players.items()
             }
-            data_to_publish = {
+            centrifugo_publication = {
                 "type": "move_rejected",
                 "move": move,  # type: ignore[dict-item]
                 "players": players,  # type: ignore[dict-item]
@@ -228,7 +228,7 @@ class MakeMoveProcessor:
                 }
                 for player_id, player_state in game.players.items()
             }
-            data_to_publish = {
+            centrifugo_publication = {
                 "type": "game_ended",
                 "move": move,  # type: ignore[dict-item]
                 "players": players,  # type: ignore[dict-item]
@@ -238,5 +238,5 @@ class MakeMoveProcessor:
 
         await self._centrifugo_client.publish(
             channel=centrifugo_game_channel_factory(game.id),
-            data=data_to_publish,  # type: ignore
+            data=centrifugo_publication,  # type: ignore
         )
