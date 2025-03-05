@@ -132,6 +132,6 @@ async def test_lose_on_time_processor():
         "last_turn": game.current_turn.hex,
     }
     assert (
-        centrifugo_client.publications[f"game:{_GAME_ID.hex}"]
+        centrifugo_client.publications[f"games:{_GAME_ID.hex}"]
         == expected_centrifugo_publication
     )

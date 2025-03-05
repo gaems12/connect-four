@@ -98,6 +98,6 @@ async def test_create_game_processor():
         "current_turn": _FIRST_PLAYER_ID.hex,
     }
     assert (
-        centrifugo_client.publications[f"lobby:{_LOBBY_ID.hex}"]
+        centrifugo_client.publications[f"lobbies:{_LOBBY_ID.hex}"]
         == expected_centrifugo_publication
     )

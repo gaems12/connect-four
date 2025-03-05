@@ -19,11 +19,11 @@ type Serializable = (
 
 
 def centrifugo_lobby_channel_factory(lobby_id: LobbyId) -> str:
-    return f"lobby:{lobby_id.hex}"
+    return f"lobbies:{lobby_id.hex}"
 
 
 def centrifugo_game_channel_factory(game_id: GameId) -> str:
-    return f"game:{game_id.hex}"
+    return f"games:{game_id.hex}"
 
 
 class CentrifugoClient(Protocol):
