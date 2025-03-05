@@ -3,21 +3,18 @@
 # Licensed under the Personal Use License (see LICENSE).
 
 from dataclasses import dataclass
-from typing import Protocol, NewType
+from typing import Protocol
 from enum import StrEnum
-from uuid import UUID
 
 from connect_four.domain import (
     ChipType,
     MoveRejectionReason,
     GameId,
     UserId,
+    LobbyId,
     PlayerState,
     Move,
 )
-
-
-LobbyId = NewType("LobbyId", UUID)
 
 
 class GameEndReason(StrEnum):

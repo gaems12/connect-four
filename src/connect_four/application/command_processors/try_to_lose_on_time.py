@@ -10,6 +10,8 @@ from connect_four.application.common import (
     GameEndReason,
     GameEndedEvent,
     EventPublisher,
+    CentrifugoClient,
+    centrifugo_game_channel_factory,
     TransactionManager,
     GameDoesNotExistError,
 )
@@ -26,6 +28,7 @@ class TryToLoseOnTimeProcessor:
         "_try_to_lose_on_time",
         "_game_gateway",
         "_event_publisher",
+        "_centrifugo_client",
         "_transaction_manager",
     )
 
@@ -34,11 +37,13 @@ class TryToLoseOnTimeProcessor:
         try_to_lose_on_time: TryToLoseOnTime,
         game_gateway: GameGateway,
         event_publisher: EventPublisher,
+        centrifugo_client: CentrifugoClient,
         transaction_manager: TransactionManager,
     ):
         self._try_to_lose_on_time = try_to_lose_on_time
         self._game_gateway = game_gateway
         self._event_publisher = event_publisher
+        self._centrifugo_client = centrifugo_client
         self._transaction_manager = transaction_manager
 
     async def process(self, command: TryToLoseOnTimeCommand) -> None:
@@ -66,5 +71,24 @@ class TryToLoseOnTimeProcessor:
             last_turn=game.current_turn,
         )
         await self._event_publisher.publish(event)
+
+        players = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),
+            }
+            for player_id, player_state in game.players.items()
+        }
+        centrifugo_publication = {
+            "type": "game_ended",
+            "move": None,
+            "players": players,
+            "reason": GameEndReason.TIME_IS_UP,
+            "last_turn": game.current_turn.hex,
+        }
+        await self._centrifugo_client.publish(
+            channel=centrifugo_game_channel_factory(game.id),
+            data=centrifugo_publication,  # type: ignore[arg-type]
+        )
 
         await self._transaction_manager.commit()

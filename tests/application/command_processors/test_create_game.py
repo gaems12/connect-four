@@ -14,16 +14,20 @@ from connect_four.domain import (
     BOARD_ROWS,
     GameId,
     UserId,
+    LobbyId,
     PlayerState,
     CreateGame,
 )
 from connect_four.application import (
-    LobbyId,
     GameCreatedEvent,
     CreateGameCommand,
     CreateGameProcessor,
 )
-from .fakes import FakeGameGateway, FakeEventPublisher
+from .fakes import (
+    FakeGameGateway,
+    FakeEventPublisher,
+    FakeCentrifugoClient,
+)
 
 
 _GAME_ID: Final = GameId(uuid7())
@@ -37,6 +41,7 @@ _TIME_FOR_EACH_PLAYER: Final = timedelta(minutes=1)
 
 async def test_create_game_processor():
     event_publisher = FakeEventPublisher([])
+    centrifugo_client = FakeCentrifugoClient({})
 
     command = CreateGameCommand(
         game_id=_GAME_ID,
@@ -50,6 +55,7 @@ async def test_create_game_processor():
         create_game=CreateGame(),
         game_gateway=FakeGameGateway({}),
         event_publisher=event_publisher,
+        centrifugo_client=centrifugo_client,
         transaction_manager=AsyncMock(),
     )
 
@@ -65,6 +71,7 @@ async def test_create_game_processor():
             time_left=_TIME_FOR_EACH_PLAYER,
         ),
     }
+
     expected_event = GameCreatedEvent(
         game_id=_GAME_ID,
         lobby_id=_LOBBY_ID,
@@ -73,3 +80,24 @@ async def test_create_game_processor():
         current_turn=_FIRST_PLAYER_ID,
     )
     assert expected_event in event_publisher.events
+
+    centrifugo_publication_players = {
+        _FIRST_PLAYER_ID.hex: {
+            "chip_type": ChipType.FIRST,
+            "time_left": _TIME_FOR_EACH_PLAYER.total_seconds(),
+        },
+        _SECOND_PLAYER_ID.hex: {
+            "chip_type": ChipType.SECOND,
+            "time_left": _TIME_FOR_EACH_PLAYER.total_seconds(),
+        },
+    }
+    expected_centrifugo_publication = {
+        "type": "game_created",
+        "game_id": _GAME_ID.hex,
+        "players": centrifugo_publication_players,
+        "current_turn": _FIRST_PLAYER_ID.hex,
+    }
+    assert (
+        centrifugo_client.publications[f"lobby:{_LOBBY_ID.hex}"]
+        == expected_centrifugo_publication
+    )

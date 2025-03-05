@@ -5,13 +5,14 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from connect_four.domain import UserId, GameId, CreateGame
+from connect_four.domain import UserId, GameId, LobbyId, CreateGame
 from connect_four.application.common import (
-    LobbyId,
     SortGamesBy,
     GameGateway,
     GameCreatedEvent,
     EventPublisher,
+    CentrifugoClient,
+    centrifugo_lobby_channel_factory,
     TransactionManager,
     GameAlreadyExistsError,
 )
@@ -32,6 +33,7 @@ class CreateGameProcessor:
         "_create_game",
         "_game_gateway",
         "_event_publisher",
+        "_centrifugo_client",
         "_transaction_manager",
     )
 
@@ -40,11 +42,13 @@ class CreateGameProcessor:
         create_game: CreateGame,
         game_gateway: GameGateway,
         event_publisher: EventPublisher,
+        centrifugo_client: CentrifugoClient,
         transaction_manager: TransactionManager,
     ):
         self._create_game = create_game
         self._game_gateway = game_gateway
         self._event_publisher = event_publisher
+        self._centrifugo_client = centrifugo_client
         self._transaction_manager = transaction_manager
 
     async def process(self, command: CreateGameCommand) -> None:
@@ -80,5 +84,23 @@ class CreateGameProcessor:
             current_turn=new_game.current_turn,
         )
         await self._event_publisher.publish(event)
+
+        players = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),  # type: ignore[arg-type]
+            }
+            for player_id, player_state in new_game.players.items()
+        }
+        centrifugo_publication = {
+            "type": "game_created",
+            "game_id": new_game.id.hex,
+            "players": players,
+            "current_turn": new_game.current_turn.hex,
+        }
+        await self._centrifugo_client.publish(
+            channel=centrifugo_lobby_channel_factory(command.lobby_id),
+            data=centrifugo_publication,  # type: ignore[arg-type]
+        )
 
         await self._transaction_manager.commit()

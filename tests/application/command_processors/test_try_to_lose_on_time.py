@@ -24,7 +24,11 @@ from connect_four.application import (
     TryToLoseOnTimeCommand,
     TryToLoseOnTimeProcessor,
 )
-from .fakes import FakeGameGateway, FakeEventPublisher
+from .fakes import (
+    FakeGameGateway,
+    FakeEventPublisher,
+    FakeCentrifugoClient,
+)
 
 
 _GAME_ID: Final = GameId(uuid7())
@@ -34,7 +38,7 @@ _FIRST_PLAYER_ID: Final = UserId(uuid7())
 _SECOND_PLAYER_ID: Final = UserId(uuid7())
 
 _TIME_LEFT_FOR_FIRST_PLAYER: Final = timedelta(seconds=20)
-_TIME_LEFT_FOR_SECOND_SECOND: Final = timedelta(minutes=1)
+_TIME_LEFT_FOR_SECOND_PLAYER: Final = timedelta(minutes=1)
 
 
 async def test_lose_on_time_processor():
@@ -45,7 +49,7 @@ async def test_lose_on_time_processor():
         ),
         _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
-            time_left=_TIME_LEFT_FOR_SECOND_SECOND,
+            time_left=_TIME_LEFT_FOR_SECOND_PLAYER,
         ),
     }
     board: list[list[ChipType | None]] = [
@@ -75,6 +79,7 @@ async def test_lose_on_time_processor():
 
     game_gateway = FakeGameGateway({_GAME_ID: game})
     event_publisher = FakeEventPublisher([])
+    centrifugo_client = FakeCentrifugoClient({})
 
     command = TryToLoseOnTimeCommand(
         game_id=_GAME_ID,
@@ -84,6 +89,7 @@ async def test_lose_on_time_processor():
         try_to_lose_on_time=TryToLoseOnTime(),
         game_gateway=game_gateway,
         event_publisher=event_publisher,
+        centrifugo_client=centrifugo_client,
         transaction_manager=AsyncMock(),
     )
 
@@ -96,7 +102,7 @@ async def test_lose_on_time_processor():
         ),
         _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
-            time_left=_TIME_LEFT_FOR_SECOND_SECOND,
+            time_left=_TIME_LEFT_FOR_SECOND_PLAYER,
         ),
     }
     expected_event = GameEndedEvent(
@@ -107,3 +113,25 @@ async def test_lose_on_time_processor():
         last_turn=_FIRST_PLAYER_ID,
     )
     assert expected_event in event_publisher.events
+
+    centrifugo_publication_players = {
+        _FIRST_PLAYER_ID.hex: {
+            "chip_type": ChipType.FIRST,
+            "time_left": timedelta(seconds=0).total_seconds(),
+        },
+        _SECOND_PLAYER_ID.hex: {
+            "chip_type": ChipType.SECOND,
+            "time_left": _TIME_LEFT_FOR_SECOND_PLAYER.total_seconds(),
+        },
+    }
+    expected_centrifugo_publication = {
+        "type": "game_ended",
+        "move": None,
+        "players": centrifugo_publication_players,
+        "reason": GameEndReason.TIME_IS_UP,
+        "last_turn": game.current_turn.hex,
+    }
+    assert (
+        centrifugo_client.publications[f"game:{_GAME_ID.hex}"]
+        == expected_centrifugo_publication
+    )

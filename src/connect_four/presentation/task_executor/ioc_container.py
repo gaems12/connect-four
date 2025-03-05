@@ -14,6 +14,7 @@ from connect_four.domain import TryToLoseOnTime
 from connect_four.application import (
     GameGateway,
     EventPublisher,
+    CentrifugoClient,
     TransactionManager,
     TryToLoseOnTimeProcessor,
 )
@@ -39,7 +40,6 @@ from connect_four.infrastructure import (
     RedisConfig,
     load_redis_config,
     common_retort_factory,
-    RealEventPublisher,
     get_operation_id,
 )
 
@@ -71,19 +71,22 @@ def ioc_container_factory() -> AsyncContainer:
     provider.provide(nats_jetstream_factory, scope=Scope.APP)
 
     provider.provide(lock_manager_factory, scope=Scope.REQUEST)
-    provider.provide(GameMapper, provides=GameGateway, scope=Scope.REQUEST)
+    provider.provide(GameMapper, scope=Scope.REQUEST, provides=GameGateway)
     provider.provide(
         RedisTransactionManager,
-        provides=TransactionManager,
         scope=Scope.REQUEST,
+        provides=TransactionManager,
     )
 
-    provider.provide(NATSEventPublisher, scope=Scope.REQUEST)
-    provider.provide(HTTPXCentrifugoClient, scope=Scope.REQUEST)
     provider.provide(
-        RealEventPublisher,
-        provides=EventPublisher,
+        NATSEventPublisher,
         scope=Scope.REQUEST,
+        provides=EventPublisher,
+    )
+    provider.provide(
+        HTTPXCentrifugoClient,
+        scope=Scope.REQUEST,
+        provides=CentrifugoClient,
     )
 
     provider.provide(TryToLoseOnTime, scope=Scope.APP)

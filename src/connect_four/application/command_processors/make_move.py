@@ -29,6 +29,8 @@ from connect_four.application import (
     EventPublisher,
     TryToLoseOnTimeTask,
     TaskScheduler,
+    CentrifugoClient,
+    centrifugo_game_channel_factory,
     TransactionManager,
     IdentityProvider,
     GameDoesNotExistError,
@@ -53,6 +55,7 @@ class MakeMoveProcessor:
         "_game_gateway",
         "_event_publisher",
         "_task_scheduler",
+        "_centrifugo_client",
         "_transaction_manager",
         "_identity_provider",
     )
@@ -63,6 +66,7 @@ class MakeMoveProcessor:
         game_gateway: GameGateway,
         event_publisher: EventPublisher,
         task_scheduler: TaskScheduler,
+        centrifugo_client: CentrifugoClient,
         transaction_manager: TransactionManager,
         identity_provider: IdentityProvider,
     ):
@@ -70,6 +74,7 @@ class MakeMoveProcessor:
         self._game_gateway = game_gateway
         self._event_publisher = event_publisher
         self._task_scheduler = task_scheduler
+        self._centrifugo_client = centrifugo_client
         self._transaction_manager = transaction_manager
         self._identity_provider = identity_provider
 
@@ -110,14 +115,18 @@ class MakeMoveProcessor:
             )
             await self._task_scheduler.schedule(task)
 
-        await self._publish_move_result(
+        await self._publish_event(
+            game=game,
+            move_result=move_result,
+        )
+        await self._publish_data_to_centrifugo(
             game=game,
             move_result=move_result,
         )
 
         await self._transaction_manager.commit()
 
-    async def _publish_move_result(
+    async def _publish_event(
         self,
         *,
         game: Game,
@@ -156,3 +165,78 @@ class MakeMoveProcessor:
             )
 
         await self._event_publisher.publish(event)
+
+    async def _publish_data_to_centrifugo(
+        self,
+        *,
+        game: Game,
+        move_result: MoveResult,
+    ) -> None:
+        if isinstance(move_result, GameStarted):
+            data_to_publish = {"type": "game_started"}
+
+        elif isinstance(move_result, MoveAccepted):
+            move = {
+                "row": move_result.move.row,
+                "column": move_result.move.column,
+            }
+            players = {
+                player_id.hex: {
+                    "chip_type": player_state.chip_type.value,
+                    "time_left": player_state.time_left.total_seconds(),
+                }
+                for player_id, player_state in game.players.items()
+            }
+            data_to_publish = {
+                "type": "move_accepted",
+                "move": move,  # type: ignore[dict-item]
+                "players": players,  # type: ignore[dict-item]
+                "current_turn": game.current_turn.hex,
+            }
+
+        elif isinstance(move_result, MoveRejected):
+            move = {
+                "row": move_result.move.row,
+                "column": move_result.move.column,
+            }
+            players = {
+                player_id.hex: {
+                    "chip_type": player_state.chip_type.value,
+                    "time_left": player_state.time_left.total_seconds(),
+                }
+                for player_id, player_state in game.players.items()
+            }
+            data_to_publish = {
+                "type": "move_rejected",
+                "move": move,  # type: ignore[dict-item]
+                "players": players,  # type: ignore[dict-item]
+                "reason": move_result.reason,
+                "current_turn": game.current_turn.hex,
+            }
+
+        elif isinstance(move_result, (PlayerWon, Draw)):
+            reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
+
+            move = {
+                "row": move_result.move.row,
+                "column": move_result.move.column,
+            }
+            players = {
+                player_id.hex: {
+                    "chip_type": player_state.chip_type.value,
+                    "time_left": player_state.time_left.total_seconds(),
+                }
+                for player_id, player_state in game.players.items()
+            }
+            data_to_publish = {
+                "type": "game_ended",
+                "move": move,  # type: ignore[dict-item]
+                "players": players,  # type: ignore[dict-item]
+                "reason": reason,
+                "last_turn": game.current_turn.hex,
+            }
+
+        await self._centrifugo_client.publish(
+            channel=centrifugo_game_channel_factory(game.id),
+            data=data_to_publish,  # type: ignore
+        )

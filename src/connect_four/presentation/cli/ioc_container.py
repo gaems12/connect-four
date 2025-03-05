@@ -14,6 +14,7 @@ from connect_four.application import (
     GameGateway,
     EventPublisher,
     TaskScheduler,
+    CentrifugoClient,
     TransactionManager,
     CreateGameProcessor,
     EndGameProcessor,
@@ -42,7 +43,6 @@ from connect_four.infrastructure import (
     RedisConfig,
     load_redis_config,
     common_retort_factory,
-    RealEventPublisher,
     get_operation_id,
 )
 
@@ -78,10 +78,8 @@ def ioc_container_factory() -> AsyncContainer:
     provider.provide(GameMapper, provides=GameGateway)
     provider.provide(RedisTransactionManager, provides=TransactionManager)
 
-    provider.provide(NATSEventPublisher)
-    provider.provide(HTTPXCentrifugoClient)
-    provider.provide(RealEventPublisher, provides=EventPublisher)
-
+    provider.provide(NATSEventPublisher, provides=EventPublisher)
+    provider.provide(HTTPXCentrifugoClient, provides=CentrifugoClient)
     provider.provide(TaskiqTaskScheduler, provides=TaskScheduler)
 
     provider.provide(CreateGame)

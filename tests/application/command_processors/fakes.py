@@ -12,6 +12,8 @@ from connect_four.application import (
     EventPublisher,
     Task,
     TaskScheduler,
+    Serializable,
+    CentrifugoClient,
 )
 
 
@@ -52,7 +54,7 @@ class FakeGameGateway(GameGateway):
             games = games[:limit]
         else:
             raise Exception(
-                "FakeGameGateway. Cannot list by player ids: "
+                "Cannot list by player ids: "
                 "limit is not a positive number or zero.",
             )
 
@@ -94,3 +96,17 @@ class FakeTaskScheduler(TaskScheduler):
 
     async def unschedule(self, task_id: UUID) -> None:
         self._tasks.pop(task_id, None)
+
+
+class FakeCentrifugoClient(CentrifugoClient):
+    __slots__ = ("_publications",)
+
+    def __init__(self, publications: dict[str, Serializable]):
+        self._publications = publications
+
+    @property
+    def publications(self) -> dict[str, Serializable]:
+        return self._publications
+
+    async def publish(self, *, channel: str, data: Serializable) -> None:
+        self._publications[channel] = data

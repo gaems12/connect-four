@@ -10,9 +10,8 @@ from cyclopts import Parameter, Token
 import rich
 import rich.prompt
 
-from connect_four.domain import GameId, UserId
+from connect_four.domain import GameId, UserId, LobbyId
 from connect_four.application import (
-    LobbyId,
     CreateGameCommand,
     CreateGameProcessor,
     EndGameCommand,

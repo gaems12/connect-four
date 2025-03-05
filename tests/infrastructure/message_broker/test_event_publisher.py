@@ -16,11 +16,11 @@ from connect_four.domain import (
     BOARD_ROWS,
     GameId,
     UserId,
+    LobbyId,
     PlayerState,
     Move,
 )
 from connect_four.application import (
-    LobbyId,
     GameCreatedEvent,
     GameStartedEvent,
     MoveAcceptedEvent,
