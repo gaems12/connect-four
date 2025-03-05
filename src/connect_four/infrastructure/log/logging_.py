@@ -12,10 +12,7 @@ from connect_four.infrastructure.operation_id import OperationId
 from .config import load_logging_config
 
 
-_log_extra: ContextVar[dict] = ContextVar(
-    "log_extra_context_var",
-    default={},
-)
+_log_extra: ContextVar[dict] = ContextVar("log_extra", default={})
 
 
 def set_operation_id(operation_id: OperationId) -> None:
