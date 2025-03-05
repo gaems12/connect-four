@@ -3,12 +3,9 @@
 # Licensed under the Personal Use License (see LICENSE).
 
 __all__ = (
-    "LoggingConfig",
-    "load_logging_config",
     "set_operation_id",
     "get_operation_id",
     "setup_logging",
 )
 
-from .config import LoggingConfig, load_logging_config
 from .logging_ import get_operation_id, set_operation_id, setup_logging
