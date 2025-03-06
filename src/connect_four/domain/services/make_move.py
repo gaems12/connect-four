@@ -83,8 +83,8 @@ class MakeMove:
     ) -> bool:
         """
         Updates the game's state based on the time taken by the
-        current player to make their move and returns whether
-        the current player's time has expired.
+        current player to make their move and returns flag indicating
+        whether the current player's time has expired.
         """
         current_datetime = datetime.now(timezone.utc)
 
@@ -276,6 +276,5 @@ class MakeMove:
                 return
 
         raise Exception(
-            "There are no other players "
-            "in the game to assign the next turn to.",
+            "There is no other player in the game to assign the next turn to.",
         )

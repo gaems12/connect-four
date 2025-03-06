@@ -87,7 +87,7 @@ class GameMapper(GameGateway):
     ) -> list[Game]:
         if limit < 0:
             raise Exception(
-                "GameMapper. Cannot list by player ids: "
+                "Cannot list by player ids: "
                 "limit is not a positive number or zero.",
             )
 

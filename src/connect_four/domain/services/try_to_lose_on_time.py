@@ -18,10 +18,9 @@ class TryToLoseOnTime:
     ) -> bool:
         """
         Ends the game with the current player's defeat. The method
-        checks if the current game state ID matches the provided one.
-        If the state IDs don't match, the action is not executed.
-        Return `True` if the game was successfully ended,
-        `False` otherwise.
+        checks if the current game state id matches the provided one.
+        If the state ids don't match, the action is not executed.
+        Return flag indicating whether the game was ended.
         """
         if game.state_id != game_state_id:
             return False
