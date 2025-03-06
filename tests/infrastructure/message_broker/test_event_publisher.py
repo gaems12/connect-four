@@ -30,6 +30,7 @@ from connect_four.application import (
     Event,
 )
 from connect_four.infrastructure import (
+    OperationId,
     common_retort_factory,
     NATSConfig,
     nats_client_factory,
@@ -126,5 +127,6 @@ async def test_nats_event_publisher(
     event_publisher = NATSEventPublisher(
         jetstream=nats_jetstream,
         common_retort=common_retort_factory(),
+        operation_id=OperationId(uuid7()),
     )
     await event_publisher.publish(event)
