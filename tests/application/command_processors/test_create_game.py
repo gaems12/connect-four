@@ -71,7 +71,6 @@ async def test_create_game_processor():
             time_left=_TIME_FOR_EACH_PLAYER,
         ),
     }
-
     expected_event = GameCreatedEvent(
         game_id=_GAME_ID,
         lobby_id=_LOBBY_ID,
