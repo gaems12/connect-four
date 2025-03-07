@@ -28,6 +28,7 @@ class GameGateway(Protocol):
                 being accessed via this method with this flag until
                 the current transaction is completed.
         """
+        raise NotImplementedError
 
     async def list_by_player_ids(
         self,
