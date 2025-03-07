@@ -136,10 +136,7 @@ def test_draw():
         current_player_id=_PLAYER_1_ID,
         move=move,
     )
-    expected_move_result = Draw(
-        move=move,
-        player_id=_PLAYER_1_ID,
-    )
+    expected_move_result = Draw()
 
     assert move_result == expected_move_result
     assert game.status == GameStatus.ENDED
@@ -297,10 +294,7 @@ def test_win(
         current_player_id=_PLAYER_1_ID,
         move=winning_move,
     )
-    expected_move_result = PlayerWon(
-        move=winning_move,
-        player_id=_PLAYER_1_ID,
-    )
+    expected_move_result = PlayerWon()
 
     assert move_result == expected_move_result
     assert game.status == GameStatus.ENDED
@@ -412,10 +406,6 @@ def test_illegal_move(
         current_player_id=_PLAYER_1_ID,
         move=illegal_move,
     )
-    expected_move_result = MoveRejected(
-        move=illegal_move,
-        player_id=_PLAYER_1_ID,
-        reason=MoveRejectionReason.ILLEGAL_MOVE,
-    )
+    expected_move_result = MoveRejected(MoveRejectionReason.ILLEGAL_MOVE)
 
     assert move_result == expected_move_result

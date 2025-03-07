@@ -6,35 +6,28 @@ from dataclasses import dataclass
 
 from connect_four.domain.identitifiers import UserId
 from connect_four.domain.constants import MoveRejectionReason
-from .move import Move
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
-class BaseMoveResult:
-    move: Move
-    player_id: UserId
-
-
-@dataclass(frozen=True, slots=True, kw_only=True)
-class GameStarted(BaseMoveResult):
+@dataclass(frozen=True, slots=True)
+class GameStarted:
     next_turn: UserId
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
-class PlayerWon(BaseMoveResult): ...
+@dataclass(frozen=True, slots=True)
+class PlayerWon: ...
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
-class Draw(BaseMoveResult): ...
+@dataclass(frozen=True, slots=True)
+class Draw: ...
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
-class MoveAccepted(BaseMoveResult):
+@dataclass(frozen=True, slots=True)
+class MoveAccepted:
     next_turn: UserId
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
-class MoveRejected(BaseMoveResult):
+@dataclass(frozen=True, slots=True)
+class MoveRejected:
     reason: MoveRejectionReason
 
 

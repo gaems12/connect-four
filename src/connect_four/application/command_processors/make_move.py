@@ -117,10 +117,12 @@ class MakeMoveProcessor:
 
         await self._publish_event(
             game=game,
+            move=command.move,
             move_result=move_result,
         )
         await self._publish_data_to_centrifugo(
             game=game,
+            move=command.move,
             move_result=move_result,
         )
 
@@ -130,6 +132,7 @@ class MakeMoveProcessor:
         self,
         *,
         game: Game,
+        move: Move,
         move_result: MoveResult,
     ) -> None:
         event: Event
@@ -140,7 +143,7 @@ class MakeMoveProcessor:
         elif isinstance(move_result, MoveAccepted):
             event = MoveAcceptedEvent(
                 game_id=game.id,
-                move=move_result.move,
+                move=move,
                 players=game.players,
                 current_turn=game.current_turn,
             )
@@ -148,7 +151,7 @@ class MakeMoveProcessor:
         elif isinstance(move_result, MoveRejected):
             event = MoveRejectedEvent(
                 game_id=game.id,
-                move=move_result.move,
+                move=move,
                 reason=move_result.reason,
                 players=game.players,
                 current_turn=game.current_turn,
@@ -158,7 +161,7 @@ class MakeMoveProcessor:
             reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
             event = GameEndedEvent(
                 game_id=game.id,
-                move=move_result.move,
+                move=move,
                 players=game.players,
                 reason=reason,
                 last_turn=game.current_turn,
@@ -170,17 +173,18 @@ class MakeMoveProcessor:
         self,
         *,
         game: Game,
+        move: Move,
         move_result: MoveResult,
     ) -> None:
         if isinstance(move_result, GameStarted):
             centrifugo_publication = {"type": "game_started"}
 
         elif isinstance(move_result, MoveAccepted):
-            move = {
-                "row": move_result.move.row,
-                "column": move_result.move.column,
+            raw_move = {
+                "row": move.row,
+                "column": move.column,
             }
-            players = {
+            raw_players = {
                 player_id.hex: {
                     "chip_type": player_state.chip_type.value,
                     "time_left": player_state.time_left.total_seconds(),
@@ -189,17 +193,17 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "move_accepted",
-                "move": move,  # type: ignore[dict-item]
-                "players": players,  # type: ignore[dict-item]
+                "move": raw_move,  # type: ignore[dict-item]
+                "players": raw_players,  # type: ignore[dict-item]
                 "current_turn": game.current_turn.hex,
             }
 
         elif isinstance(move_result, MoveRejected):
-            move = {
-                "row": move_result.move.row,
-                "column": move_result.move.column,
+            raw_move = {
+                "row": move.row,
+                "column": move.column,
             }
-            players = {
+            raw_players = {
                 player_id.hex: {
                     "chip_type": player_state.chip_type.value,
                     "time_left": player_state.time_left.total_seconds(),
@@ -208,8 +212,8 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "move_rejected",
-                "move": move,  # type: ignore[dict-item]
-                "players": players,  # type: ignore[dict-item]
+                "move": raw_move,  # type: ignore[dict-item]
+                "players": raw_players,  # type: ignore[dict-item]
                 "reason": move_result.reason,
                 "current_turn": game.current_turn.hex,
             }
@@ -217,11 +221,11 @@ class MakeMoveProcessor:
         elif isinstance(move_result, (PlayerWon, Draw)):
             reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
 
-            move = {
-                "row": move_result.move.row,
-                "column": move_result.move.column,
+            raw_move = {
+                "row": move.row,
+                "column": move.column,
             }
-            players = {
+            raw_players = {
                 player_id.hex: {
                     "chip_type": player_state.chip_type.value,
                     "time_left": player_state.time_left.total_seconds(),
@@ -230,13 +234,13 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "game_ended",
-                "move": move,  # type: ignore[dict-item]
-                "players": players,  # type: ignore[dict-item]
+                "move": raw_move,  # type: ignore[dict-item]
+                "players": raw_players,  # type: ignore[dict-item]
                 "reason": reason,
                 "last_turn": game.current_turn.hex,
             }
 
         await self._centrifugo_client.publish(
             channel=centrifugo_game_channel_factory(game.id),
-            data=centrifugo_publication,  # type: ignore
+            data=centrifugo_publication,  # type: ignore[arg-type]
         )

@@ -48,11 +48,7 @@ class MakeMove:
             current_player_id=current_player_id,
         )
         if move_rejection_reason:
-            return MoveRejected(
-                move=move,
-                player_id=current_player_id,
-                reason=move_rejection_reason,
-            )
+            return MoveRejected(reason=move_rejection_reason)
 
         no_time_left_for_current_player = self._apply_turn_time(
             game=game,
@@ -61,12 +57,7 @@ class MakeMove:
         if no_time_left_for_current_player:
             game.state_id = GameStateId(uuid4())
             game.status = GameStatus.ENDED
-
-            return MoveRejected(
-                move=move,
-                player_id=current_player_id,
-                reason=MoveRejectionReason.TIME_IS_UP,
-            )
+            return MoveRejected(reason=MoveRejectionReason.TIME_IS_UP)
 
         move_result = self._make_move(
             game=game,
@@ -154,12 +145,7 @@ class MakeMove:
                 game=game,
                 current_player_id=current_player_id,
             )
-
-            return GameStarted(
-                move=move,
-                player_id=current_player_id,
-                next_turn=game.current_turn,
-            )
+            return GameStarted(next_turn=game.current_turn)
 
         player_won = self._check_if_player_won(
             game=game,
@@ -168,31 +154,18 @@ class MakeMove:
         )
         if player_won:
             game.status = GameStatus.ENDED
-
-            return PlayerWon(
-                move=move,
-                player_id=current_player_id,
-            )
+            return PlayerWon()
 
         board_is_full = self._check_if_board_is_full(game.board)
         if board_is_full:
             game.status = GameStatus.ENDED
-
-            return Draw(
-                move=move,
-                player_id=current_player_id,
-            )
+            return Draw()
 
         self._next_turn(
             game=game,
             current_player_id=current_player_id,
         )
-
-        return MoveAccepted(
-            move=move,
-            player_id=current_player_id,
-            next_turn=game.current_turn,
-        )
+        return MoveAccepted(next_turn=game.current_turn)
 
     def _check_if_player_won(
         self,
