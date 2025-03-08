@@ -9,7 +9,6 @@ from nats.js.client import JetStreamContext
 
 from connect_four.application import (
     GameCreatedEvent,
-    GameStartedEvent,
     GameEndedEvent,
     MoveAcceptedEvent,
     MoveRejectedEvent,
@@ -23,7 +22,6 @@ _STREAM: Final = "games"
 
 _EVENT_TO_SUBJECT_MAP: Final = {
     GameCreatedEvent: "connect_four.game.created",
-    GameStartedEvent: "connect_four.game.started",
     GameEndedEvent: "connect_four.game.ended",
     MoveAcceptedEvent: "connect_four.game.move_accepted",
     MoveRejectedEvent: "connect_four.game.move_rejected",

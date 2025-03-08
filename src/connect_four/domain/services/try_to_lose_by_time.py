@@ -9,7 +9,7 @@ from connect_four.domain.constants import GameStatus
 from connect_four.domain.models import Game
 
 
-class TryToLoseOnTime:
+class TryToLoseByTime:
     def __call__(
         self,
         *,
@@ -17,10 +17,11 @@ class TryToLoseOnTime:
         game_state_id: GameStateId,
     ) -> bool:
         """
-        Ends the game with the current player's defeat. The method
-        checks if the current game state id matches the provided one.
-        If the state ids don't match, the action is not executed.
-        Return flag indicating whether the game was ended.
+        Ends the game with the current player's loss by time
+        if possible. The method checks if the current game state id
+        matches the provided one. If the state ids don't match,
+        the action is not executed. Return flag indicating whether
+        the game was ended.
         """
         if game.state_id != game_state_id:
             return False

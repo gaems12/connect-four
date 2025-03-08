@@ -5,15 +5,15 @@
 from dishka.integrations.taskiq import FromDishka, inject
 
 from connect_four.application import (
-    TryToLoseOnTimeCommand,
-    TryToLoseOnTimeProcessor,
+    TryToLoseByTimeCommand,
+    TryToLoseByTimeProcessor,
 )
 
 
 @inject
-async def try_to_lose_on_time(
+async def try_to_lose_by_time(
     *,
-    command: TryToLoseOnTimeCommand,
-    command_processor: FromDishka[TryToLoseOnTimeProcessor],
+    command: TryToLoseByTimeCommand,
+    command_processor: FromDishka[TryToLoseByTimeProcessor],
 ) -> None:
     await command_processor.process(command)

@@ -17,12 +17,12 @@ class BaseTask:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class TryToLoseOnTimeTask(BaseTask):
+class TryToLoseByTimeTask(BaseTask):
     game_id: GameId
     game_state_id: GameStateId
 
 
-type Task = TryToLoseOnTimeTask
+type Task = TryToLoseByTimeTask
 
 
 class TaskScheduler(Protocol):

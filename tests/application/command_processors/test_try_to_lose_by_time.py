@@ -16,13 +16,13 @@ from connect_four.domain import (
     UserId,
     PlayerState,
     Game,
-    TryToLoseOnTime,
+    TryToLoseByTime,
 )
 from connect_four.application import (
     GameEndReason,
     GameEndedEvent,
-    TryToLoseOnTimeCommand,
-    TryToLoseOnTimeProcessor,
+    TryToLoseByTimeCommand,
+    TryToLoseByTimeProcessor,
 )
 from .fakes import (
     FakeGameGateway,
@@ -41,7 +41,7 @@ _TIME_LEFT_FOR_FIRST_PLAYER: Final = timedelta(seconds=20)
 _TIME_LEFT_FOR_SECOND_PLAYER: Final = timedelta(minutes=1)
 
 
-async def test_lose_on_time_processor():
+async def test_lose_by_time_processor():
     players = {
         _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
@@ -81,12 +81,12 @@ async def test_lose_on_time_processor():
     event_publisher = FakeEventPublisher([])
     centrifugo_client = FakeCentrifugoClient({})
 
-    command = TryToLoseOnTimeCommand(
+    command = TryToLoseByTimeCommand(
         game_id=_GAME_ID,
         game_state_id=_GAME_STATE_ID,
     )
-    command_processor = TryToLoseOnTimeProcessor(
-        try_to_lose_on_time=TryToLoseOnTime(),
+    command_processor = TryToLoseByTimeProcessor(
+        try_to_lose_by_time=TryToLoseByTime(),
         game_gateway=game_gateway,
         event_publisher=event_publisher,
         centrifugo_client=centrifugo_client,
@@ -107,9 +107,9 @@ async def test_lose_on_time_processor():
     }
     expected_event = GameEndedEvent(
         game_id=_GAME_ID,
-        move=None,
+        chip_location=None,
         players=updated_players,
-        reason=GameEndReason.TIME_IS_UP,
+        reason=GameEndReason.LOSS_BY_TIME,
         last_turn=_FIRST_PLAYER_ID,
     )
     assert expected_event in event_publisher.events
@@ -126,9 +126,9 @@ async def test_lose_on_time_processor():
     }
     expected_centrifugo_publication = {
         "type": "game_ended",
-        "move": None,
+        "chip_location": None,
         "players": centrifugo_publication_players,
-        "reason": GameEndReason.TIME_IS_UP,
+        "reason": GameEndReason.LOSS_BY_TIME,
         "last_turn": game.current_turn.hex,
     }
     assert (

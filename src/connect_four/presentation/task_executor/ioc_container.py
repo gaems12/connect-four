@@ -10,13 +10,13 @@ from dishka import (
 )
 from dishka.integrations.taskiq import TaskiqProvider
 
-from connect_four.domain import TryToLoseOnTime
+from connect_four.domain import TryToLoseByTime
 from connect_four.application import (
     GameGateway,
     EventPublisher,
     CentrifugoClient,
     TransactionManager,
-    TryToLoseOnTimeProcessor,
+    TryToLoseByTimeProcessor,
 )
 from connect_four.infrastructure import (
     httpx_client_factory,
@@ -89,7 +89,7 @@ def ioc_container_factory() -> AsyncContainer:
         provides=CentrifugoClient,
     )
 
-    provider.provide(TryToLoseOnTime, scope=Scope.APP)
-    provider.provide(TryToLoseOnTimeProcessor, scope=Scope.REQUEST)
+    provider.provide(TryToLoseByTime, scope=Scope.APP)
+    provider.provide(TryToLoseByTimeProcessor, scope=Scope.REQUEST)
 
     return make_async_container(provider, TaskiqProvider(), context=context)

@@ -8,26 +8,24 @@ from typing import Final
 
 from connect_four.domain import (
     GameId,
-    Move,
     Game,
-    GameStarted,
     MoveAccepted,
     MoveRejected,
-    PlayerWon,
+    Win,
     Draw,
+    LossByTime,
     MoveResult,
     MakeMove,
 )
 from connect_four.application import (
     GameGateway,
     GameEndReason,
-    GameStartedEvent,
     MoveAcceptedEvent,
     MoveRejectedEvent,
     GameEndedEvent,
     Event,
     EventPublisher,
-    TryToLoseOnTimeTask,
+    TryToLoseByTimeTask,
     TaskScheduler,
     CentrifugoClient,
     centrifugo_game_channel_factory,
@@ -38,15 +36,16 @@ from connect_four.application import (
 
 
 _MOVE_RESULT_TO_GAME_END_REASON_MAP: Final = {
-    PlayerWon: GameEndReason.WIN,
+    Win: GameEndReason.WIN,
     Draw: GameEndReason.DRAW,
+    LossByTime: GameEndReason.LOSS_BY_TIME,
 }
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MakeMoveCommand:
     game_id: GameId
-    move: Move
+    column: int
 
 
 class MakeMoveProcessor:
@@ -93,21 +92,21 @@ class MakeMoveProcessor:
         move_result = self._make_move(
             game=game,
             current_player_id=current_user_id,
-            move=command.move,
+            column=command.column,
         )
         await self._game_gateway.update(game)
 
         if not isinstance(move_result, MoveRejected):
             await self._task_scheduler.unschedule(old_game_state_id)
 
-        if isinstance(move_result, (GameStarted, MoveAccepted)):
+        if isinstance(move_result, MoveAccepted):
             current_player_state = game.players[current_user_id]
             time_left_for_current_player = current_player_state.time_left
 
             execute_task_at = (
                 datetime.now(timezone.utc) + time_left_for_current_player
             )
-            task = TryToLoseOnTimeTask(
+            task = TryToLoseByTimeTask(
                 id=game.state_id,
                 execute_at=execute_task_at,
                 game_id=game.id,
@@ -117,12 +116,10 @@ class MakeMoveProcessor:
 
         await self._publish_event(
             game=game,
-            move=command.move,
             move_result=move_result,
         )
         await self._publish_data_to_centrifugo(
             game=game,
-            move=command.move,
             move_result=move_result,
         )
 
@@ -132,18 +129,14 @@ class MakeMoveProcessor:
         self,
         *,
         game: Game,
-        move: Move,
         move_result: MoveResult,
     ) -> None:
         event: Event
 
-        if isinstance(move_result, GameStarted):
-            event = GameStartedEvent(game_id=game.id)
-
-        elif isinstance(move_result, MoveAccepted):
+        if isinstance(move_result, MoveAccepted):
             event = MoveAcceptedEvent(
                 game_id=game.id,
-                move=move,
+                chip_location=move_result.chip_location,
                 players=game.players,
                 current_turn=game.current_turn,
             )
@@ -151,17 +144,16 @@ class MakeMoveProcessor:
         elif isinstance(move_result, MoveRejected):
             event = MoveRejectedEvent(
                 game_id=game.id,
-                move=move,
                 reason=move_result.reason,
                 players=game.players,
                 current_turn=game.current_turn,
             )
 
-        elif isinstance(move_result, (PlayerWon, Draw)):
+        elif isinstance(move_result, (Win, Draw, LossByTime)):
             reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
             event = GameEndedEvent(
                 game_id=game.id,
-                move=move,
+                chip_location=move_result.chip_location,
                 players=game.players,
                 reason=reason,
                 last_turn=game.current_turn,
@@ -173,16 +165,12 @@ class MakeMoveProcessor:
         self,
         *,
         game: Game,
-        move: Move,
         move_result: MoveResult,
     ) -> None:
-        if isinstance(move_result, GameStarted):
-            centrifugo_publication = {"type": "game_started"}
-
-        elif isinstance(move_result, MoveAccepted):
-            raw_move = {
-                "row": move.row,
-                "column": move.column,
+        if isinstance(move_result, MoveAccepted):
+            raw_chip_location = {
+                "row": move_result.chip_location.row,
+                "column": move_result.chip_location.column,
             }
             raw_players = {
                 player_id.hex: {
@@ -193,16 +181,12 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "move_accepted",
-                "move": raw_move,  # type: ignore[dict-item]
+                "chip_location": raw_chip_location,  # type: ignore[dict-item]
                 "players": raw_players,  # type: ignore[dict-item]
                 "current_turn": game.current_turn.hex,
             }
 
         elif isinstance(move_result, MoveRejected):
-            raw_move = {
-                "row": move.row,
-                "column": move.column,
-            }
             raw_players = {
                 player_id.hex: {
                     "chip_type": player_state.chip_type.value,
@@ -212,18 +196,17 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "move_rejected",
-                "move": raw_move,  # type: ignore[dict-item]
                 "players": raw_players,  # type: ignore[dict-item]
                 "reason": move_result.reason,
                 "current_turn": game.current_turn.hex,
             }
 
-        elif isinstance(move_result, (PlayerWon, Draw)):
+        elif isinstance(move_result, (Win, Draw, LossByTime)):
             reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
 
-            raw_move = {
-                "row": move.row,
-                "column": move.column,
+            raw_chip_location = {
+                "row": move_result.chip_location.row,
+                "column": move_result.chip_location.column,
             }
             raw_players = {
                 player_id.hex: {
@@ -234,7 +217,7 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "game_ended",
-                "move": raw_move,  # type: ignore[dict-item]
+                "chip_location": raw_chip_location,  # type: ignore[dict-item]
                 "players": raw_players,  # type: ignore[dict-item]
                 "reason": reason,
                 "last_turn": game.current_turn.hex,

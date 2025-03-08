@@ -5,23 +5,23 @@
 __all__ = (
     "PlayerState",
     "Game",
-    "Move",
-    "GameStarted",
-    "PlayerWon",
-    "MoveAccepted",
-    "Draw",
+    "ChipLocation",
     "MoveRejected",
     "MoveResult",
+    "Win",
+    "LossByTime",
+    "MoveAccepted",
+    "Draw",
 )
 
 from .player_state import PlayerState
 from .game import Game
-from .move import Move
+from .chip_location import ChipLocation
 from .move_result import (
-    GameStarted,
-    PlayerWon,
-    MoveAccepted,
-    Draw,
     MoveRejected,
     MoveResult,
+    Win,
+    LossByTime,
+    MoveAccepted,
+    Draw,
 )

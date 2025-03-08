@@ -16,10 +16,10 @@ from connect_four.domain import (
     GameStatus,
     MoveRejectionReason,
     PlayerState,
-    Move,
+    ChipLocation,
     Game,
     Draw,
-    PlayerWon,
+    Win,
     MoveRejected,
     MakeMove,
 )
@@ -129,21 +129,19 @@ def test_draw():
         created_at=datetime.now(timezone.utc) - timedelta(minutes=1),
     )
 
-    move = Move(column=5, row=0)
-
     move_result = MakeMove()(
         game=game,
         current_player_id=_PLAYER_1_ID,
-        move=move,
+        column=5,
     )
-    expected_move_result = Draw()
+    expected_move_result = Draw(ChipLocation(column=5, row=0))
 
     assert move_result == expected_move_result
     assert game.status == GameStatus.ENDED
 
 
 @pytest.mark.parametrize(
-    ["board", "winning_move"],
+    ["board", "column", "expected_chip_location"],
     [
         [
             #  x = ChipType.FIRST
@@ -173,7 +171,8 @@ def test_draw():
                 [ChipType.SECOND, ChipType.FIRST] + [None] * 4,
                 [ChipType.FIRST, ChipType.FIRST, ChipType.FIRST] + [None] * 3,
             ],
-            Move(column=3, row=6),
+            3,
+            ChipLocation(column=3, row=6),
         ],
         [
             #  x = ChipType.FIRST
@@ -209,7 +208,8 @@ def test_draw():
                 ]
                 + [None] * 3,
             ],
-            Move(column=0, row=2),
+            0,
+            ChipLocation(column=0, row=2),
         ],
         [
             #  x = ChipType.FIRST
@@ -260,13 +260,15 @@ def test_draw():
                     ChipType.FIRST,
                 ],
             ],
-            Move(column=4, row=2),
+            4,
+            ChipLocation(column=4, row=2),
         ],
     ],
 )
 def test_win(
     board: list[list[ChipType | None]],
-    winning_move: Move,
+    column: int,
+    expected_chip_location: ChipLocation,
 ):
     players = {
         _PLAYER_1_ID: PlayerState(
@@ -292,16 +294,16 @@ def test_win(
     move_result = MakeMove()(
         game=game,
         current_player_id=_PLAYER_1_ID,
-        move=winning_move,
+        column=column,
     )
-    expected_move_result = PlayerWon()
+    expected_move_result = Win(expected_chip_location)
 
     assert move_result == expected_move_result
     assert game.status == GameStatus.ENDED
 
 
 @pytest.mark.parametrize(
-    ["board", "illegal_move"],
+    ["board", "column"],
     [
         [
             #  x = ChipType.FIRST
@@ -336,34 +338,34 @@ def test_win(
                 ]
                 + [None] * 3,
             ],
-            Move(column=0, row=6),
+            6,
         ],
         [
             #  x = ChipType.FIRST
             #  y = ChipType.SECOND
             #
             #  +---+---+---+---+---+---+
-            #  |   |   |   |   |   |   |
+            #  | x |   |   |   |   |   |
             #  +---+---+---+---+---+---+
-            #  |   |   |   |   |   |   |
+            #  | y |   |   |   |   |   |
             #  +---+---+---+---+---+---+
-            #  |   |   |   |   |   |   |
+            #  | x |   |   |   |   |   |
             #  +---+---+---+---+---+---+
-            #  |   |   |   |   |   |   |
+            #  | y |   |   |   |   |   |
             #  +---+---+---+---+---+---+
-            #  |   |   |   |   |   |   |
+            #  | x |   |   |   |   |   |
             #  +---+---+---+---+---+---+
-            #  |   |   |   |   |   |   |
+            #  | y |   |   |   |   |   |
             #  +---+---+---+---+---+---+
             #  | x | y | y |   |   |   |
             #  +---+---+---+---+---+---+
             [
-                [None] * 6,
-                [None] * 6,
-                [None] * 6,
-                [None] * 6,
-                [None] * 6,
-                [None] * 6,
+                [ChipType.FIRST] + [None] * 5,
+                [ChipType.SECOND] + [None] * 5,
+                [ChipType.FIRST] + [None] * 5,
+                [ChipType.SECOND] + [None] * 5,
+                [ChipType.FIRST] + [None] * 5,
+                [ChipType.SECOND] + [None] * 5,
                 [
                     ChipType.FIRST,
                     ChipType.SECOND,
@@ -371,13 +373,13 @@ def test_win(
                 ]
                 + [None] * 3,
             ],
-            Move(column=0, row=0),
+            0,
         ],
     ],
 )
 def test_illegal_move(
     board: list[list[ChipType | None]],
-    illegal_move: Move,
+    column: int,
 ):
     players = {
         _PLAYER_1_ID: PlayerState(
@@ -404,7 +406,7 @@ def test_illegal_move(
     move_result = MakeMove()(
         game=game,
         current_player_id=_PLAYER_1_ID,
-        move=illegal_move,
+        column=column,
     )
     expected_move_result = MoveRejected(MoveRejectionReason.ILLEGAL_MOVE)
 

@@ -17,7 +17,6 @@ class NATSStreamCreator:
             name="games",
             subjects=[
                 "connect_four.game.created",
-                "connect_four.game.started",
                 "connect_four.game.ended",
                 "connect_four.game.move_accepted",
                 "connect_four.game.move_rejected",

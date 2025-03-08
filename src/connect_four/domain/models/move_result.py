@@ -4,26 +4,13 @@
 
 from dataclasses import dataclass
 
-from connect_four.domain.identitifiers import UserId
 from connect_four.domain.constants import MoveRejectionReason
-
-
-@dataclass(frozen=True, slots=True)
-class GameStarted:
-    next_turn: UserId
-
-
-@dataclass(frozen=True, slots=True)
-class PlayerWon: ...
-
-
-@dataclass(frozen=True, slots=True)
-class Draw: ...
+from .chip_location import ChipLocation
 
 
 @dataclass(frozen=True, slots=True)
 class MoveAccepted:
-    next_turn: UserId
+    chip_location: ChipLocation
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,4 +18,19 @@ class MoveRejected:
     reason: MoveRejectionReason
 
 
-type MoveResult = GameStarted | PlayerWon | Draw | MoveAccepted | MoveRejected
+@dataclass(frozen=True, slots=True)
+class Win:
+    chip_location: ChipLocation
+
+
+@dataclass(frozen=True, slots=True)
+class LossByTime:
+    chip_location: ChipLocation
+
+
+@dataclass(frozen=True, slots=True)
+class Draw:
+    chip_location: ChipLocation
+
+
+type MoveResult = MoveAccepted | MoveRejected | Win | LossByTime | Draw

@@ -18,11 +18,10 @@ from connect_four.domain import (
     UserId,
     LobbyId,
     PlayerState,
-    Move,
+    ChipLocation,
 )
 from connect_four.application import (
     GameCreatedEvent,
-    GameStartedEvent,
     MoveAcceptedEvent,
     MoveRejectedEvent,
     GameEndReason,
@@ -70,10 +69,9 @@ async def nats_jetstream(
             },
             current_turn=_FIRST_PLAYER_ID,
         ),
-        GameStartedEvent(game_id=GameId(uuid7())),
         MoveAcceptedEvent(
             game_id=GameId(uuid7()),
-            move=Move(column=5, row=6),
+            chip_location=ChipLocation(column=5, row=6),
             players={
                 _FIRST_PLAYER_ID: PlayerState(
                     chip_type=ChipType.FIRST,
@@ -88,7 +86,6 @@ async def nats_jetstream(
         ),
         MoveRejectedEvent(
             game_id=GameId(uuid7()),
-            move=Move(column=0, row=0),
             reason=MoveRejectionReason.ILLEGAL_MOVE,
             players={
                 _FIRST_PLAYER_ID: PlayerState(
@@ -104,7 +101,7 @@ async def nats_jetstream(
         ),
         GameEndedEvent(
             game_id=GameId(uuid7()),
-            move=Move(column=0, row=0),
+            chip_location=ChipLocation(column=0, row=0),
             players={
                 _FIRST_PLAYER_ID: PlayerState(
                     chip_type=ChipType.FIRST,

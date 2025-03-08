@@ -5,7 +5,6 @@
 __all__ = (
     "GameEndReason",
     "GameCreatedEvent",
-    "GameStartedEvent",
     "MoveAcceptedEvent",
     "MoveRejectedEvent",
     "GameEndedEvent",
@@ -13,7 +12,7 @@ __all__ = (
     "EventPublisher",
     "SortGamesBy",
     "GameGateway",
-    "TryToLoseOnTimeTask",
+    "TryToLoseByTimeTask",
     "Task",
     "TaskScheduler",
     "Serializable",
@@ -30,7 +29,6 @@ __all__ = (
 from .event_publisher import (
     GameEndReason,
     GameCreatedEvent,
-    GameStartedEvent,
     MoveAcceptedEvent,
     MoveRejectedEvent,
     GameEndedEvent,
@@ -38,7 +36,7 @@ from .event_publisher import (
     EventPublisher,
 )
 from .game_gateway import SortGamesBy, GameGateway
-from .task_scheduler import TryToLoseOnTimeTask, Task, TaskScheduler
+from .task_scheduler import TryToLoseByTimeTask, Task, TaskScheduler
 from .transaction_manager import TransactionManager
 from .centrifugo_client import (
     Serializable,

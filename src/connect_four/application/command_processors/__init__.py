@@ -9,14 +9,14 @@ __all__ = (
     "EndGameProcessor",
     "MakeMoveCommand",
     "MakeMoveProcessor",
-    "TryToLoseOnTimeCommand",
-    "TryToLoseOnTimeProcessor",
+    "TryToLoseByTimeCommand",
+    "TryToLoseByTimeProcessor",
 )
 
 from .create_game import CreateGameCommand, CreateGameProcessor
 from .end_game import EndGameCommand, EndGameProcessor
 from .make_move import MakeMoveCommand, MakeMoveProcessor
-from .try_to_lose_on_time import (
-    TryToLoseOnTimeCommand,
-    TryToLoseOnTimeProcessor,
+from .try_to_lose_by_time import (
+    TryToLoseByTimeCommand,
+    TryToLoseByTimeProcessor,
 )

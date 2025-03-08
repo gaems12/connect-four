@@ -16,9 +16,9 @@ from connect_four.domain.constants import (
 )
 from connect_four.domain.models import (
     Game,
-    Move,
-    GameStarted,
-    PlayerWon,
+    ChipLocation,
+    Win,
+    LossByTime,
     MoveAccepted,
     Draw,
     MoveRejected,
@@ -40,66 +40,42 @@ class MakeMove:
         *,
         game: Game,
         current_player_id: UserId,
-        move: Move,
+        column: int,
     ) -> MoveResult:
-        move_rejection_reason = self._vallidate_move(
+        move_rejection_reason = self._validate_move(
             game=game,
-            move=move,
+            column=column,
             current_player_id=current_player_id,
         )
         if move_rejection_reason:
             return MoveRejected(reason=move_rejection_reason)
 
-        no_time_left_for_current_player = self._apply_turn_time(
+        chip_location = self._calculate_chip_location(
+            game=game,
+            column=column,
+        )
+        if not chip_location:
+            return MoveRejected(reason=MoveRejectionReason.ILLEGAL_MOVE)
+
+        current_player_lost_by_time = self._apply_turn_time(
             game=game,
             current_player_id=current_player_id,
         )
-        if no_time_left_for_current_player:
-            game.state_id = GameStateId(uuid4())
-            game.status = GameStatus.ENDED
-            return MoveRejected(reason=MoveRejectionReason.TIME_IS_UP)
+        if current_player_lost_by_time:
+            return LossByTime(chip_location=chip_location)
 
-        move_result = self._make_move(
+        move_result = self._place_chip(
             game=game,
-            move=move,
+            chip_location=chip_location,
             current_player_id=current_player_id,
         )
         return move_result
 
-    def _apply_turn_time(
+    def _validate_move(
         self,
         *,
         game: Game,
-        current_player_id: UserId,
-    ) -> bool:
-        """
-        Updates the game's state based on the time taken by the
-        current player to make their move and returns flag indicating
-        whether the current player's time has expired.
-        """
-        current_datetime = datetime.now(timezone.utc)
-
-        if game.status == GameStatus.NOT_STARTED:
-            game.last_move_made_at = current_datetime
-            return False
-
-        time_for_move = current_datetime - game.last_move_made_at  # type: ignore
-
-        if time_for_move >= game.players[current_player_id].time_left:
-            game.players[current_player_id].time_left = timedelta(seconds=0)
-            game.last_move_made_at = current_datetime
-            return True
-
-        game.players[current_player_id].time_left -= time_for_move
-        game.last_move_made_at = current_datetime
-
-        return False
-
-    def _vallidate_move(
-        self,
-        *,
-        game: Game,
-        move: Move,
+        column: int,
         current_player_id: UserId,
     ) -> MoveRejectionReason | None:
         if current_player_id not in game.players:
@@ -111,32 +87,74 @@ class MakeMove:
         if game.current_turn != current_player_id:
             return MoveRejectionReason.OTHER_PLAYER_TURN
 
-        if (
-            move.column > BOARD_COLUMNS - 1
-            or move.row > BOARD_ROWS - 1
-            or game.board[move.row][move.column]
-        ):
-            return MoveRejectionReason.ILLEGAL_MOVE
-
-        if (
-            move.row != BOARD_ROWS - 1
-            and game.board[move.row + 1][move.column] is None
-        ):
+        if column > BOARD_COLUMNS - 1:
             return MoveRejectionReason.ILLEGAL_MOVE
 
         return None
 
-    def _make_move(
+    def _calculate_chip_location(
         self,
         *,
         game: Game,
-        move: Move,
+        column: int,
+    ) -> ChipLocation | None:
+        for row in range(BOARD_ROWS - 1, -1, -1):
+            if game.board[row][column] is None:
+                return ChipLocation(column=column, row=row)
+
+        return None
+
+    def _apply_turn_time(
+        self,
+        *,
+        game: Game,
         current_player_id: UserId,
-    ) -> GameStarted | PlayerWon | Draw | MoveAccepted:
+    ) -> bool:
+        """
+        Updates the game's state based on the time taken by the
+        current player to make their move and returns flag
+        indicating whether the current player lost by time.
+        """
+        current_datetime = datetime.now(timezone.utc)
+
+        if game.status == GameStatus.NOT_STARTED:
+            game.last_move_made_at = current_datetime
+            return False
+
+        time_for_move = current_datetime - game.last_move_made_at  # type: ignore
+        time_left_for_current_player = game.players[
+            current_player_id
+        ].time_left
+
+        if time_for_move >= time_left_for_current_player:
+            game.players[current_player_id].time_left = timedelta(seconds=0)
+            game.last_move_made_at = current_datetime
+
+            game.state_id = GameStateId(uuid4())
+            game.status = GameStatus.ENDED
+
+            return True
+
+        game.players[current_player_id].time_left -= time_for_move
+        game.last_move_made_at = current_datetime
+
+        return False
+
+    def _place_chip(
+        self,
+        *,
+        game: Game,
+        chip_location: ChipLocation,
+        current_player_id: UserId,
+    ) -> MoveAccepted | Win | Draw:
         game.state_id = GameStateId(uuid4())
 
-        current_player_chip_type = game.players[current_player_id].chip_type
-        game.board[move.row][move.column] = current_player_chip_type
+        current_player = game.players[current_player_id]
+        current_player_chip_type = current_player.chip_type
+
+        game.board[chip_location.row][chip_location.column] = (
+            current_player_chip_type
+        )
 
         if game.status == GameStatus.NOT_STARTED:
             game.status = GameStatus.IN_PROGRESS
@@ -145,56 +163,56 @@ class MakeMove:
                 game=game,
                 current_player_id=current_player_id,
             )
-            return GameStarted(next_turn=game.current_turn)
+            return MoveAccepted(chip_location=chip_location)
 
         player_won = self._check_if_player_won(
-            game=game,
-            move=move,
+            board=game.board,
+            chip_location=chip_location,
             current_player_chip_type=current_player_chip_type,
         )
         if player_won:
             game.status = GameStatus.ENDED
-            return PlayerWon()
+            return Win(chip_location=chip_location)
 
         board_is_full = self._check_if_board_is_full(game.board)
         if board_is_full:
             game.status = GameStatus.ENDED
-            return Draw()
+            return Draw(chip_location=chip_location)
 
         self._next_turn(
             game=game,
             current_player_id=current_player_id,
         )
-        return MoveAccepted(next_turn=game.current_turn)
+        return MoveAccepted(chip_location=chip_location)
 
     def _check_if_player_won(
         self,
         *,
-        game: Game,
-        move: Move,
+        board: list[list[ChipType | None]],
+        chip_location: ChipLocation,
         current_player_chip_type: ChipType,
     ) -> bool:
         for row_delta, column_delta in _DIRECTIONS:
             forward_count = self._count_chips_in_direction(
-                board=game.board,
-                row=move.row,
-                column=move.column,
+                board=board,
+                row=chip_location.row,
+                column=chip_location.column,
                 row_delta=row_delta,
                 column_delta=column_delta,
                 chip_type=current_player_chip_type,
             )
-            if forward_count >= 4:
+            if forward_count == 4:
                 return True
 
             backward_count = self._count_chips_in_direction(
-                board=game.board,
-                row=move.row,
-                column=move.column,
+                board=board,
+                row=chip_location.row,
+                column=chip_location.column,
                 row_delta=-row_delta,
                 column_delta=-column_delta,
                 chip_type=current_player_chip_type,
             )
-            if backward_count >= 4:
+            if backward_count == 4:
                 return True
 
             total_count = (

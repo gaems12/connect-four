@@ -13,14 +13,14 @@ from connect_four.domain import (
     UserId,
     LobbyId,
     PlayerState,
-    Move,
+    ChipLocation,
 )
 
 
 class GameEndReason(StrEnum):
     WIN = "win"
     DRAW = "draw"
-    TIME_IS_UP = "time_is_up"
+    LOSS_BY_TIME = "loss_by_time"
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -33,14 +33,9 @@ class GameCreatedEvent:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class GameStartedEvent:
-    game_id: GameId
-
-
-@dataclass(frozen=True, slots=True, kw_only=True)
 class MoveAcceptedEvent:
     game_id: GameId
-    move: Move
+    chip_location: ChipLocation
     players: dict[UserId, PlayerState]
     current_turn: UserId
 
@@ -48,7 +43,6 @@ class MoveAcceptedEvent:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MoveRejectedEvent:
     game_id: GameId
-    move: Move
     reason: MoveRejectionReason
     players: dict[UserId, PlayerState]
     current_turn: UserId
@@ -57,18 +51,14 @@ class MoveRejectedEvent:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GameEndedEvent:
     game_id: GameId
-    move: Move | None
+    chip_location: ChipLocation | None
     players: dict[UserId, PlayerState]
     reason: GameEndReason
     last_turn: UserId
 
 
 type Event = (
-    GameCreatedEvent
-    | GameStartedEvent
-    | MoveAcceptedEvent
-    | MoveRejectedEvent
-    | GameEndedEvent
+    GameCreatedEvent | MoveAcceptedEvent | MoveRejectedEvent | GameEndedEvent
 )
 
 

@@ -7,7 +7,7 @@ from typing import overload
 from taskiq import InMemoryBroker
 from taskiq_nats import PullBasedJetStreamBroker
 
-from .executors import try_to_lose_on_time
+from .executors import try_to_lose_by_time
 from .middlewares import OperationIdMiddleware, LoggingMiddleware
 
 
@@ -37,6 +37,6 @@ def create_broker(
         broker = InMemoryBroker()
 
     broker.add_middlewares(OperationIdMiddleware(), LoggingMiddleware())
-    broker.register_task(try_to_lose_on_time, task_name="try_to_lose_on_time")
+    broker.register_task(try_to_lose_by_time, task_name="try_to_lose_by_time")
 
     return broker

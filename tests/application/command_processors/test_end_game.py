@@ -19,7 +19,7 @@ from connect_four.domain import (
     EndGame,
 )
 from connect_four.application import (
-    TryToLoseOnTimeTask,
+    TryToLoseByTimeTask,
     EndGameCommand,
     EndGameProcessor,
 )
@@ -74,7 +74,7 @@ async def test_end_game_processor():
 
     game_gateway = FakeGameGateway({_GAME_ID: game})
 
-    task = TryToLoseOnTimeTask(
+    task = TryToLoseByTimeTask(
         id=_GAME_STATE_ID,
         execute_at=datetime.now(timezone.utc) + _TIME_LEFT_FOR_FIRST_PLAYER,
         game_id=_GAME_ID,
