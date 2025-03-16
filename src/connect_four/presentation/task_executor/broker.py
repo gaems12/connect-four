@@ -4,7 +4,7 @@
 
 from typing import overload
 
-from taskiq import InMemoryBroker
+from taskiq import InMemoryBroker, SimpleRetryMiddleware
 from taskiq_nats import PullBasedJetStreamBroker
 
 from .executors import try_to_lose_by_time
@@ -36,7 +36,16 @@ def create_broker(
     else:
         broker = InMemoryBroker()
 
-    broker.add_middlewares(OperationIdMiddleware(), LoggingMiddleware())
-    broker.register_task(try_to_lose_by_time, task_name="try_to_lose_by_time")
+    broker.add_middlewares(
+        OperationIdMiddleware(),
+        LoggingMiddleware(),
+        SimpleRetryMiddleware(),
+    )
+    broker.register_task(
+        try_to_lose_by_time,
+        task_name="try_to_lose_by_time",
+        retry_on_error=True,
+        max_retries=5,
+    )
 
     return broker

@@ -5,6 +5,7 @@
 from dishka.integrations.taskiq import FromDishka, inject
 
 from connect_four.application import (
+    ApplicationError,
     TryToLoseByTimeCommand,
     TryToLoseByTimeProcessor,
 )
@@ -16,4 +17,7 @@ async def try_to_lose_by_time(
     command: TryToLoseByTimeCommand,
     command_processor: FromDishka[TryToLoseByTimeProcessor],
 ) -> None:
-    await command_processor.process(command)
+    try:
+        await command_processor.process(command)
+    except ApplicationError:
+        return
