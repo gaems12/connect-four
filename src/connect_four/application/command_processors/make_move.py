@@ -97,7 +97,7 @@ class MakeMoveProcessor:
         await self._game_gateway.update(game)
 
         if not isinstance(move_result, MoveRejected):
-            await self._task_scheduler.unschedule(old_game_state_id)
+            await self._task_scheduler.unschedule(old_game_state_id.hex)
 
         if isinstance(move_result, MoveAccepted):
             current_player_state = game.players[current_user_id]
@@ -107,7 +107,7 @@ class MakeMoveProcessor:
                 datetime.now(timezone.utc) + time_left_for_current_player
             )
             task = TryToLoseByTimeTask(
-                id=game.state_id,
+                id=game.state_id.hex,
                 execute_at=execute_task_at,
                 game_id=game.id,
                 game_state_id=game.state_id,

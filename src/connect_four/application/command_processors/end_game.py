@@ -47,7 +47,7 @@ class EndGameProcessor:
             raise GameDoesNotExistError()
 
         old_game_state_id = game.state_id
-        await self._task_scheduler.unschedule(old_game_state_id)
+        await self._task_scheduler.unschedule(old_game_state_id.hex)
 
         self._end_game(game)
         await self._game_gateway.update(game)

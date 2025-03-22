@@ -2,7 +2,6 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-from uuid import UUID
 
 from connect_four.domain import GameId, UserId, Game
 from connect_four.application import (
@@ -84,7 +83,7 @@ class FakeEventPublisher(EventPublisher):
 class FakeTaskScheduler(TaskScheduler):
     __slots__ = ("_tasks",)
 
-    def __init__(self, tasks: dict[UUID, Task]):
+    def __init__(self, tasks: dict[str, Task]):
         self._tasks = tasks
 
     @property
@@ -94,7 +93,7 @@ class FakeTaskScheduler(TaskScheduler):
     async def schedule(self, task: Task) -> None:
         self._tasks[task.id] = task
 
-    async def unschedule(self, task_id: UUID) -> None:
+    async def unschedule(self, task_id: str) -> None:
         self._tasks.pop(task_id, None)
 
 

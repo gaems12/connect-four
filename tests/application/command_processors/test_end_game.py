@@ -75,12 +75,12 @@ async def test_end_game_processor():
     game_gateway = FakeGameGateway({_GAME_ID: game})
 
     task = TryToLoseByTimeTask(
-        id=_GAME_STATE_ID,
+        id=_GAME_STATE_ID.hex,
         execute_at=datetime.now(timezone.utc) + _TIME_LEFT_FOR_FIRST_PLAYER,
         game_id=_GAME_ID,
         game_state_id=_GAME_STATE_ID,
     )
-    task_scheduler = FakeTaskScheduler({_GAME_STATE_ID: task})
+    task_scheduler = FakeTaskScheduler({_GAME_STATE_ID.hex: task})
 
     command = EndGameCommand(game_id=_GAME_ID)
     command_processor = EndGameProcessor(
