@@ -9,6 +9,12 @@ from typing import Protocol
 from connect_four.domain import GameId, GameStateId
 
 
+def try_to_lose_by_time_task_id_factory(
+    game_state_id: GameStateId,
+) -> str:
+    return f"try_to_lose_by_time:{game_state_id.hex}"
+
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BaseTask:
     id: str

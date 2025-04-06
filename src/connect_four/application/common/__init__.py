@@ -12,6 +12,7 @@ __all__ = (
     "EventPublisher",
     "SortGamesBy",
     "GameGateway",
+    "try_to_lose_by_time_task_id_factory",
     "TryToLoseByTimeTask",
     "Task",
     "TaskScheduler",
@@ -36,7 +37,12 @@ from .event_publisher import (
     EventPublisher,
 )
 from .game_gateway import SortGamesBy, GameGateway
-from .task_scheduler import TryToLoseByTimeTask, Task, TaskScheduler
+from .task_scheduler import (
+    try_to_lose_by_time_task_id_factory,
+    TryToLoseByTimeTask,
+    Task,
+    TaskScheduler,
+)
 from .transaction_manager import TransactionManager
 from .centrifugo_client import (
     Serializable,

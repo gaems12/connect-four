@@ -25,6 +25,7 @@ from connect_four.application import (
     GameEndedEvent,
     Event,
     EventPublisher,
+    try_to_lose_by_time_task_id_factory,
     TryToLoseByTimeTask,
     TaskScheduler,
     CentrifugoClient,
@@ -97,17 +98,19 @@ class MakeMoveProcessor:
         await self._game_gateway.update(game)
 
         if not isinstance(move_result, MoveRejected):
-            await self._task_scheduler.unschedule(old_game_state_id.hex)
+            task_id = try_to_lose_by_time_task_id_factory(old_game_state_id)
+            await self._task_scheduler.unschedule(task_id)
 
         if isinstance(move_result, MoveAccepted):
             current_player_state = game.players[current_user_id]
             time_left_for_current_player = current_player_state.time_left
 
+            task_id = try_to_lose_by_time_task_id_factory(old_game_state_id)
             execute_task_at = (
                 datetime.now(timezone.utc) + time_left_for_current_player
             )
             task = TryToLoseByTimeTask(
-                id=game.state_id.hex,
+                id=task_id,
                 execute_at=execute_task_at,
                 game_id=game.id,
                 game_state_id=game.state_id,

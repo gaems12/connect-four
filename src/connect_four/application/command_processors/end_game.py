@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from connect_four.domain import GameId, EndGame
 from connect_four.application.common import (
     GameGateway,
+    try_to_lose_by_time_task_id_factory,
     TaskScheduler,
     TransactionManager,
     GameDoesNotExistError,
@@ -46,8 +47,8 @@ class EndGameProcessor:
         if not game:
             raise GameDoesNotExistError()
 
-        old_game_state_id = game.state_id
-        await self._task_scheduler.unschedule(old_game_state_id.hex)
+        task_id = try_to_lose_by_time_task_id_factory(game.state_id)
+        await self._task_scheduler.unschedule(task_id)
 
         self._end_game(game)
         await self._game_gateway.update(game)
