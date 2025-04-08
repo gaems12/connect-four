@@ -77,9 +77,9 @@ async def test_lose_by_time_processor():
         ),
     )
 
-    game_gateway = FakeGameGateway({_GAME_ID: game})
-    event_publisher = FakeEventPublisher([])
-    centrifugo_client = FakeCentrifugoClient({})
+    game_gateway = FakeGameGateway([game])
+    event_publisher = FakeEventPublisher()
+    centrifugo_client = FakeCentrifugoClient()
 
     command = TryToLoseByTimeCommand(
         game_id=_GAME_ID,

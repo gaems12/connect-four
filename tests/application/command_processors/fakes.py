@@ -2,7 +2,6 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-
 from connect_four.domain import GameId, UserId, Game
 from connect_four.application import (
     SortGamesBy,
@@ -19,8 +18,8 @@ from connect_four.application import (
 class FakeGameGateway(GameGateway):
     __slots__ = ("_games",)
 
-    def __init__(self, games: dict[GameId, Game]):
-        self._games = games
+    def __init__(self, games: list[Game] | None = None):
+        self._games = {game.id: game for game in games or []}
 
     @property
     def games(self) -> list[Game]:
@@ -69,8 +68,8 @@ class FakeGameGateway(GameGateway):
 class FakeEventPublisher(EventPublisher):
     __slots__ = ("_events",)
 
-    def __init__(self, events: list[Event]):
-        self._events = events
+    def __init__(self, events: list[Event] | None = None):
+        self._events = events or []
 
     @property
     def events(self) -> list[Event]:
@@ -83,8 +82,8 @@ class FakeEventPublisher(EventPublisher):
 class FakeTaskScheduler(TaskScheduler):
     __slots__ = ("_tasks",)
 
-    def __init__(self, tasks: dict[str, Task]):
-        self._tasks = tasks
+    def __init__(self, tasks: list[Task] | None = None):
+        self._tasks = {task.id: task for task in tasks or []}
 
     @property
     def tasks(self) -> list[Task]:
@@ -100,8 +99,8 @@ class FakeTaskScheduler(TaskScheduler):
 class FakeCentrifugoClient(CentrifugoClient):
     __slots__ = ("_publications",)
 
-    def __init__(self, publications: dict[str, Serializable]):
-        self._publications = publications
+    def __init__(self, publications: dict[str, Serializable] | None = None):
+        self._publications = publications or {}
 
     @property
     def publications(self) -> dict[str, Serializable]:

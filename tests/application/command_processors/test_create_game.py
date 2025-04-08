@@ -40,8 +40,8 @@ _TIME_FOR_EACH_PLAYER: Final = timedelta(minutes=1)
 
 
 async def test_create_game_processor():
-    event_publisher = FakeEventPublisher([])
-    centrifugo_client = FakeCentrifugoClient({})
+    event_publisher = FakeEventPublisher()
+    centrifugo_client = FakeCentrifugoClient()
 
     command = CreateGameCommand(
         game_id=_GAME_ID,
@@ -53,7 +53,7 @@ async def test_create_game_processor():
     )
     command_processor = CreateGameProcessor(
         create_game=CreateGame(),
-        game_gateway=FakeGameGateway({}),
+        game_gateway=FakeGameGateway(),
         event_publisher=event_publisher,
         centrifugo_client=centrifugo_client,
         transaction_manager=AsyncMock(),
