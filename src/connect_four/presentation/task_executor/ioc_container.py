@@ -44,10 +44,10 @@ from connect_four.infrastructure import (
 )
 
 
-def ioc_container_factory() -> AsyncContainer:
+def ioc_container_factory(context: dict | None = None) -> AsyncContainer:
     provider = Provider()
 
-    context = {
+    context = context or {
         CentrifugoConfig: load_centrifugo_config(),
         RedisConfig: load_redis_config(),
         GameMapperConfig: load_game_mapper_config(),

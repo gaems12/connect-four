@@ -22,7 +22,6 @@ from connect_four.domain import (
 )
 from connect_four.application import SortGamesBy
 from connect_four.infrastructure import (
-    get_env_var,
     RedisConfig,
     redis_factory,
     redis_pipeline_factory,
@@ -40,10 +39,7 @@ _PLAYER_2_ID: Final = UserId(uuid7())
 
 
 @pytest.fixture(scope="function")
-async def redis() -> AsyncGenerator[Redis, None]:
-    redis_url = get_env_var("TEST_REDIS_URL")
-    redis_config = RedisConfig(url=redis_url)
-
+async def redis(redis_config: RedisConfig) -> AsyncGenerator[Redis, None]:
     async for redis in redis_factory(redis_config):
         yield redis
 
