@@ -18,7 +18,12 @@ from connect_four.application import (
     MakeMoveProcessor,
 )
 from connect_four.infrastructure import NATSConfig
-from connect_four.presentation.message_consumer import create_broker
+from connect_four.presentation.message_consumer import (
+    create_game,
+    end_game,
+    make_move,
+    create_broker,
+)
 from connect_four.main.message_consumer import create_message_consumer_app
 
 
@@ -77,6 +82,7 @@ async def test_create_game(app: FastStream, broker: NatsBroker):
             subject="connection_hub.connect_four.game.created",
             stream="games",
         )
+        await create_game.wait_call(1)
 
 
 async def test_end_game(app: FastStream, broker: NatsBroker):
@@ -90,6 +96,7 @@ async def test_end_game(app: FastStream, broker: NatsBroker):
             subject="connection_hub.connect_four.game.player_disqualified",
             stream="games",
         )
+        await end_game.wait_call(1)
 
 
 async def test_make_move(app: FastStream, broker: NatsBroker):
@@ -98,14 +105,13 @@ async def test_make_move(app: FastStream, broker: NatsBroker):
         TestNatsBroker(broker=broker, with_real=True) as test_broker,
     ):
         message = {
+            "current_user_id": uuid7().hex,
             "game_id": uuid7().hex,
-            "move": {
-                "column": 0,
-                "row": 0,
-            },
+            "column": 0,
         }
         await test_broker.publish(
             message=message,
             subject="api_gateway.connect_four.game.move_was_made",
             stream="games",
         )
+        await make_move.wait_call(1)

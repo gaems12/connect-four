@@ -24,5 +24,5 @@ class MessageBrokerIdentityProvider(IdentityProvider):
                 "converted to dict.",
             )
 
-        user_id = decoded_message.get("user_id")
+        user_id = decoded_message.get("current_user_id")
         return UserId(UUID(user_id))
