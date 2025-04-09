@@ -10,12 +10,14 @@ from uuid_extensions import uuid7
 
 from connect_four.domain import (
     ChipType,
+    GameStatus,
     BOARD_COLUMNS,
     BOARD_ROWS,
     GameId,
     UserId,
     LobbyId,
     PlayerState,
+    Game,
     CreateGame,
 )
 from connect_four.application import (
@@ -24,6 +26,9 @@ from connect_four.application import (
     CreateGameProcessor,
 )
 from .fakes import (
+    ANY_GAME_ID,
+    ANY_GAME_STATE_ID,
+    ANY_DATETIME,
     FakeGameGateway,
     FakeEventPublisher,
     FakeCentrifugoClient,
@@ -40,6 +45,7 @@ _TIME_FOR_EACH_PLAYER: Final = timedelta(minutes=1)
 
 
 async def test_create_game_processor():
+    game_gateway = FakeGameGateway()
     event_publisher = FakeEventPublisher()
     centrifugo_client = FakeCentrifugoClient()
 
@@ -53,7 +59,7 @@ async def test_create_game_processor():
     )
     command_processor = CreateGameProcessor(
         create_game=CreateGame(),
-        game_gateway=FakeGameGateway(),
+        game_gateway=game_gateway,
         event_publisher=event_publisher,
         centrifugo_client=centrifugo_client,
         transaction_manager=AsyncMock(),
@@ -61,6 +67,7 @@ async def test_create_game_processor():
 
     await command_processor.process(command)
 
+    board = [[None] * BOARD_COLUMNS for _ in range(BOARD_ROWS)]
     players = {
         _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
@@ -71,10 +78,22 @@ async def test_create_game_processor():
             time_left=_TIME_FOR_EACH_PLAYER,
         ),
     }
+    expected_game = Game(
+        id=ANY_GAME_ID,
+        state_id=ANY_GAME_STATE_ID,
+        status=GameStatus.NOT_STARTED,
+        players=players,
+        current_turn=_FIRST_PLAYER_ID,
+        board=board,
+        last_move_made_at=None,
+        created_at=ANY_DATETIME,
+    )
+    assert expected_game in game_gateway.games
+
     expected_event = GameCreatedEvent(
         game_id=_GAME_ID,
         lobby_id=_LOBBY_ID,
-        board=[[None] * BOARD_COLUMNS for _ in range(BOARD_ROWS)],
+        board=board,
         players=players,
         current_turn=_FIRST_PLAYER_ID,
     )

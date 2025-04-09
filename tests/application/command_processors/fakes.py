@@ -2,7 +2,11 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-from connect_four.domain import GameId, UserId, Game
+from typing import Any, Final, cast, overload
+from datetime import datetime
+from uuid import UUID
+
+from connect_four.domain import GameId, GameStateId, UserId, Game
 from connect_four.application import (
     SortGamesBy,
     GameGateway,
@@ -108,3 +112,73 @@ class FakeCentrifugoClient(CentrifugoClient):
 
     async def publish(self, *, channel: str, data: Serializable) -> None:
         self._publications[channel] = data
+
+
+class _Anything:
+    __slots__ = ("_name", "_type")
+
+    def __init__(self, name: str, type_: type):
+        self._name = name
+        self._type = type_
+
+    @classmethod
+    @overload
+    def create[TH: Any](
+        cls,
+        *,
+        name: str,
+        type_: type[Any],
+        type_hint: type[TH],
+    ) -> TH: ...
+
+    @classmethod
+    @overload
+    def create[T: Any](
+        cls,
+        *,
+        name: str,
+        type_: type[T],
+    ) -> T: ...
+
+    @classmethod
+    def create[T: Any, TH: Any](
+        cls,
+        *,
+        name: str,
+        type_: type[T],
+        type_hint: type[TH] | None = None,
+    ) -> T | TH:
+        anything = _Anything(name, type_)
+        if type_hint:
+            return cast(TH, anything)
+
+        return cast(T, anything)
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, self._type):
+            return NotImplemented
+        return True
+
+    def __ne__(self, value: object) -> bool:
+        if not isinstance(value, self._type):
+            return NotImplemented
+        return False
+
+    def __repr__(self) -> str:
+        return f"<{self._name}>"
+
+
+ANY_GAME_ID = _Anything.create(
+    name="ANY_GAME_ID",
+    type_=UUID,
+    type_hint=GameId,
+)
+ANY_GAME_STATE_ID = _Anything.create(
+    name="ANY_GAME_STATE_ID",
+    type_=UUID,
+    type_hint=GameStateId,
+)
+ANY_DATETIME: Final = _Anything.create(
+    name="ANY_DATETIME",
+    type_=datetime,
+)
