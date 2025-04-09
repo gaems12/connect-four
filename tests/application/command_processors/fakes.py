@@ -2,8 +2,7 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-from typing import Any, Final, cast, overload
-from datetime import datetime
+from typing import Any, cast, overload
 from uuid import UUID
 
 from connect_four.domain import GameId, GameStateId, UserId, Game
@@ -168,17 +167,8 @@ class _Anything:
         return f"<{self._name}>"
 
 
-ANY_GAME_ID = _Anything.create(
-    name="ANY_GAME_ID",
-    type_=UUID,
-    type_hint=GameId,
-)
 ANY_GAME_STATE_ID = _Anything.create(
     name="ANY_GAME_STATE_ID",
     type_=UUID,
     type_hint=GameStateId,
-)
-ANY_DATETIME: Final = _Anything.create(
-    name="ANY_DATETIME",
-    type_=datetime,
 )
