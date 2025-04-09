@@ -69,7 +69,9 @@ async def test_create_game_processor():
 
     await command_processor.process(command)
 
-    board = [[None] * BOARD_COLUMNS for _ in range(BOARD_ROWS)]
+    board: list[list[ChipType | None]] = [
+        [None] * BOARD_COLUMNS for _ in range(BOARD_ROWS)
+    ]
     players = {
         _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
