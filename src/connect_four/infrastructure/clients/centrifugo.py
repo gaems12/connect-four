@@ -15,7 +15,7 @@ from connect_four.application import Serializable, CentrifugoClient
 from connect_four.infrastructure.utils import get_env_var
 
 
-_logger = logging.getLogger(__name__)
+_logger: Final = logging.getLogger(__name__)
 
 _MAX_RETRIES: Final = 20
 _BASE_BACKOFF_DELAY: Final = 0.5

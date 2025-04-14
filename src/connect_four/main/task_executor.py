@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+from typing import Final
+
 from taskiq import AsyncBroker
 from dishka import AsyncContainer
 from dishka.integrations.taskiq import setup_dishka
@@ -28,4 +30,4 @@ def create_task_executor_app(
     return broker
 
 
-task_executor = create_task_executor_app()
+task_executor: Final = create_task_executor_app()
