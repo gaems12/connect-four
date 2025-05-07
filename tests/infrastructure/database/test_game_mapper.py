@@ -100,7 +100,7 @@ async def test_game_mapper(redis: Redis, redis_pipeline: Pipeline):
     await transaction_manager.commit()
 
     game_from_database = await game_mapper.by_id(
-        game_id,
+        game_id=game_id,
         acquire=True,
     )
     assert game_from_database == new_game

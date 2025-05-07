@@ -12,14 +12,14 @@ from connect_four.infrastructure.operation_id import OperationId
 from .config import load_logging_config
 
 
-_log_extra: ContextVar[dict] = ContextVar("log_extra", default={})
+_log_extra: ContextVar[dict] = ContextVar("log_extra")
 
 
 def set_operation_id(operation_id: OperationId) -> None:
     """
     Sets the operation ID in the exta context var.
     """
-    current_log_extra = _log_extra.get().copy()
+    current_log_extra = _log_extra.get({})
     current_log_extra["operation_id"] = operation_id
     _log_extra.set(current_log_extra)
 
@@ -28,13 +28,13 @@ def get_operation_id() -> OperationId:
     """
     Returns the operation ID from the exta context var.
     """
-    current_log_extra = _log_extra.get()
+    current_log_extra = _log_extra.get({})
     return current_log_extra["operation_id"]
 
 
 class _ContextVarLogExtraSetterFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        log_extra = _log_extra.get()
+        log_extra = _log_extra.get({})
 
         for key, value in log_extra.items():
             setattr(record, key, value)

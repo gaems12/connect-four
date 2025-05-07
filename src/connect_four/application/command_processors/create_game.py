@@ -67,7 +67,7 @@ class CreateGameProcessor:
             last_game = None
 
         new_game = self._create_game(
-            id=command.game_id,
+            game_id=command.game_id,
             first_player_id=command.first_player_id,
             second_player_id=command.second_player_id,
             created_at=command.created_at,

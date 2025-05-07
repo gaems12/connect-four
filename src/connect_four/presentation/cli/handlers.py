@@ -36,7 +36,7 @@ def _str_to_timedelta(_, tokens: list[Token]) -> timedelta:
 
 
 async def create_game(
-    id: Annotated[
+    game_id: Annotated[
         UUID,
         Parameter("--id", converter=_str_to_uuid),
     ],
@@ -72,7 +72,7 @@ async def create_game(
     set_operation_id(operation_id)
 
     command = CreateGameCommand(
-        game_id=GameId(id),
+        game_id=GameId(game_id),
         lobby_id=LobbyId(lobby_id),
         first_player_id=UserId(first_player_id),
         second_player_id=UserId(second_player_id),
@@ -80,6 +80,7 @@ async def create_game(
         created_at=datetime.now(timezone.utc),
     )
     command_processor = await ioc_container.get(CreateGameProcessor)
+
     try:
         await command_processor.process(command)
     except GameAlreadyExistsError:
@@ -87,7 +88,7 @@ async def create_game(
 
 
 async def end_game(
-    id: Annotated[
+    game_id: Annotated[
         UUID,
         Parameter("--id", converter=_str_to_uuid),
     ],
@@ -96,7 +97,7 @@ async def end_game(
     Ends game. Asks confirmation before exection.
     """
     execution_is_confirmed = rich.prompt.Confirm.ask(
-        f"You are going to end game {id.hex}. Would you like to continue?",
+        f"You are going to end game {game_id.hex}. Would you like to continue?",
     )
     if not execution_is_confirmed:
         return
@@ -106,8 +107,9 @@ async def end_game(
     operation_id = default_operation_id_factory()
     set_operation_id(operation_id)
 
-    command = EndGameCommand(GameId(id))
+    command = EndGameCommand(GameId(game_id))
     command_processor = await ioc_container.get(EndGameProcessor)
+
     try:
         await command_processor.process(command)
     except GameDoesNotExistError:

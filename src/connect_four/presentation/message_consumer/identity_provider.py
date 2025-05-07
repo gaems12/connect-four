@@ -21,8 +21,14 @@ class MessageBrokerIdentityProvider(IdentityProvider):
         if not decoded_message or not isinstance(decoded_message, dict):
             raise Exception(
                 "Message received from message broker cannot be "
-                "converted to dict.",
+                "converted to dict. ",
             )
 
         user_id = decoded_message.get("current_user_id")
-        return UserId(UUID(user_id))
+        if not user_id:
+            raise Exception(
+                "Message received from message borker has no "
+                "'current_user_id'.",
+            )
+
+        return UserId(UUID(user_id))  # type: ignore[arg-type]

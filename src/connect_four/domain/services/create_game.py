@@ -19,7 +19,7 @@ class CreateGame:
     def __call__(
         self,
         *,
-        id: GameId,
+        game_id: GameId,
         first_player_id: UserId,
         second_player_id: UserId,
         created_at: datetime,
@@ -50,7 +50,7 @@ class CreateGame:
             }
 
         return Game(
-            id=id,
+            id=game_id,
             state_id=GameStateId(uuid4()),
             status=GameStatus.NOT_STARTED,
             players=players,

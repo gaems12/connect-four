@@ -15,12 +15,12 @@ class SortGamesBy(IntEnum):
 class GameGateway(Protocol):
     async def by_id(
         self,
-        id: GameId,
+        game_id: GameId,
         *,
         acquire: bool = False,
     ) -> Game | None:
         """
-        Returns game by specified `id`.
+        Returns game by specified `game_id`.
 
         Parameters:
 

@@ -30,11 +30,11 @@ class FakeGameGateway(GameGateway):
 
     async def by_id(
         self,
-        id: GameId,
+        game_id: GameId,
         *,
         acquire: bool = False,
     ) -> Game | None:
-        return self._games.get(id)
+        return self._games.get(game_id)
 
     async def list_by_player_ids(
         self,
