@@ -2,14 +2,19 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-import asyncio
-import random
 import logging
 from urllib.parse import urljoin
 from dataclasses import dataclass
 from typing import Final
 
 from httpx import AsyncClient, Timeout
+from tenacity import (
+    RetryCallState,
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+)
 
 from connect_four.application import Serializable, CentrifugoClient
 from connect_four.infrastructure.utils import get_env_var
@@ -40,6 +45,16 @@ class CentrifugoConfig:
     api_key: str
 
 
+def _log_before_retry(retry_state: RetryCallState) -> None:
+    _logger.debug(
+        {
+            "message": "Going to retry request to centrifugo.",
+            "retry_number": retry_state.attempt_number,
+            "retries_left": _MAX_RETRIES - retry_state.attempt_number,
+        },
+    )
+
+
 class HTTPXCentrifugoClient(CentrifugoClient):
     __slots__ = ("_httpx_client", "_config")
 
@@ -63,6 +78,13 @@ class HTTPXCentrifugoClient(CentrifugoClient):
             retry_on_failure=True,
         )
 
+    @retry(
+        stop=stop_after_attempt(_MAX_RETRIES),
+        wait=wait_exponential(_BASE_BACKOFF_DELAY, _MAX_BACKOFF_DELAY),
+        retry=retry_if_exception_type(CentrifuoClientError),
+        before_sleep=_log_before_retry,
+        reraise=True,
+    )
     async def _send_request(
         self,
         *,
@@ -90,14 +112,6 @@ class HTTPXCentrifugoClient(CentrifugoClient):
             )
             _logger.exception(error_message)
 
-            if retry_on_failure:
-                retries_were_successful = await self._retry_request(
-                    url=url,
-                    json_=json_,
-                )
-                if retries_were_successful:
-                    return
-
             raise CentrifuoClientError(error_message) from error
 
         if response.status_code == 200:
@@ -119,49 +133,4 @@ class HTTPXCentrifugoClient(CentrifugoClient):
             },
         )
 
-        if retry_on_failure:
-            retries_were_successful = await self._retry_request(
-                url=url,
-                json_=json_,
-            )
-            if retries_were_successful:
-                return
-
         raise CentrifuoClientError(error_message)
-
-    async def _retry_request(
-        self,
-        *,
-        url: str,
-        json_: Serializable,
-    ) -> bool:
-        for retry_number in range(1, _MAX_RETRIES + 1):
-            try:
-                _logger.debug(
-                    {
-                        "message": "Going to retry request to centrifugo.",
-                        "retry_number": retry_number,
-                        "retries_left": _MAX_RETRIES - retry_number,
-                    },
-                )
-                await self._send_request(
-                    url=url,
-                    json_=json_,
-                    retry_on_failure=False,
-                )
-                return True
-
-            except CentrifuoClientError:
-                if retry_number == _MAX_RETRIES:
-                    return False
-
-                wait_time = self._calculate_backoff_wait_time(retry_number)
-                await asyncio.sleep(wait_time)
-
-        return False
-
-    def _calculate_backoff_wait_time(self, retry_number: int) -> float:
-        return min(
-            _BASE_BACKOFF_DELAY * (2**retry_number) + random.uniform(0, 0.5),
-            _MAX_BACKOFF_DELAY,
-        )
