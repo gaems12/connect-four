@@ -1,4 +1,4 @@
- Connect Four
+# Connect Four
 
 <p align="left">
    <a>
