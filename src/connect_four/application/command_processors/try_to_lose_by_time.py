@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("TryToLoseByTimeCommand", "TryToLoseByTimeProcessor")
+
 from dataclasses import dataclass
 
 from connect_four.domain import GameId, GameStateId, TryToLoseByTime

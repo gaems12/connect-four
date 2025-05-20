@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("MakeMove",)
+
 from typing import Final
 from datetime import datetime, timezone, timedelta
 from uuid import uuid4

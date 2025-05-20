@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("TryToLoseByTime",)
+
 from datetime import timedelta
 
 from connect_four.domain.identitifiers import GameStateId

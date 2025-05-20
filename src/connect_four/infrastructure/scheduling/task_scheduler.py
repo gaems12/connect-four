@@ -2,6 +2,7 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("TaskiqTaskScheduler",)
 
 from taskiq import ScheduledTask
 from taskiq_redis import RedisScheduleSource

@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("RedisTransactionManager",)
+
 from redis.asyncio.client import Pipeline
 
 from connect_four.application import TransactionManager

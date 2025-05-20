@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("LoggingConfig", "load_logging_config")
+
 from dataclasses import dataclass
 
 from connect_four.infrastructure.utils import get_env_var

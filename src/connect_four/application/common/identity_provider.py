@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("IdentityProvider",)
+
 from typing import Protocol
 
 from connect_four.domain import UserId

@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("BOARD_COLUMNS", "BOARD_ROWS")
+
 from typing import Final
 
 
