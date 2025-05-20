@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("SortGamesBy", "GameGateway")
+
 from typing import Protocol
 from enum import IntEnum, auto
 

@@ -2,6 +2,15 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = (
+    "MoveAccepted",
+    "MoveRejected",
+    "Win",
+    "LossByTime",
+    "Draw",
+    "MoveResult",
+)
+
 from dataclasses import dataclass
 
 from connect_four.domain.constants import MoveRejectionReason

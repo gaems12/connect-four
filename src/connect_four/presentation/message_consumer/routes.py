@@ -2,6 +2,12 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = (
+    "create_game",
+    "end_game",
+    "make_move",
+)
+
 from typing import Final
 
 from faststream.nats import NatsRouter, JStream, PullSub
@@ -19,7 +25,7 @@ from connect_four.application import (
 
 _STREAM: Final = JStream(name="games", declare=False)
 
-router = NatsRouter()
+router: Final = NatsRouter()
 
 
 @router.subscriber(

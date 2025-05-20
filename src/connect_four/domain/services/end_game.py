@@ -2,6 +2,8 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
+__all__ = ("EndGame",)
+
 from uuid import uuid4
 
 from connect_four.domain.identitifiers import GameStateId
