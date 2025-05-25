@@ -4,6 +4,9 @@
 
 __all__ = ("TaskiqTaskScheduler",)
 
+import logging
+from typing import Final
+
 from taskiq import ScheduledTask
 from taskiq_redis import RedisScheduleSource
 
@@ -14,6 +17,9 @@ from connect_four.application import (
     TaskScheduler,
 )
 from connect_four.infrastructure.operation_id import OperationId
+
+
+_logger: Final = logging.getLogger(__name__)
 
 
 class TaskiqTaskScheduler(TaskScheduler):
@@ -39,7 +45,6 @@ class TaskiqTaskScheduler(TaskScheduler):
             game_id=task.game_id,
             game_state_id=task.game_state_id,
         )
-
         schedule = ScheduledTask(
             task_name="try_to_lose_by_time",
             labels={},
@@ -48,6 +53,14 @@ class TaskiqTaskScheduler(TaskScheduler):
             schedule_id=task.id,
             time=task.execute_at,
         )
+
+        _logger.debug(
+            {
+                "message": "Going to schedule a task.",
+                "task": schedule.model_dump(mode="json"),
+            },
+        )
+
         await self._schedule_source.add_schedule(schedule)
 
     async def unschedule(self, task_id: str) -> None:

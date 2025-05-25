@@ -5,6 +5,7 @@
 __all__ = ("NATSEventPublisher",)
 
 import json
+import logging
 from typing import Final
 
 from nats.js.client import JetStreamContext
@@ -29,6 +30,8 @@ _EVENT_TO_SUBJECT_MAP: Final = {
     MoveRejectedEvent: "connect_four.game.move_rejected",
 }
 
+_logger: Final = logging.getLogger(__name__)
+
 
 class NATSEventPublisher:
     __slots__ = ("_jetstream", "_common_retort", "_operation_id")
@@ -49,6 +52,13 @@ class NATSEventPublisher:
         event_as_dict = self._common_retort.dump(event)
         event_as_dict["operation_id"] = str(self._operation_id)
         payload = json.dumps(event_as_dict).encode()
+
+        _logger.debug(
+            {
+                "message": "Going to send message to nats.",
+                "data": event_as_dict,
+            },
+        )
 
         await self._jetstream.publish(
             subject=subject,
