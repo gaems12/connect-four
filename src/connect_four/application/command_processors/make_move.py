@@ -123,7 +123,7 @@ class MakeMoveProcessor:
             game=game,
             move_result=move_result,
         )
-        await self._publish_data_to_centrifugo(
+        await self._make_requests_to_centrifugo(
             game=game,
             move_result=move_result,
         )
@@ -166,7 +166,7 @@ class MakeMoveProcessor:
 
         await self._event_publisher.publish(event)
 
-    async def _publish_data_to_centrifugo(
+    async def _make_requests_to_centrifugo(
         self,
         *,
         game: Game,

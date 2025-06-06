@@ -81,7 +81,7 @@ class MakeMove:
         current_player_id: UserId,
     ) -> MoveRejectionReason | None:
         if current_player_id not in game.players:
-            raise Exception("There is no current player in the game")
+            raise Exception("There is no current player in the game.")
 
         if game.status == GameStatus.ENDED:
             return MoveRejectionReason.GAME_IS_ENDED
@@ -124,12 +124,11 @@ class MakeMove:
             return False
 
         time_for_move = current_datetime - game.last_move_made_at  # type: ignore
-        time_left_for_current_player = game.players[
-            current_player_id
-        ].time_left
+        current_player_state = game.players[current_player_id]
+        time_left_for_current_player = current_player_state.time_left
 
         if time_for_move >= time_left_for_current_player:
-            game.players[current_player_id].time_left = timedelta(seconds=0)
+            current_player_state.time_left = timedelta(seconds=0)
             game.last_move_made_at = current_datetime
 
             game.state_id = GameStateId(uuid4())
@@ -137,7 +136,7 @@ class MakeMove:
 
             return True
 
-        game.players[current_player_id].time_left -= time_for_move
+        current_player_state.time_left -= time_for_move
         game.last_move_made_at = current_datetime
 
         return False
