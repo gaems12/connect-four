@@ -18,13 +18,13 @@ class NATSStreamCreator:
         games_stream_config = StreamConfig(
             name="games",
             subjects=[
-                "connect_four.game.created",
-                "connect_four.game.ended",
-                "connect_four.game.move_accepted",
-                "connect_four.game.move_rejected",
-                "connection_hub.connect_four.game.created",
-                "connection_hub.connect_four.game.player_disqualified",
-                "api_gateway.connect_four.game.move_was_made",
+                "gaems12.connect_four.game.created",
+                "gaems12.connect_four.game.ended",
+                "gaems12.connect_four.game.move_accepted",
+                "gaems12.connect_four.game.move_rejected",
+                "gaems12.connection_hub.connect_four.game.created",
+                "gaems12.connection_hub.connect_four.game.player_disqualified",
+                "gaems12.api_gateway.connect_four.game.move_was_made",
             ],
         )
         await self._jetstream.add_stream(games_stream_config)

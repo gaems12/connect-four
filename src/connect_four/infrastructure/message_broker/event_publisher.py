@@ -24,10 +24,10 @@ from connect_four.infrastructure.operation_id import OperationId
 _STREAM: Final = "games"
 
 _EVENT_TO_SUBJECT_MAP: Final = {
-    GameCreatedEvent: "connect_four.game.created",
-    GameEndedEvent: "connect_four.game.ended",
-    MoveAcceptedEvent: "connect_four.game.move_accepted",
-    MoveRejectedEvent: "connect_four.game.move_rejected",
+    GameCreatedEvent: "gaems12.connect_four.game.created",
+    GameEndedEvent: "gaems12.connect_four.game.ended",
+    MoveAcceptedEvent: "gaems12.connect_four.game.move_accepted",
+    MoveRejectedEvent: "gaems12.connect_four.game.move_rejected",
 }
 
 _logger: Final = logging.getLogger(__name__)

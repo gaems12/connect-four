@@ -79,7 +79,7 @@ async def test_create_game(app: FastStream, broker: NatsBroker):
         }
         await test_broker.publish(
             message=message,
-            subject="connection_hub.connect_four.game.created",
+            subject="gaems12.connection_hub.connect_four.game.created",
             stream="games",
         )
         await create_game.wait_call(1)
@@ -93,7 +93,7 @@ async def test_end_game(app: FastStream, broker: NatsBroker):
         message = {"game_id": uuid7().hex}
         await test_broker.publish(
             message=message,
-            subject="connection_hub.connect_four.game.player_disqualified",
+            subject="gaems12.connection_hub.connect_four.game.player_disqualified",
             stream="games",
         )
         await end_game.wait_call(1)
@@ -111,7 +111,7 @@ async def test_make_move(app: FastStream, broker: NatsBroker):
         }
         await test_broker.publish(
             message=message,
-            subject="api_gateway.connect_four.game.move_was_made",
+            subject="gaems12.api_gateway.connect_four.game.move_was_made",
             stream="games",
         )
         await make_move.wait_call(1)

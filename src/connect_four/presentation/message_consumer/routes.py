@@ -29,7 +29,7 @@ router: Final = NatsRouter()
 
 
 @router.subscriber(
-    subject="connection_hub.connect_four.game.created",
+    subject="gaems12.connection_hub.connect_four.game.created",
     durable="connect_four_game_created",
     stream=_STREAM,
     pull_sub=PullSub(timeout=0.2),
@@ -44,7 +44,7 @@ async def create_game(
 
 
 @router.subscriber(
-    subject="connection_hub.connect_four.game.player_disqualified",
+    subject="gaems12.connection_hub.connect_four.game.player_disqualified",
     durable="connect_four_game_player_disqualified",
     stream=_STREAM,
     pull_sub=PullSub(timeout=0.2),
@@ -59,7 +59,7 @@ async def end_game(
 
 
 @router.subscriber(
-    subject="api_gateway.connect_four.game.move_was_made",
+    subject="gaems12.api_gateway.connect_four.game.move_was_made",
     durable="connect_four_game_move_was_made",
     stream=_STREAM,
     pull_sub=PullSub(timeout=0.2),
