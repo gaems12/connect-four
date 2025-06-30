@@ -13,6 +13,7 @@ from connect_four.application.common import (
     GameGateway,
     GameCreatedEvent,
     EventPublisher,
+    Serializable,
     CentrifugoClient,
     centrifugo_lobby_channel_factory,
     TransactionManager,
@@ -87,14 +88,14 @@ class CreateGameProcessor:
         )
         await self._event_publisher.publish(event)
 
-        players = {
+        players: Serializable = {
             player_id.hex: {
                 "chip_type": player_state.chip_type.value,
-                "time_left": player_state.time_left.total_seconds(),  # type: ignore[arg-type]
+                "time_left": player_state.time_left.total_seconds(),
             }
             for player_id, player_state in new_game.players.items()
         }
-        centrifugo_publication = {
+        centrifugo_publication: Serializable = {
             "type": "game_created",
             "game_id": new_game.id.hex,
             "players": players,
@@ -102,7 +103,7 @@ class CreateGameProcessor:
         }
         await self._centrifugo_client.publish(
             channel=centrifugo_lobby_channel_factory(command.lobby_id),
-            data=centrifugo_publication,  # type: ignore[arg-type]
+            data=centrifugo_publication,
         )
 
         await self._transaction_manager.commit()

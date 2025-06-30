@@ -30,6 +30,7 @@ from connect_four.application import (
     try_to_lose_by_time_task_id_factory,
     TryToLoseByTimeTask,
     TaskScheduler,
+    Serializable,
     CentrifugoClient,
     centrifugo_game_channel_factory,
     TransactionManager,
@@ -172,6 +173,10 @@ class MakeMoveProcessor:
         game: Game,
         move_result: MoveResult,
     ) -> None:
+        raw_chip_location: Serializable
+        raw_players: Serializable
+        centrifugo_publication: Serializable
+
         if isinstance(move_result, MoveAccepted):
             raw_chip_location = {
                 "row": move_result.chip_location.row,
@@ -186,8 +191,8 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "move_accepted",
-                "chip_location": raw_chip_location,  # type: ignore[dict-item]
-                "players": raw_players,  # type: ignore[dict-item]
+                "chip_location": raw_chip_location,
+                "players": raw_players,
                 "current_turn": game.current_turn.hex,
             }
 
@@ -201,7 +206,7 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "move_rejected",
-                "players": raw_players,  # type: ignore[dict-item]
+                "players": raw_players,
                 "reason": move_result.reason,
                 "current_turn": game.current_turn.hex,
             }
@@ -222,13 +227,13 @@ class MakeMoveProcessor:
             }
             centrifugo_publication = {
                 "type": "game_ended",
-                "chip_location": raw_chip_location,  # type: ignore[dict-item]
-                "players": raw_players,  # type: ignore[dict-item]
+                "chip_location": raw_chip_location,
+                "players": raw_players,
                 "reason": reason,
                 "last_turn": game.current_turn.hex,
             }
 
         await self._centrifugo_client.publish(
             channel=centrifugo_game_channel_factory(game.id),
-            data=centrifugo_publication,  # type: ignore[arg-type]
+            data=centrifugo_publication,
         )

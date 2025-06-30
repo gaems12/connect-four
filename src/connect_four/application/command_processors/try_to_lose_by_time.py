@@ -12,6 +12,7 @@ from connect_four.application.common import (
     GameEndReason,
     GameEndedEvent,
     EventPublisher,
+    Serializable,
     CentrifugoClient,
     centrifugo_game_channel_factory,
     TransactionManager,
@@ -74,14 +75,14 @@ class TryToLoseByTimeProcessor:
         )
         await self._event_publisher.publish(event)
 
-        players = {
+        players: Serializable = {
             player_id.hex: {
                 "chip_type": player_state.chip_type.value,
                 "time_left": player_state.time_left.total_seconds(),
             }
             for player_id, player_state in game.players.items()
         }
-        centrifugo_publication = {
+        centrifugo_publication: Serializable = {
             "type": "game_ended",
             "chip_location": None,
             "players": players,
@@ -90,7 +91,7 @@ class TryToLoseByTimeProcessor:
         }
         await self._centrifugo_client.publish(
             channel=centrifugo_game_channel_factory(game.id),
-            data=centrifugo_publication,  # type: ignore[arg-type]
+            data=centrifugo_publication,
         )
 
         await self._transaction_manager.commit()
