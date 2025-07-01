@@ -12,7 +12,13 @@ from cyclopts import Parameter, Token
 import rich
 import rich.prompt
 
-from connect_four.domain import GameId, UserId, LobbyId
+from connect_four.domain import (
+    CommunicatonType,
+    GameId,
+    UserId,
+    LobbyId,
+    Player,
+)
 from connect_four.application import (
     CreateGameCommand,
     CreateGameProcessor,
@@ -37,6 +43,10 @@ def _str_to_timedelta(_, tokens: list[Token]) -> timedelta:
     return str_to_timedelta(tokens[0].value)
 
 
+def _str_to_communication_type(_, tokens: list[Token]) -> CommunicatonType:
+    return CommunicatonType(tokens[0].value)
+
+
 async def create_game(
     game_id: Annotated[
         UUID,
@@ -50,13 +60,31 @@ async def create_game(
         UUID,
         Parameter("--first-player-id", converter=_str_to_uuid),
     ],
+    first_player_time: Annotated[
+        timedelta,
+        Parameter("--first-player-time", converter=_str_to_timedelta),
+    ],
+    first_player_communication: Annotated[
+        CommunicatonType,
+        Parameter(
+            "--first-player-communication",
+            converter=_str_to_communication_type,
+        ),
+    ],
     second_player_id: Annotated[
         UUID,
         Parameter("--second-player-id", converter=_str_to_uuid),
     ],
-    time_for_each_player: Annotated[
+    second_player_time: Annotated[
         timedelta,
-        Parameter("--time-for-each-player", converter=_str_to_timedelta),
+        Parameter("--second-player-time", converter=_str_to_timedelta),
+    ],
+    second_player_communication: Annotated[
+        CommunicatonType,
+        Parameter(
+            "--second-player-communication",
+            converter=_str_to_communication_type,
+        ),
     ],
 ) -> None:
     """
@@ -73,12 +101,21 @@ async def create_game(
     operation_id = default_operation_id_factory()
     set_operation_id(operation_id)
 
+    first_player = Player(
+        id=UserId(first_player_id),
+        time=first_player_time,
+        communication_type=first_player_communication,
+    )
+    second_player = Player(
+        id=UserId(second_player_id),
+        time=second_player_time,
+        communication_type=second_player_communication,
+    )
     command = CreateGameCommand(
         game_id=GameId(game_id),
         lobby_id=LobbyId(lobby_id),
-        first_player_id=UserId(first_player_id),
-        second_player_id=UserId(second_player_id),
-        time_for_each_player=time_for_each_player,
+        first_player=first_player,
+        second_player=second_player,
         created_at=datetime.now(timezone.utc),
     )
     command_processor = await ioc_container.get(CreateGameProcessor)
@@ -99,7 +136,8 @@ async def end_game(
     Ends game. Asks confirmation before exection.
     """
     execution_is_confirmed = rich.prompt.Confirm.ask(
-        f"You are going to end game {game_id.hex}. Would you like to continue?",
+        f"You are going to end game {game_id.hex}. "
+        "Would you like to continue?",
     )
     if not execution_is_confirmed:
         return

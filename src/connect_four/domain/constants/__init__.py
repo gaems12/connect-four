@@ -6,3 +6,4 @@ from .chip_type import *
 from .game_status import *
 from .move_rejection_reason import *
 from .board import *
+from .communication_type import *

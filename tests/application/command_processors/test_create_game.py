@@ -10,8 +10,9 @@ import pytest
 from uuid_extensions import uuid7
 
 from connect_four.domain import (
-    ChipType,
     GameStatus,
+    ChipType,
+    CommunicatonType,
     BOARD_COLUMNS,
     BOARD_ROWS,
     GameId,
@@ -20,6 +21,7 @@ from connect_four.domain import (
     LobbyId,
     PlayerState,
     Game,
+    Player,
     CreateGame,
 )
 from connect_four.application import (
@@ -38,10 +40,15 @@ from .fakes import (
 
 _GAME_ID: Final = GameId(uuid7())
 _GAME_STATE_ID: Final = GameStateId(uuid7())
-_FIRST_PLAYER_ID: Final = UserId(uuid7())
-_SECOND_PLAYER_ID: Final = UserId(uuid7())
-_TIME_FOR_EACH_PLAYER: Final = timedelta(minutes=1)
 _CREATED_AT: Final = datetime.now(timezone.utc)
+
+_FIRST_PLAYER_ID: Final = UserId(uuid7())
+_FIRST_PLAYER_TIME: Final = timedelta(minutes=1)
+_FIRST_PLAYER_COMMUNICATION_TYPE: Final = CommunicatonType.CENTRIFUGO
+
+_SECOND_PLAYER_ID: Final = UserId(uuid7())
+_SECOND_PLAYER_TIME: Final = timedelta(minutes=1)
+_SECOND_PLAYER_COMMUNICATION_TYPE: Final = CommunicatonType.CENTRIFUGO
 
 _LOBBY_ID: Final = LobbyId(uuid7())
 
@@ -51,12 +58,21 @@ async def test_create_game_processor():
     event_publisher = FakeEventPublisher()
     centrifugo_client = FakeCentrifugoClient()
 
+    first_player = Player(
+        id=_FIRST_PLAYER_ID,
+        time=_FIRST_PLAYER_TIME,
+        communication_type=_FIRST_PLAYER_COMMUNICATION_TYPE,
+    )
+    second_player = Player(
+        id=_SECOND_PLAYER_ID,
+        time=_SECOND_PLAYER_TIME,
+        communication_type=_SECOND_PLAYER_COMMUNICATION_TYPE,
+    )
     command = CreateGameCommand(
         game_id=_GAME_ID,
         lobby_id=_LOBBY_ID,
-        first_player_id=_FIRST_PLAYER_ID,
-        second_player_id=_SECOND_PLAYER_ID,
-        time_for_each_player=_TIME_FOR_EACH_PLAYER,
+        first_player=first_player,
+        second_player=second_player,
         created_at=_CREATED_AT,
     )
     command_processor = CreateGameProcessor(
@@ -75,11 +91,13 @@ async def test_create_game_processor():
     players = {
         _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
-            time_left=_TIME_FOR_EACH_PLAYER,
+            time_left=_FIRST_PLAYER_TIME,
+            communication_type=_FIRST_PLAYER_COMMUNICATION_TYPE,
         ),
         _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
-            time_left=_TIME_FOR_EACH_PLAYER,
+            time_left=_SECOND_PLAYER_TIME,
+            communication_type=_SECOND_PLAYER_COMMUNICATION_TYPE,
         ),
     }
     expected_game = Game(
@@ -106,11 +124,11 @@ async def test_create_game_processor():
     centrifugo_publication_players = {
         _FIRST_PLAYER_ID.hex: {
             "chip_type": ChipType.FIRST,
-            "time_left": _TIME_FOR_EACH_PLAYER.total_seconds(),
+            "time_left": _FIRST_PLAYER_TIME.total_seconds(),
         },
         _SECOND_PLAYER_ID.hex: {
             "chip_type": ChipType.SECOND,
-            "time_left": _TIME_FOR_EACH_PLAYER.total_seconds(),
+            "time_left": _SECOND_PLAYER_TIME.total_seconds(),
         },
     }
     expected_centrifugo_publication = {
@@ -129,11 +147,13 @@ async def test_create_game_processor_errors():
     players = {
         _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
-            time_left=_TIME_FOR_EACH_PLAYER,
+            time_left=_FIRST_PLAYER_TIME,
+            communication_type=_FIRST_PLAYER_COMMUNICATION_TYPE,
         ),
         _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
-            time_left=_TIME_FOR_EACH_PLAYER,
+            time_left=_SECOND_PLAYER_TIME,
+            communication_type=_SECOND_PLAYER_COMMUNICATION_TYPE,
         ),
     }
     game = Game(
@@ -151,12 +171,21 @@ async def test_create_game_processor_errors():
     event_publisher = FakeEventPublisher()
     centrifugo_client = FakeCentrifugoClient()
 
+    first_player = Player(
+        id=_FIRST_PLAYER_ID,
+        time=_FIRST_PLAYER_TIME,
+        communication_type=_FIRST_PLAYER_COMMUNICATION_TYPE,
+    )
+    second_player = Player(
+        id=_SECOND_PLAYER_ID,
+        time=_SECOND_PLAYER_TIME,
+        communication_type=_SECOND_PLAYER_COMMUNICATION_TYPE,
+    )
     command = CreateGameCommand(
         game_id=_GAME_ID,
         lobby_id=_LOBBY_ID,
-        first_player_id=_FIRST_PLAYER_ID,
-        second_player_id=_SECOND_PLAYER_ID,
-        time_for_each_player=_TIME_FOR_EACH_PLAYER,
+        first_player=first_player,
+        second_player=second_player,
         created_at=_CREATED_AT,
     )
     command_processor = CreateGameProcessor(

@@ -10,13 +10,14 @@ from redis.asyncio.client import Redis, Pipeline
 from uuid_extensions import uuid7
 
 from connect_four.domain import (
+    GameStatus,
+    ChipType,
+    CommunicatonType,
     GameId,
     GameStateId,
     UserId,
     BOARD_ROWS,
     BOARD_COLUMNS,
-    ChipType,
-    GameStatus,
     PlayerState,
     Game,
 )
@@ -79,10 +80,12 @@ async def test_game_mapper(redis: Redis, redis_pipeline: Pipeline):
         _PLAYER_1_ID: PlayerState(
             chip_type=ChipType.FIRST,
             time_left=timedelta(minutes=1),
+            communication_type=CommunicatonType.CENTRIFUGO,
         ),
         _PLAYER_2_ID: PlayerState(
             chip_type=ChipType.SECOND,
             time_left=timedelta(minutes=1),
+            communication_type=CommunicatonType.CENTRIFUGO,
         ),
     }
 

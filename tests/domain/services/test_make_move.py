@@ -9,12 +9,13 @@ from typing import Final
 from uuid_extensions import uuid7
 
 from connect_four.domain import (
+    GameStatus,
+    ChipType,
+    MoveRejectionReason,
+    CommunicatonType,
     GameId,
     GameStateId,
     UserId,
-    ChipType,
-    GameStatus,
-    MoveRejectionReason,
     PlayerState,
     ChipLocation,
     Game,
@@ -25,19 +26,21 @@ from connect_four.domain import (
 )
 
 
-_PLAYER_1_ID: Final = UserId(uuid7())
-_PLAYER_2_ID: Final = UserId(uuid7())
+_FIRST_PLAYER_ID: Final = UserId(uuid7())
+_SECOND_PLAYER_ID: Final = UserId(uuid7())
 
 
 def test_draw():
     players = {
-        _PLAYER_1_ID: PlayerState(
+        _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
             time_left=timedelta(minutes=1),
+            communication_type=CommunicatonType.CENTRIFUGO,
         ),
-        _PLAYER_2_ID: PlayerState(
+        _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
             time_left=timedelta(minutes=1),
+            communication_type=CommunicatonType.CENTRIFUGO,
         ),
     }
 
@@ -123,7 +126,7 @@ def test_draw():
         state_id=GameStateId(uuid7()),
         status=GameStatus.IN_PROGRESS,
         players=players,
-        current_turn=_PLAYER_1_ID,
+        current_turn=_FIRST_PLAYER_ID,
         board=board,
         last_move_made_at=datetime.now(timezone.utc),
         created_at=datetime.now(timezone.utc) - timedelta(minutes=1),
@@ -131,7 +134,7 @@ def test_draw():
 
     move_result = MakeMove()(
         game=game,
-        current_player_id=_PLAYER_1_ID,
+        current_player_id=_FIRST_PLAYER_ID,
         column=5,
     )
     expected_move_result = Draw(ChipLocation(column=5, row=0))
@@ -271,13 +274,15 @@ def test_win(
     expected_chip_location: ChipLocation,
 ):
     players = {
-        _PLAYER_1_ID: PlayerState(
+        _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
             time_left=timedelta(minutes=1),
+            communication_type=CommunicatonType.CENTRIFUGO,
         ),
-        _PLAYER_2_ID: PlayerState(
+        _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
             time_left=timedelta(minutes=1),
+            communication_type=CommunicatonType.CENTRIFUGO,
         ),
     }
     game = Game(
@@ -285,7 +290,7 @@ def test_win(
         state_id=GameStateId(uuid7()),
         status=GameStatus.IN_PROGRESS,
         players=players,
-        current_turn=_PLAYER_1_ID,
+        current_turn=_FIRST_PLAYER_ID,
         board=board,
         last_move_made_at=datetime.now(timezone.utc),
         created_at=datetime.now(timezone.utc) - timedelta(minutes=1),
@@ -293,7 +298,7 @@ def test_win(
 
     move_result = MakeMove()(
         game=game,
-        current_player_id=_PLAYER_1_ID,
+        current_player_id=_FIRST_PLAYER_ID,
         column=column,
     )
     expected_move_result = Win(expected_chip_location)
@@ -382,13 +387,15 @@ def test_illegal_move(
     column: int,
 ):
     players = {
-        _PLAYER_1_ID: PlayerState(
+        _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
             time_left=timedelta(minutes=1),
+            communication_type=CommunicatonType.CENTRIFUGO,
         ),
-        _PLAYER_2_ID: PlayerState(
+        _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
             time_left=timedelta(minutes=1),
+            communication_type=CommunicatonType.CENTRIFUGO,
         ),
     }
 
@@ -397,7 +404,7 @@ def test_illegal_move(
         state_id=GameStateId(uuid7()),
         status=GameStatus.IN_PROGRESS,
         players=players,
-        current_turn=_PLAYER_1_ID,
+        current_turn=_FIRST_PLAYER_ID,
         board=board,
         last_move_made_at=datetime.now(timezone.utc),
         created_at=datetime.now(timezone.utc) - timedelta(minutes=1),
@@ -405,7 +412,7 @@ def test_illegal_move(
 
     move_result = MakeMove()(
         game=game,
-        current_player_id=_PLAYER_1_ID,
+        current_player_id=_FIRST_PLAYER_ID,
         column=column,
     )
     expected_move_result = MoveRejected(MoveRejectionReason.ILLEGAL_MOVE)

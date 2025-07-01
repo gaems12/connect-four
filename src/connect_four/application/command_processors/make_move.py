@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from typing import Final
 
 from connect_four.domain import (
+    CommunicatonType,
     GameId,
     Game,
     MoveAccepted,
@@ -124,10 +125,22 @@ class MakeMoveProcessor:
             game=game,
             move_result=move_result,
         )
-        await self._make_requests_to_centrifugo(
-            game=game,
-            move_result=move_result,
+
+        player_communication_types = (
+            player_state.communication_type
+            for player_state in game.players.values()
         )
+        should_make_requests_to_centrifugo = any(
+            (
+                nt == CommunicatonType.CENTRIFUGO
+                for nt in player_communication_types
+            ),
+        )
+        if should_make_requests_to_centrifugo:
+            await self._make_requests_to_centrifugo(
+                game=game,
+                move_result=move_result,
+            )
 
         await self._transaction_manager.commit()
 

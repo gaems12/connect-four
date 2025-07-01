@@ -11,6 +11,7 @@ from uuid_extensions import uuid7
 
 from connect_four.domain import (
     ChipType,
+    CommunicatonType,
     MoveRejectionReason,
     BOARD_COLUMNS,
     BOARD_ROWS,
@@ -61,10 +62,12 @@ async def nats_jetstream(
                 _FIRST_PLAYER_ID: PlayerState(
                     chip_type=ChipType.FIRST,
                     time_left=timedelta(minutes=1),
+                    communication_type=CommunicatonType.CENTRIFUGO,
                 ),
                 _SECOND_PLAYER_ID: PlayerState(
                     chip_type=ChipType.SECOND,
                     time_left=timedelta(minutes=1),
+                    communication_type=CommunicatonType.CENTRIFUGO,
                 ),
             },
             current_turn=_FIRST_PLAYER_ID,
@@ -76,10 +79,12 @@ async def nats_jetstream(
                 _FIRST_PLAYER_ID: PlayerState(
                     chip_type=ChipType.FIRST,
                     time_left=timedelta(seconds=50),
+                    communication_type=CommunicatonType.CENTRIFUGO,
                 ),
                 _SECOND_PLAYER_ID: PlayerState(
                     chip_type=ChipType.SECOND,
                     time_left=timedelta(minutes=1),
+                    communication_type=CommunicatonType.CENTRIFUGO,
                 ),
             },
             current_turn=_SECOND_PLAYER_ID,
@@ -91,10 +96,12 @@ async def nats_jetstream(
                 _FIRST_PLAYER_ID: PlayerState(
                     chip_type=ChipType.FIRST,
                     time_left=timedelta(seconds=50),
+                    communication_type=CommunicatonType.CENTRIFUGO,
                 ),
                 _SECOND_PLAYER_ID: PlayerState(
                     chip_type=ChipType.SECOND,
                     time_left=timedelta(minutes=1),
+                    communication_type=CommunicatonType.CENTRIFUGO,
                 ),
             },
             current_turn=_FIRST_PLAYER_ID,
@@ -106,10 +113,12 @@ async def nats_jetstream(
                 _FIRST_PLAYER_ID: PlayerState(
                     chip_type=ChipType.FIRST,
                     time_left=timedelta(seconds=50),
+                    communication_type=CommunicatonType.CENTRIFUGO,
                 ),
                 _SECOND_PLAYER_ID: PlayerState(
                     chip_type=ChipType.SECOND,
                     time_left=timedelta(seconds=40),
+                    communication_type=CommunicatonType.CENTRIFUGO,
                 ),
             },
             reason=GameEndReason.DRAW,

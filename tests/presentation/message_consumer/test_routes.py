@@ -69,12 +69,21 @@ async def test_create_game(app: FastStream, broker: NatsBroker):
         TestApp(app),
         TestNatsBroker(broker, with_real=True) as test_broker,
     ):
+        first_player = {
+            "id": uuid7().hex,
+            "time": timedelta(minutes=3),
+            "communication_type": "centrifugo",
+        }
+        second_player = {
+            "id": uuid7().hex,
+            "time": timedelta(minutes=3),
+            "communication_type": "other",
+        }
         message = {
             "game_id": uuid7().hex,
             "lobby_id": uuid7().hex,
-            "first_player_id": uuid7().hex,
-            "second_player_id": uuid7().hex,
-            "time_for_each_player": timedelta(minutes=3),
+            "first_player": first_player,
+            "second_player": second_player,
             "created_at": datetime.now(timezone.utc),
         }
         await test_broker.publish(

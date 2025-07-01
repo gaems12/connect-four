@@ -6,7 +6,13 @@ __all__ = ("TryToLoseByTimeCommand", "TryToLoseByTimeProcessor")
 
 from dataclasses import dataclass
 
-from connect_four.domain import GameId, GameStateId, TryToLoseByTime
+from connect_four.domain import (
+    CommunicatonType,
+    GameId,
+    GameStateId,
+    Game,
+    TryToLoseByTime,
+)
 from connect_four.application.common import (
     GameGateway,
     GameEndReason,
@@ -75,6 +81,22 @@ class TryToLoseByTimeProcessor:
         )
         await self._event_publisher.publish(event)
 
+        player_communication_types = (
+            player_state.communication_type
+            for player_state in game.players.values()
+        )
+        should_make_requests_to_centrifugo = any(
+            (
+                nt == CommunicatonType.CENTRIFUGO
+                for nt in player_communication_types
+            ),
+        )
+        if should_make_requests_to_centrifugo:
+            await self._make_requests_to_centrifugo(game)
+
+        await self._transaction_manager.commit()
+
+    async def _make_requests_to_centrifugo(self, game: Game) -> None:
         players: Serializable = {
             player_id.hex: {
                 "chip_type": player_state.chip_type.value,
@@ -93,5 +115,3 @@ class TryToLoseByTimeProcessor:
             channel=centrifugo_game_channel_factory(game.id),
             data=centrifugo_publication,
         )
-
-        await self._transaction_manager.commit()

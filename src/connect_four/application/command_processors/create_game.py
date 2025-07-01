@@ -5,9 +5,16 @@
 __all__ = ("CreateGameCommand", "CreateGameProcessor")
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from connect_four.domain import UserId, GameId, LobbyId, CreateGame
+from connect_four.domain import (
+    CommunicatonType,
+    GameId,
+    LobbyId,
+    Game,
+    Player,
+    CreateGame,
+)
 from connect_four.application.common import (
     SortGamesBy,
     GameGateway,
@@ -25,9 +32,8 @@ from connect_four.application.common import (
 class CreateGameCommand:
     game_id: GameId
     lobby_id: LobbyId
-    first_player_id: UserId
-    second_player_id: UserId
-    time_for_each_player: timedelta
+    first_player: Player
+    second_player: Player
     created_at: datetime
 
 
@@ -60,7 +66,7 @@ class CreateGameProcessor:
             raise GameAlreadyExistsError()
 
         games = await self._game_gateway.list_by_player_ids(
-            player_ids=(command.first_player_id, command.second_player_id),
+            player_ids=(command.first_player.id, command.second_player.id),
             sort_by=SortGamesBy.DESC_CREATED_AT,
             limit=1,
         )
@@ -71,10 +77,9 @@ class CreateGameProcessor:
 
         new_game = self._create_game(
             game_id=command.game_id,
-            first_player_id=command.first_player_id,
-            second_player_id=command.second_player_id,
+            first_player=command.first_player,
+            second_player=command.second_player,
             created_at=command.created_at,
-            time_for_each_player=command.time_for_each_player,
             last_game=last_game,
         )
         await self._game_gateway.save(new_game)
@@ -88,9 +93,33 @@ class CreateGameProcessor:
         )
         await self._event_publisher.publish(event)
 
+        player_communication_types = (
+            command.first_player.communication_type,
+            command.second_player.communication_type,
+        )
+        should_make_requests_to_centrifugo = any(
+            (
+                nt == CommunicatonType.CENTRIFUGO
+                for nt in player_communication_types
+            ),
+        )
+        if should_make_requests_to_centrifugo:
+            await self._make_requests_to_centrifugo(
+                lobby_id=command.lobby_id,
+                new_game=new_game,
+            )
+
+        await self._transaction_manager.commit()
+
+    async def _make_requests_to_centrifugo(
+        self,
+        *,
+        lobby_id: LobbyId,
+        new_game: Game,
+    ) -> None:
         players: Serializable = {
             player_id.hex: {
-                "chip_type": player_state.chip_type.value,
+                "chip_type": player_state.chip_type,
                 "time_left": player_state.time_left.total_seconds(),
             }
             for player_id, player_state in new_game.players.items()
@@ -102,8 +131,6 @@ class CreateGameProcessor:
             "current_turn": new_game.current_turn.hex,
         }
         await self._centrifugo_client.publish(
-            channel=centrifugo_lobby_channel_factory(command.lobby_id),
+            channel=centrifugo_lobby_channel_factory(lobby_id),
             data=centrifugo_publication,
         )
-
-        await self._transaction_manager.commit()

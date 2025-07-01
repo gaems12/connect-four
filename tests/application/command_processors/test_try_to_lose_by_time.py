@@ -11,6 +11,7 @@ from uuid_extensions import uuid7
 from connect_four.domain import (
     GameStatus,
     ChipType,
+    CommunicatonType,
     GameId,
     GameStateId,
     UserId,
@@ -35,10 +36,12 @@ _GAME_ID: Final = GameId(uuid7())
 _GAME_STATE_ID: Final = GameStateId(uuid7())
 
 _FIRST_PLAYER_ID: Final = UserId(uuid7())
-_SECOND_PLAYER_ID: Final = UserId(uuid7())
-
 _TIME_LEFT_FOR_FIRST_PLAYER: Final = timedelta(seconds=20)
+_FIRST_PLAYER_COMMUNICATION_TYPE: Final = CommunicatonType.CENTRIFUGO
+
+_SECOND_PLAYER_ID: Final = UserId(uuid7())
 _TIME_LEFT_FOR_SECOND_PLAYER: Final = timedelta(minutes=1)
+_SECOND_PLAYER_COMMUNICATION_TYPE: Final = CommunicatonType.CENTRIFUGO
 
 
 async def test_lose_by_time_processor():
@@ -46,10 +49,12 @@ async def test_lose_by_time_processor():
         _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
             time_left=_TIME_LEFT_FOR_FIRST_PLAYER,
+            communication_type=_FIRST_PLAYER_COMMUNICATION_TYPE,
         ),
         _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
             time_left=_TIME_LEFT_FOR_SECOND_PLAYER,
+            communication_type=_SECOND_PLAYER_COMMUNICATION_TYPE,
         ),
     }
     board: list[list[ChipType | None]] = [
@@ -99,10 +104,12 @@ async def test_lose_by_time_processor():
         _FIRST_PLAYER_ID: PlayerState(
             chip_type=ChipType.FIRST,
             time_left=timedelta(seconds=0),
+            communication_type=_FIRST_PLAYER_COMMUNICATION_TYPE,
         ),
         _SECOND_PLAYER_ID: PlayerState(
             chip_type=ChipType.SECOND,
             time_left=_TIME_LEFT_FOR_SECOND_PLAYER,
+            communication_type=_SECOND_PLAYER_COMMUNICATION_TYPE,
         ),
     }
     expected_event = GameEndedEvent(
