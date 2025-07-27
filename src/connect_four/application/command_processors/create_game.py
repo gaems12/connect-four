@@ -99,8 +99,8 @@ class CreateGameProcessor:
         )
         should_make_requests_to_centrifugo = any(
             (
-                nt == CommunicatonType.CENTRIFUGO
-                for nt in player_communication_types
+                ct == CommunicatonType.CENTRIFUGO
+                for ct in player_communication_types
             ),
         )
         if should_make_requests_to_centrifugo:
