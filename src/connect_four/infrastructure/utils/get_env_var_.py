@@ -51,7 +51,7 @@ def get_env_var[T: Any, D: Any](
     variable. If a `value_factory` function is provided, the
     variable's value is passed through this function before being
     returned. If the environment variable is not found or is empty,
-    the `default` value is returned if provided; otherwise, a
+    the `default` value is returned if provided; otherwise, an
     exception is raised.
     """
     value = os.getenv(key)

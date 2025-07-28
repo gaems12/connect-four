@@ -33,6 +33,7 @@ def create_cli_app() -> App:
     app = App(
         name="Connect Four Game",
         version=version("connect_four"),
+        version_flags=["--version", "-v"],
         help_format="rich",
     )
 
@@ -97,5 +98,6 @@ def run_task_executor(
         modules=["connect_four.presentation.task_executor"],
         tasks_pattern=("executors.py",),
         workers=workers,
+        configure_logging=False,
     )
     run_worker(worker_args)
