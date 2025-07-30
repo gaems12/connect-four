@@ -4,6 +4,7 @@
 
 __all__ = (
     "CentrifugoConfig",
+    "CentrifugoClientError",
     "load_centrifugo_config",
     "HTTPXCentrifugoClient",
 )
@@ -26,16 +27,16 @@ from connect_four.application import Serializable, CentrifugoClient
 from connect_four.infrastructure.utils import get_env_var
 
 
-_logger: Final = logging.getLogger(__name__)
-
 _MAX_RETRIES: Final = 20
 _BASE_BACKOFF_DELAY: Final = 0.5
 _MAX_BACKOFF_DELAY: Final = 10
 
 _REQUEST_TIMEOUT: Final = Timeout(30)
 
+_logger: Final = logging.getLogger(__name__)
 
-class CentrifuoClientError(Exception): ...
+
+class CentrifugoClientError(Exception): ...
 
 
 def load_centrifugo_config() -> "CentrifugoConfig":
@@ -84,7 +85,7 @@ class HTTPXCentrifugoClient(CentrifugoClient):
     @retry(
         stop=stop_after_attempt(_MAX_RETRIES),
         wait=wait_exponential(_BASE_BACKOFF_DELAY, _MAX_BACKOFF_DELAY),
-        retry=retry_if_exception_type(CentrifuoClientError),
+        retry=retry_if_exception_type(CentrifugoClientError),
         before_sleep=_log_before_retry,
         reraise=True,
     )
@@ -107,12 +108,10 @@ class HTTPXCentrifugoClient(CentrifugoClient):
                 timeout=_REQUEST_TIMEOUT,
             )
         except Exception as error:
-            error_message = (
-                "Unexpected error occurred during request to centrifugo."
-            )
+            error_message = "Error occurred during request to centrifugo."
             _logger.exception(error_message)
 
-            raise CentrifuoClientError(error_message) from error
+            raise CentrifugoClientError(error_message) from error
 
         if response.status_code == 200:
             _logger.debug({
@@ -123,10 +122,11 @@ class HTTPXCentrifugoClient(CentrifugoClient):
             return
 
         error_message = "Centrifugo responded with bad status code."
+
         _logger.error({
             "message": error_message,
             "status_code": response.status_code,
             "content": response.content.decode(),
         })
 
-        raise CentrifuoClientError(error_message)
+        raise CentrifugoClientError(error_message)

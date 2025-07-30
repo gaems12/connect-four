@@ -2,7 +2,7 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-__all__ = ("NATSEventPublisher",)
+__all__ = ("NATSEventPublisher", "NATSEventPublisherError")
 
 import json
 import logging
@@ -33,6 +33,9 @@ _EVENT_TO_SUBJECT_MAP: Final = {
 _logger: Final = logging.getLogger(__name__)
 
 
+class NATSEventPublisherError(Exception): ...
+
+
 class NATSEventPublisher:
     __slots__ = ("_jetstream", "_common_retort", "_operation_id")
 
@@ -58,8 +61,14 @@ class NATSEventPublisher:
             "data": event_as_dict,
         })
 
-        await self._jetstream.publish(
-            subject=subject,
-            payload=payload,
-            stream=_STREAM,
-        )
+        try:
+            await self._jetstream.publish(
+                subject=subject,
+                payload=payload,
+                stream=_STREAM,
+            )
+        except Exception as error:
+            error_message = "Error occured during sending message to nats."
+            _logger.exception(error_message)
+
+            raise NATSEventPublisherError(error_message) from error
