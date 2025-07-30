@@ -52,13 +52,11 @@ class CentrifugoConfig:
 
 
 def _log_before_retry(retry_state: RetryCallState) -> None:
-    _logger.debug(
-        {
-            "message": "About to retry request to centrifugo.",
-            "retry_number": retry_state.attempt_number,
-            "retries_left": _MAX_RETRIES - retry_state.attempt_number,
-        },
-    )
+    _logger.debug({
+        "message": "About to retry request to centrifugo.",
+        "retry_number": retry_state.attempt_number,
+        "retries_left": _MAX_RETRIES - retry_state.attempt_number,
+    })
 
 
 class HTTPXCentrifugoClient(CentrifugoClient):
@@ -97,13 +95,11 @@ class HTTPXCentrifugoClient(CentrifugoClient):
         json_: Serializable,
     ) -> None:
         try:
-            _logger.debug(
-                {
-                    "message": "About to make request to centrifugo.",
-                    "url": url,
-                    "json": json_,
-                },
-            )
+            _logger.debug({
+                "message": "About to make request to centrifugo.",
+                "url": url,
+                "json": json_,
+            })
             response = await self._httpx_client.post(
                 url=url,
                 json=json_,
@@ -119,22 +115,18 @@ class HTTPXCentrifugoClient(CentrifugoClient):
             raise CentrifuoClientError(error_message) from error
 
         if response.status_code == 200:
-            _logger.debug(
-                {
-                    "message": "Centrifuo responded.",
-                    "status_code": response.status_code,
-                    "content": response.content.decode(),
-                },
-            )
+            _logger.debug({
+                "message": "Centrifuo responded.",
+                "status_code": response.status_code,
+                "content": response.content.decode(),
+            })
             return
 
         error_message = "Centrifugo responded with bad status code."
-        _logger.error(
-            {
-                "message": error_message,
-                "status_code": response.status_code,
-                "content": response.content.decode(),
-            },
-        )
+        _logger.error({
+            "message": error_message,
+            "status_code": response.status_code,
+            "content": response.content.decode(),
+        })
 
         raise CentrifuoClientError(error_message)

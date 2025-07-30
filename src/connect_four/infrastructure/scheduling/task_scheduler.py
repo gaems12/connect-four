@@ -54,12 +54,10 @@ class TaskiqTaskScheduler(TaskScheduler):
             time=task.execute_at,
         )
 
-        _logger.debug(
-            {
-                "message": "About to schedule a task.",
-                "task": schedule.model_dump(mode="json"),
-            },
-        )
+        _logger.debug({
+            "message": "About to schedule a task.",
+            "task": schedule.model_dump(mode="json"),
+        })
 
         await self._schedule_source.add_schedule(schedule)
 

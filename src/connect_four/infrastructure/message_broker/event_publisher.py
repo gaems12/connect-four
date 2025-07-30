@@ -53,12 +53,10 @@ class NATSEventPublisher:
         event_as_dict["operation_id"] = str(self._operation_id)
         payload = json.dumps(event_as_dict).encode()
 
-        _logger.debug(
-            {
-                "message": "About to send message to nats.",
-                "data": event_as_dict,
-            },
-        )
+        _logger.debug({
+            "message": "About to send message to nats.",
+            "data": event_as_dict,
+        })
 
         await self._jetstream.publish(
             subject=subject,
