@@ -2,7 +2,7 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-__all__ = ("TaskiqTaskScheduler", "TaskiqTaskSchedulerError")
+__all__ = ("TaskiqTaskScheduler",)
 
 import logging
 from typing import Final
@@ -20,9 +20,6 @@ from connect_four.infrastructure.operation_id import OperationId
 
 
 _logger: Final = logging.getLogger(__name__)
-
-
-class TaskiqTaskSchedulerError(Exception): ...
 
 
 class TaskiqTaskScheduler(TaskScheduler):
@@ -65,10 +62,21 @@ class TaskiqTaskScheduler(TaskScheduler):
         try:
             await self._schedule_source.add_schedule(schedule)
         except Exception as error:
-            error_message = "Error occurred during scheduling task."
+            error_message = "Error occurred during scheduling a task."
             _logger.exception(error_message)
 
-            raise TaskiqTaskSchedulerError(error_message) from error
+            raise Exception(error_message) from error
 
     async def unschedule(self, task_id: str) -> None:
-        await self._schedule_source.delete_schedule(task_id)
+        _logger.debug({
+            "message": "Going to unschedule a task.",
+            "task_id": task_id,
+        })
+
+        try:
+            await self._schedule_source.delete_schedule(task_id)
+        except Exception as error:
+            error_message = "Error occurred during unscheduling a task."
+            _logger.exception(error_message)
+
+            raise Exception(error_message) from error

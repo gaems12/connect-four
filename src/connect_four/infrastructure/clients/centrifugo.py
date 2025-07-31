@@ -4,7 +4,6 @@
 
 __all__ = (
     "CentrifugoConfig",
-    "CentrifugoClientError",
     "load_centrifugo_config",
     "HTTPXCentrifugoClient",
 )
@@ -34,9 +33,6 @@ _MAX_BACKOFF_DELAY: Final = 10
 _REQUEST_TIMEOUT: Final = Timeout(30)
 
 _logger: Final = logging.getLogger(__name__)
-
-
-class CentrifugoClientError(Exception): ...
 
 
 def load_centrifugo_config() -> "CentrifugoConfig":
@@ -85,7 +81,7 @@ class HTTPXCentrifugoClient(CentrifugoClient):
     @retry(
         stop=stop_after_attempt(_MAX_RETRIES),
         wait=wait_exponential(_BASE_BACKOFF_DELAY, _MAX_BACKOFF_DELAY),
-        retry=retry_if_exception_type(CentrifugoClientError),
+        retry=retry_if_exception_type(Exception),
         before_sleep=_log_before_retry,
         reraise=True,
     )
@@ -97,7 +93,7 @@ class HTTPXCentrifugoClient(CentrifugoClient):
     ) -> None:
         try:
             _logger.debug({
-                "message": "About to make request to centrifugo.",
+                "message": "About to make a request to centrifugo.",
                 "url": url,
                 "json": json_,
             })
@@ -111,7 +107,7 @@ class HTTPXCentrifugoClient(CentrifugoClient):
             error_message = "Error occurred during request to centrifugo."
             _logger.exception(error_message)
 
-            raise CentrifugoClientError(error_message) from error
+            raise Exception(error_message) from error
 
         if response.status_code == 200:
             _logger.debug({
@@ -129,4 +125,4 @@ class HTTPXCentrifugoClient(CentrifugoClient):
             "content": response.content.decode(),
         })
 
-        raise CentrifugoClientError(error_message)
+        raise Exception(error_message)
