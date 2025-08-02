@@ -86,10 +86,8 @@ class TryToLoseByTimeProcessor:
             for player_state in game.players.values()
         )
         should_make_requests_to_centrifugo = any(
-            (
-                ct == CommunicatonType.CENTRIFUGO
-                for ct in player_communication_types
-            ),
+            ct == CommunicatonType.CENTRIFUGO
+            for ct in player_communication_types
         )
         if should_make_requests_to_centrifugo:
             await self._make_requests_to_centrifugo(game)

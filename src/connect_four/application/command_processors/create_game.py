@@ -98,10 +98,8 @@ class CreateGameProcessor:
             command.second_player.communication_type,
         )
         should_make_requests_to_centrifugo = any(
-            (
-                ct == CommunicatonType.CENTRIFUGO
-                for ct in player_communication_types
-            ),
+            ct == CommunicatonType.CENTRIFUGO
+            for ct in player_communication_types
         )
         if should_make_requests_to_centrifugo:
             await self._make_requests_to_centrifugo(

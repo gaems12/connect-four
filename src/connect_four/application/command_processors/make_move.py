@@ -131,10 +131,8 @@ class MakeMoveProcessor:
             for player_state in game.players.values()
         )
         should_make_requests_to_centrifugo = any(
-            (
-                ct == CommunicatonType.CENTRIFUGO
-                for ct in player_communication_types
-            ),
+            ct == CommunicatonType.CENTRIFUGO
+            for ct in player_communication_types
         )
         if should_make_requests_to_centrifugo:
             await self._make_requests_to_centrifugo(
@@ -170,6 +168,7 @@ class MakeMoveProcessor:
 
         elif isinstance(move_result, (Win, Draw, LossByTime)):
             reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
+
             event = GameEndedEvent(
                 game_id=game.id,
                 chip_location=move_result.chip_location,
