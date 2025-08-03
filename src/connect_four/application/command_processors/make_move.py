@@ -11,13 +11,14 @@ from typing import Final
 from connect_four.domain import (
     CommunicatonType,
     GameId,
+    GameStateId,
+    UserId,
     Game,
     MoveAccepted,
     MoveRejected,
     Win,
     Draw,
     LossByTime,
-    MoveResult,
     MakeMove,
 )
 from connect_four.application import (
@@ -26,7 +27,6 @@ from connect_four.application import (
     MoveAcceptedEvent,
     MoveRejectedEvent,
     GameEndedEvent,
-    Event,
     EventPublisher,
     try_to_lose_by_time_task_id_factory,
     TryToLoseByTimeTask,
@@ -101,151 +101,191 @@ class MakeMoveProcessor:
         )
         await self._game_gateway.update(game)
 
-        if not isinstance(move_result, MoveRejected):
-            task_id = try_to_lose_by_time_task_id_factory(old_game_state_id)
-            await self._task_scheduler.unschedule(task_id)
-
         if isinstance(move_result, MoveAccepted):
-            current_player_state = game.players[current_user_id]
-            time_left_for_current_player = current_player_state.time_left
+            await self._unschedule_loss_by_time_task(old_game_state_id)
+            await self._publish_move_accepted_event(game, move_result)
+            await self._maybe_notify_on_move_accepted(game, move_result)
+            await self._schedule_loss_by_time_task(game, current_user_id)
 
-            task_id = try_to_lose_by_time_task_id_factory(old_game_state_id)
-            execute_task_at = (
-                datetime.now(timezone.utc) + time_left_for_current_player
-            )
-            task = TryToLoseByTimeTask(
-                id=task_id,
-                execute_at=execute_task_at,
-                game_id=game.id,
-                game_state_id=game.state_id,
-            )
-            await self._task_scheduler.schedule(task)
+        elif isinstance(move_result, MoveRejected):
+            await self._publish_move_rejected_event(game, move_result)
+            await self._maybe_notify_on_move_rejected(game, move_result)
 
-        await self._publish_event(
-            game=game,
-            move_result=move_result,
-        )
-
-        player_communication_types = (
-            player_state.communication_type
-            for player_state in game.players.values()
-        )
-        should_notify_via_centrifugo = any(
-            ct == CommunicatonType.CENTRIFUGO
-            for ct in player_communication_types
-        )
-        if should_notify_via_centrifugo:
-            await self._notify_via_centrifugo(
-                game=game,
-                move_result=move_result,
-            )
+        elif isinstance(move_result, (Win, Draw, LossByTime)):
+            await self._unschedule_loss_by_time_task(old_game_state_id)
+            await self._publish_game_ended_event(game, move_result)
+            await self._maybe_notify_on_game_ended(game, move_result)
 
         await self._transaction_manager.commit()
 
-    async def _publish_event(
+    async def _unschedule_loss_by_time_task(
         self,
-        *,
-        game: Game,
-        move_result: MoveResult,
+        old_game_state_id: GameStateId,
     ) -> None:
-        event: Event
+        task_id = try_to_lose_by_time_task_id_factory(old_game_state_id)
+        await self._task_scheduler.unschedule(task_id)
 
-        if isinstance(move_result, MoveAccepted):
-            event = MoveAcceptedEvent(
-                game_id=game.id,
-                chip_location=move_result.chip_location,
-                players=game.players,
-                current_turn=game.current_turn,
-            )
+    async def _schedule_loss_by_time_task(
+        self,
+        game: Game,
+        current_user_id: UserId,
+    ) -> None:
+        current_player_state = game.players[current_user_id]
+        time_left_for_current_player = current_player_state.time_left
 
-        elif isinstance(move_result, MoveRejected):
-            event = MoveRejectedEvent(
-                game_id=game.id,
-                reason=move_result.reason,
-                players=game.players,
-                current_turn=game.current_turn,
-            )
+        current_timestamp = datetime.now(timezone.utc)
+        execute_task_at = current_timestamp + time_left_for_current_player
 
-        elif isinstance(move_result, (Win, Draw, LossByTime)):
-            reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
+        task_id = try_to_lose_by_time_task_id_factory(game.state_id)
 
-            event = GameEndedEvent(
-                game_id=game.id,
-                chip_location=move_result.chip_location,
-                players=game.players,
-                reason=reason,
-                last_turn=game.current_turn,
-            )
+        task = TryToLoseByTimeTask(
+            id=task_id,
+            execute_at=execute_task_at,
+            game_id=game.id,
+            game_state_id=game.state_id,
+        )
+        await self._task_scheduler.schedule(task)
 
+    async def _publish_move_accepted_event(
+        self,
+        game: Game,
+        move_result: MoveAccepted,
+    ) -> None:
+        event = MoveAcceptedEvent(
+            game_id=game.id,
+            chip_location=move_result.chip_location,
+            players=game.players,
+            current_turn=game.current_turn,
+        )
         await self._event_publisher.publish(event)
 
-    async def _notify_via_centrifugo(
+    async def _publish_move_rejected_event(
         self,
-        *,
         game: Game,
-        move_result: MoveResult,
+        move_result: MoveRejected,
     ) -> None:
-        raw_chip_location: Serializable
-        raw_players: Serializable
-        centrifugo_publication: Serializable
+        event = MoveRejectedEvent(
+            game_id=game.id,
+            reason=move_result.reason,
+            players=game.players,
+            current_turn=game.current_turn,
+        )
+        await self._event_publisher.publish(event)
 
-        if isinstance(move_result, MoveAccepted):
-            raw_chip_location = {
-                "row": move_result.chip_location.row,
-                "column": move_result.chip_location.column,
-            }
-            raw_players = {
-                player_id.hex: {
-                    "chip_type": player_state.chip_type.value,
-                    "time_left": player_state.time_left.total_seconds(),
-                }
-                for player_id, player_state in game.players.items()
-            }
-            centrifugo_publication = {
-                "type": "move_accepted",
-                "chip_location": raw_chip_location,
-                "players": raw_players,
-                "current_turn": game.current_turn.hex,
-            }
+    async def _publish_game_ended_event(
+        self,
+        game: Game,
+        move_result: Win | Draw | LossByTime,
+    ) -> None:
+        reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
 
-        elif isinstance(move_result, MoveRejected):
-            raw_players = {
-                player_id.hex: {
-                    "chip_type": player_state.chip_type.value,
-                    "time_left": player_state.time_left.total_seconds(),
-                }
-                for player_id, player_state in game.players.items()
-            }
-            centrifugo_publication = {
-                "type": "move_rejected",
-                "players": raw_players,
-                "reason": move_result.reason,
-                "current_turn": game.current_turn.hex,
-            }
+        event = GameEndedEvent(
+            game_id=game.id,
+            chip_location=move_result.chip_location,
+            players=game.players,
+            reason=reason,
+            last_turn=game.current_turn,
+        )
+        await self._event_publisher.publish(event)
 
-        elif isinstance(move_result, (Win, Draw, LossByTime)):
-            reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
+    async def _maybe_notify_on_move_accepted(
+        self,
+        game: Game,
+        move_result: MoveAccepted,
+    ) -> None:
+        if not self._game_has_any_centrifugo_client(game):
+            return
 
-            raw_chip_location = {
-                "row": move_result.chip_location.row,
-                "column": move_result.chip_location.column,
+        raw_chip_location: Serializable = {
+            "row": move_result.chip_location.row,
+            "column": move_result.chip_location.column,
+        }
+        raw_players: Serializable = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),
             }
-            raw_players = {
-                player_id.hex: {
-                    "chip_type": player_state.chip_type.value,
-                    "time_left": player_state.time_left.total_seconds(),
-                }
-                for player_id, player_state in game.players.items()
-            }
-            centrifugo_publication = {
-                "type": "game_ended",
-                "chip_location": raw_chip_location,
-                "players": raw_players,
-                "reason": reason,
-                "last_turn": game.current_turn.hex,
-            }
+            for player_id, player_state in game.players.items()
+        }
+        centrifugo_publication: Serializable = {
+            "type": "move_accepted",
+            "chip_location": raw_chip_location,
+            "players": raw_players,
+            "current_turn": game.current_turn.hex,
+        }
 
         await self._centrifugo_client.publish(
             channel=centrifugo_game_channel_factory(game.id),
             data=centrifugo_publication,
+        )
+
+    async def _maybe_notify_on_move_rejected(
+        self,
+        game: Game,
+        move_result: MoveRejected,
+    ) -> None:
+        if not self._game_has_any_centrifugo_client(game):
+            return
+
+        raw_players: Serializable = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),
+            }
+            for player_id, player_state in game.players.items()
+        }
+        centrifugo_publication: Serializable = {
+            "type": "move_rejected",
+            "players": raw_players,
+            "reason": move_result.reason,
+            "current_turn": game.current_turn.hex,
+        }
+
+        await self._centrifugo_client.publish(
+            channel=centrifugo_game_channel_factory(game.id),
+            data=centrifugo_publication,
+        )
+
+    async def _maybe_notify_on_game_ended(
+        self,
+        game: Game,
+        move_result: Win | Draw | LossByTime,
+    ) -> None:
+        if not self._game_has_any_centrifugo_client(game):
+            return
+
+        reason = _MOVE_RESULT_TO_GAME_END_REASON_MAP[type(move_result)]
+
+        raw_chip_location: Serializable = {
+            "row": move_result.chip_location.row,
+            "column": move_result.chip_location.column,
+        }
+        raw_players: Serializable = {
+            player_id.hex: {
+                "chip_type": player_state.chip_type.value,
+                "time_left": player_state.time_left.total_seconds(),
+            }
+            for player_id, player_state in game.players.items()
+        }
+        centrifugo_publication: Serializable = {
+            "type": "game_ended",
+            "chip_location": raw_chip_location,
+            "players": raw_players,
+            "reason": reason,
+            "last_turn": game.current_turn.hex,
+        }
+
+        await self._centrifugo_client.publish(
+            channel=centrifugo_game_channel_factory(game.id),
+            data=centrifugo_publication,
+        )
+
+    def _game_has_any_centrifugo_client(self, game: Game) -> bool:
+        player_communication_types = (
+            player_state.communication_type
+            for player_state in game.players.values()
+        )
+        return any(
+            ct == CommunicatonType.CENTRIFUGO
+            for ct in player_communication_types
         )
