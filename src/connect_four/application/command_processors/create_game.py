@@ -97,19 +97,19 @@ class CreateGameProcessor:
             command.first_player.communication_type,
             command.second_player.communication_type,
         )
-        should_make_requests_to_centrifugo = any(
+        should_notify_via_centrifugo = any(
             ct == CommunicatonType.CENTRIFUGO
             for ct in player_communication_types
         )
-        if should_make_requests_to_centrifugo:
-            await self._make_requests_to_centrifugo(
+        if should_notify_via_centrifugo:
+            await self._notify_via_centrifugo(
                 lobby_id=command.lobby_id,
                 new_game=new_game,
             )
 
         await self._transaction_manager.commit()
 
-    async def _make_requests_to_centrifugo(
+    async def _notify_via_centrifugo(
         self,
         *,
         lobby_id: LobbyId,

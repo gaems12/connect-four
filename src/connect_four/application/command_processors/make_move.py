@@ -130,12 +130,12 @@ class MakeMoveProcessor:
             player_state.communication_type
             for player_state in game.players.values()
         )
-        should_make_requests_to_centrifugo = any(
+        should_notify_via_centrifugo = any(
             ct == CommunicatonType.CENTRIFUGO
             for ct in player_communication_types
         )
-        if should_make_requests_to_centrifugo:
-            await self._make_requests_to_centrifugo(
+        if should_notify_via_centrifugo:
+            await self._notify_via_centrifugo(
                 game=game,
                 move_result=move_result,
             )
@@ -179,7 +179,7 @@ class MakeMoveProcessor:
 
         await self._event_publisher.publish(event)
 
-    async def _make_requests_to_centrifugo(
+    async def _notify_via_centrifugo(
         self,
         *,
         game: Game,
