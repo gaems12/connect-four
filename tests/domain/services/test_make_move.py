@@ -171,7 +171,7 @@ def test_draw():
                 [None] * 6,
                 [ChipType.SECOND] + [None] * 5,
                 [ChipType.SECOND] + [None] * 5,
-                [ChipType.SECOND, ChipType.FIRST] + [None] * 4,
+                [ChipType.SECOND, ChipType.SECOND] + [None] * 4,
                 [ChipType.FIRST, ChipType.FIRST, ChipType.FIRST] + [None] * 3,
             ],
             3,
