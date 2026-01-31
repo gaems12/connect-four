@@ -8,7 +8,7 @@ from typing import Annotated
 
 from cyclopts import App, Parameter
 from faststream.cli.main import cli as run_faststream
-from taskiq.cli.scheduler.run import run_scheduler_loop
+from taskiq.cli.scheduler.run import SchedulerLoop
 from taskiq.cli.worker.args import WorkerArgs
 from taskiq.cli.worker.run import run_worker
 
@@ -82,7 +82,8 @@ async def run_task_scheduler() -> None:
     """Run task scheduler."""
     task_scheduler = create_task_scheduler_app()
     await task_scheduler.startup()
-    await run_scheduler_loop(task_scheduler)
+    scheduler_loop = SchedulerLoop(task_scheduler)
+    await scheduler_loop.run()
     await task_scheduler.shutdown()
 
 
