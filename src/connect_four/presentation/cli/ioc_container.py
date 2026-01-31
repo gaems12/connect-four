@@ -23,26 +23,21 @@ from connect_four.application import (
 )
 from connect_four.infrastructure import (
     httpx_client_factory,
-    CentrifugoConfig,
     load_centrifugo_config,
     HTTPXCentrifugoClient,
     redis_factory,
     redis_pipeline_factory,
-    GameMapperConfig,
     load_game_mapper_config,
     GameMapper,
-    LockManagerConfig,
     load_lock_manager_config,
     lock_manager_factory,
     RedisTransactionManager,
-    NATSConfig,
     load_nats_config,
     nats_client_factory,
     nats_jetstream_factory,
     NATSEventPublisher,
     taskiq_redis_schedule_source_factory,
     TaskiqTaskScheduler,
-    RedisConfig,
     load_redis_config,
     common_retort_factory,
     get_operation_id,
@@ -52,19 +47,11 @@ from connect_four.infrastructure import (
 def ioc_container_factory() -> AsyncContainer:
     provider = Provider(scope=Scope.APP)
 
-    context = {
-        CentrifugoConfig: load_centrifugo_config(),
-        RedisConfig: load_redis_config(),
-        GameMapperConfig: load_game_mapper_config(),
-        LockManagerConfig: load_lock_manager_config(),
-        NATSConfig: load_nats_config(),
-    }
-
-    provider.from_context(CentrifugoConfig)
-    provider.from_context(RedisConfig)
-    provider.from_context(GameMapperConfig)
-    provider.from_context(LockManagerConfig)
-    provider.from_context(NATSConfig)
+    provider.provide(load_centrifugo_config)
+    provider.provide(load_redis_config)
+    provider.provide(load_game_mapper_config)
+    provider.provide(load_lock_manager_config)
+    provider.provide(load_nats_config)
 
     provider.provide(get_operation_id)
     provider.provide(common_retort_factory)
@@ -90,4 +77,4 @@ def ioc_container_factory() -> AsyncContainer:
     provider.provide(CreateGameProcessor)
     provider.provide(EndGameProcessor)
 
-    return make_async_container(provider, context=context)
+    return make_async_container(provider)

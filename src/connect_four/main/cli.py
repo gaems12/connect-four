@@ -7,6 +7,7 @@ from importlib.metadata import version
 from typing import Annotated
 
 from cyclopts import App, Parameter
+from dishka_cyclopts import setup_dishka
 from faststream.cli import cli as faststream_cli
 from taskiq.cli.scheduler.run import SchedulerLoop
 from taskiq.cli.worker.args import WorkerArgs
@@ -19,7 +20,11 @@ from connect_four.infrastructure import (
     nats_jetstream_factory,
     NATSStreamCreator,
 )
-from connect_four.presentation.cli import create_game, end_game
+from connect_four.presentation.cli import (
+    ioc_container_factory,
+    create_game,
+    end_game,
+)
 from .task_scheduler import create_task_scheduler_app
 
 
@@ -36,6 +41,9 @@ def create_cli_app() -> App:
         version_flags=["--version", "-v"],
         help_format="rich",
     )
+    ioc_container = ioc_container_factory()
+
+    setup_dishka(ioc_container, app)
 
     app.command(create_nats_streams)
 

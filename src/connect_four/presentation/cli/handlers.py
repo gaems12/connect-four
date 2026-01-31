@@ -9,6 +9,8 @@ from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from cyclopts import Parameter, Token
+from dishka import FromDishka
+from dishka_cyclopts import inject
 import rich
 import rich.prompt
 
@@ -32,7 +34,6 @@ from connect_four.infrastructure import (
     default_operation_id_factory,
     set_operation_id,
 )
-from .ioc_container import ioc_container_factory
 
 
 def _str_to_uuid(_, tokens: list[Token]) -> UUID:
@@ -47,6 +48,7 @@ def _str_to_communication_type(_, tokens: list[Token]) -> CommunicatonType:
     return CommunicatonType(tokens[0].value)
 
 
+@inject
 async def create_game(
     game_id: Annotated[
         UUID,
@@ -86,6 +88,7 @@ async def create_game(
             converter=_str_to_communication_type,
         ),
     ],
+    command_processor: FromDishka[CreateGameProcessor],
 ) -> None:
     """
     Creates a new game. Asks confirmation before exection.
@@ -95,8 +98,6 @@ async def create_game(
     )
     if not execution_is_confirmed:
         return
-
-    ioc_container = ioc_container_factory()
 
     operation_id = default_operation_id_factory()
     set_operation_id(operation_id)
@@ -111,26 +112,27 @@ async def create_game(
         time=second_player_time,
         communication_type=second_player_communication,
     )
-    command = CreateGameCommand(
-        game_id=GameId(game_id),
-        lobby_id=LobbyId(lobby_id),
-        first_player=first_player,
-        second_player=second_player,
-        created_at=datetime.now(timezone.utc),
-    )
-    command_processor = await ioc_container.get(CreateGameProcessor)
 
     try:
+        command = CreateGameCommand(
+            game_id=GameId(game_id),
+            lobby_id=LobbyId(lobby_id),
+            first_player=first_player,
+            second_player=second_player,
+            created_at=datetime.now(timezone.utc),
+        )
         await command_processor.process(command)
     except GameAlreadyExistsError:
         rich.print("Game already exists.")
 
 
+@inject
 async def end_game(
     game_id: Annotated[
         UUID,
         Parameter("--id", converter=_str_to_uuid),
     ],
+    command_processor: FromDishka[EndGameProcessor],
 ) -> None:
     """
     Ends game. Asks confirmation before exection.
@@ -142,15 +144,11 @@ async def end_game(
     if not execution_is_confirmed:
         return
 
-    ioc_container = ioc_container_factory()
-
     operation_id = default_operation_id_factory()
     set_operation_id(operation_id)
 
-    command = EndGameCommand(GameId(game_id))
-    command_processor = await ioc_container.get(EndGameProcessor)
-
     try:
+        command = EndGameCommand(GameId(game_id))
         await command_processor.process(command)
     except GameDoesNotExistError:
         rich.print("Game doesn't exist.")

@@ -3,3 +3,4 @@
 # Licensed under the Personal Use License (see LICENSE).
 
 from .handlers import *
+from .ioc_container import *
