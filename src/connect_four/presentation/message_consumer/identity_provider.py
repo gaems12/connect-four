@@ -6,7 +6,7 @@ __all__ = ("MessageBrokerIdentityProvider",)
 
 from uuid import UUID
 
-from faststream.broker.message import StreamMessage
+from faststream import StreamMessage
 
 from connect_four.domain import UserId
 from connect_four.application import IdentityProvider

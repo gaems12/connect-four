@@ -2,8 +2,6 @@
 # All rights reserved.
 # Licensed under the Personal Use License (see LICENSE).
 
-from importlib.metadata import version
-
 from faststream import FastStream
 from faststream.nats import NatsBroker
 from dishka import AsyncContainer
@@ -25,11 +23,7 @@ def create_message_consumer_app(
         nats_config = load_nats_config()
         broker = create_broker(nats_config.url)
 
-    app = FastStream(
-        broker=broker,
-        title="Connect Four Game",
-        version=version("connect_four"),
-    )
+    app = FastStream(broker)
     ioc_container = ioc_container or ioc_container_factory()
     setup_dishka(ioc_container, app)
 

@@ -7,7 +7,7 @@ from importlib.metadata import version
 from typing import Annotated
 
 from cyclopts import App, Parameter
-from faststream.cli.main import cli as run_faststream
+from faststream.cli import cli as faststream_cli
 from taskiq.cli.scheduler.run import SchedulerLoop
 from taskiq.cli.worker.args import WorkerArgs
 from taskiq.cli.worker.run import run_worker
@@ -70,12 +70,12 @@ def run_message_consumer(
     sys.argv = [
         "faststream",
         "run",
-        "connect_four.main.message_consumer:create_message_consumer_app",
+        "src.connect_four.main.message_consumer:create_message_consumer_app",
         "--workers",
         workers,
         "--factory",
     ]
-    run_faststream()
+    faststream_cli()
 
 
 async def run_task_scheduler() -> None:
