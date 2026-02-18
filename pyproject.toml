@@ -11,7 +11,7 @@ requires-python = "==3.13.*"
 dependencies = [
     "uuid7==0.1.*",
     "python-json-logger==4.0.*",
-    "redis==7.1.*",
+    "redis==7.2.*",
     "nats-py==2.13.*",
     "httpx==0.28.*",
     "dishka==1.8.*",
