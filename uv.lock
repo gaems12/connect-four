@@ -201,7 +201,7 @@ requires-dist = [
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = "==1.4.*" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==7.0.*" },
     { name = "python-json-logger", specifier = "==4.0.*" },
-    { name = "redis", specifier = "==7.2.*" },
+    { name = "redis", specifier = "==7.4.*" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.15.*" },
     { name = "taskiq", specifier = "==0.12.*" },
     { name = "taskiq-nats", specifier = "==0.6.*" },
@@ -924,11 +924,11 @@ wheels = [
 
 [[package]]
 name = "redis"
-version = "7.2.2"
+version = "7.4.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/7f/b3/fddae1baaf88100f0bd52e726d9dd140997f513258d22429b0da1d889170/redis-7.2.2.tar.gz", hash = "sha256:91125c133362620d9f2caec11c70e6febc2745bbb8a0ce15ad8542811bd2dfd1", size = 4909057, upload-time = "2026-06-05T08:26:46.931Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/51/93/05e7d4a65285066a74f48697f9b9cde5cfce71398033d69ed83c3d98f5c9/redis-7.4.1.tar.gz", hash = "sha256:1a1df5067062cf7cbe677994e391f8ee0840f499d370f1a71266e0dd3aa9308e", size = 4945742, upload-time = "2026-06-05T09:10:06.703Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f6/f4/062f77785c590d62a323e92ba9d179ce80286c4f31369f799612d5d1d0f2/redis-7.2.2-py3-none-any.whl", hash = "sha256:8bd20727048c01a1fb4741f98c4194f5aa64781b7dd28386ca74ce6b41e42dcf", size = 396377, upload-time = "2026-06-05T08:26:45.186Z" },
+    { url = "https://files.pythonhosted.org/packages/4a/2e/2677f3f93dae0497e7e33b6637302e7f3744efc553f34231183e32584885/redis-7.4.1-py3-none-any.whl", hash = "sha256:1fa4647af1c5e93a2c685aa248ee44cce092691146d41390518dabe9a99839b0", size = 410171, upload-time = "2026-06-05T09:10:05.128Z" },
 ]
 
 [[package]]
