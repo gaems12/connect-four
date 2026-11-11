@@ -187,7 +187,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "adaptix", specifier = "==3.0.0b11" },
-    { name = "cosmic-ray", marker = "extra == 'dev'", specifier = "==8.4.*" },
+    { name = "cosmic-ray", marker = "extra == 'dev'", specifier = "==8.9.*" },
     { name = "cyclopts", specifier = "==4.20.*" },
     { name = "dishka", specifier = "==1.8.*" },
     { name = "dishka-cyclopts", specifier = "==1.0.*" },
@@ -212,7 +212,7 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "cosmic-ray"
-version = "8.4.6"
+version = "8.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -229,9 +229,9 @@ dependencies = [
     { name = "toml" },
     { name = "yattag" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/28/fe/3ae2caf974a5ffe7411dccd4d067f3b3b06f2fe655097be959bf2c9cf571/cosmic_ray-8.4.6.tar.gz", hash = "sha256:2b9a72d2aec3480608a7d665fd6637133a75963472dec42e2de4afb69f0665f9", size = 1642209, upload-time = "2026-04-02T13:36:29.92Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/63/5e/213bfcfad6a8acc270327421cc3d4fe0456b9885fb2738a7b77dbacd9da6/cosmic_ray-8.9.0.tar.gz", hash = "sha256:632737cbb3ea3965634ef275abadaeabef6c61ba895d0f3eb796947f555904b9", size = 1680377, upload-time = "2026-11-10T17:39:26.632Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9b/45/f78505d164e38a1bf00bd2ec8f54f340969c61c4d2486aaa2e18090a1ccf/cosmic_ray-8.4.6-py3-none-any.whl", hash = "sha256:448af7e6aa365bdbb254106b907a677950fc785f7745ab9a659d4735285bb307", size = 59932, upload-time = "2026-04-02T13:36:28.388Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/a6/a69506bfe4ed9140cf88b30f6b6a54991c11061387e5d99417bfc08eaa68/cosmic_ray-8.9.0-py3-none-any.whl", hash = "sha256:3a37732939e1119e459c7b21f7ff6b62d0d1d0ff18ef2b9ea1e3e90e7e7829c6", size = 62823, upload-time = "2026-11-10T17:39:24.998Z" },
 ]
 
 [[package]]
