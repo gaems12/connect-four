@@ -194,7 +194,7 @@ requires-dist = [
     { name = "faststream", extras = ["nats", "cli"], specifier = "==0.6.*" },
     { name = "httpx", specifier = "==0.28.*" },
     { name = "mypy", marker = "extra == 'dev'", specifier = "==1.19.*" },
-    { name = "nats-py", specifier = "==2.14.*" },
+    { name = "nats-py", specifier = "==2.17.*" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = "==4.6.*" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==9.1.*" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = "==1.4.*" },
@@ -623,11 +623,11 @@ wheels = [
 
 [[package]]
 name = "nats-py"
-version = "2.14.0"
+version = "2.17.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c3/f8/b956c4621ba88748ed707c52e69f95b7a50c8914e750edca59a5bef84a76/nats_py-2.14.0.tar.gz", hash = "sha256:4ed02cb8e3b55c68074a063aa2687087115d805d1513297da90cb2068fb07bed", size = 120751, upload-time = "2026-02-23T22:44:58.988Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ad/81/bb848a2b1a78e65be0a1127c6b3554fb3dffd9106111a21f7a466ef032a6/nats_py-2.17.0.tar.gz", hash = "sha256:d231b0915567777e283b3553dbe6b35df450c9ffaba65c8a6ca11e6a622bcc07", size = 83960, upload-time = "2026-11-17T14:09:21.97Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/39/0e87753df1072254bac190b33ed34b264f28f6aa9bea0f01b7e818071756/nats_py-2.14.0-py3-none-any.whl", hash = "sha256:4116f5d2233ce16e63c3d5538fa40a5e207f75fcf42a741773929ddf1e29d19d", size = 82259, upload-time = "2026-02-23T22:45:00.152Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/5a/dbc821dce27cf8f322f36fc99ad2b5c61d37f0b6a96604077aae892ccffb/nats_py-2.17.0-py3-none-any.whl", hash = "sha256:fc7d01f68957462220d6bdce310cad1707eeb5fbd369903d84217b18ea341c0e", size = 97786, upload-time = "2026-11-17T14:09:20.486Z" },
 ]
 
 [[package]]
