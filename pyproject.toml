@@ -13,7 +13,7 @@ dependencies = [
     "python-json-logger==4.0.*",
     "redis==7.4.*",
     "nats-py==2.14.*",
-    "httpx==0.28.*",
+    "httpx==0.29.*",
     "dishka==1.8.*",
     "dishka-cyclopts==1.0.*",
     "adaptix==3.0.0b11",
